@@ -170,7 +170,7 @@ body {
 /* --- extended styles for full rebuild --- */
 :root{
   --person:#E8A23D; --project:#6C7BC4; --event:#C1503A; --goal:#4FA694; --habit:#7C93A6; --task:#C7935A;
-  --movie:#D4785C; --show:#8B7FD4; --book:#5FA8D3; --game:#C79FE0; --leisure:#9BBF6E;
+  --movie:#D4785C; --show:#8B7FD4; --book:#5FA8D3; --game:#C79FE0; --leisure:#9BBF6E; --order:#7FB07F;
 }
 .tabs{display:flex;border-bottom:1px solid var(--line);padding:0 12px;flex-wrap:nowrap;overflow-x:auto;flex-shrink:0;}
 .tab{padding:12px 14px;color:var(--muted);cursor:pointer;font-size:0.85rem;border-bottom:2px solid transparent;white-space:nowrap;}
@@ -220,8 +220,12 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .move-btn:hover{color:var(--text);}
 .move-btn.disabled{opacity:0.2;cursor:default;pointer-events:none;}
 
-.drag-wrap{cursor:grab;transition:transform .1s;}
-.drag-wrap:active{cursor:grabbing;}
+.drag-wrap{display:flex;align-items:stretch;gap:6px;}
+.drag-content{flex:1;min-width:0;user-select:none;}
+.drag-content input, .drag-content textarea{user-select:text;}
+.drag-handle{flex-shrink:0;width:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:1.3rem;cursor:grab;touch-action:none;user-select:none;background:var(--card);border:1px solid var(--line);border-radius:8px;}
+.drag-handle:active{background:var(--bg);color:var(--text);}
+.drag-wrap.dragging{opacity:0.5;}
 .drag-wrap.drag-over{outline:2px dashed var(--project, #6C7BC4);outline-offset:2px;border-radius:10px;}
 .add-field-link{margin-right:2px;}
 
