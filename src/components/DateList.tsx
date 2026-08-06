@@ -1,0 +1,127 @@
+import { useEffect, useRef, useState } from "react";
+import { Entity, updateEntityField } from "../api";
+import EntityCard from "./EntityCard";
+
+function parseTimeMinutes(t?: string): number | null {
+  if (!t) return null;
+  const m = t.match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
+
+function timeOfDayTag(name: string): number | null {
+  const n = name.toLowerCase();
+  if (n.includes("(утро)")) return 6 * 60;
+  if (n.includes("(день)")) return 12 * 60;
+  if (n.includes("(вечер)")) return 18 * 60;
+  return null;
+}
+
+function effectiveKey(e: Entity): number {
+  const o = e.attributes?.order;
+  if (typeof o === "number") return o;
+  const t = parseTimeMinutes(e.attributes?.time);
+  if (t !== null) return t;
+  const tagged = timeOfDayTag(e.name);
+  if (tagged !== null) return tagged;
+  return 100000 + new Date(e.created_at).getTime() / 1e10;
+}
+
+export default function DateList({ items, selectedDate, onChanged }: { items: Entity[]; selectedDate: string; onChanged: () => void }) {
+  const sorted = [...items].sort((a, b) => effectiveKey(a) - effectiveKey(b));
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+  const dragIdRef = useRef<string | null>(null);
+  const overIdRef = useRef<string | null>(null);
+  const sortedRef = useRef(sorted);
+  sortedRef.current = sorted;
+
+  function findRowUnder(clientX: number, clientY: number): string | null {
+    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
+    const row = el?.closest("[data-drag-id]") as HTMLElement | null;
+    return row?.dataset.dragId ?? null;
+  }
+
+  async function commitDrop(sourceId: string, targetId: string) {
+    const list = sortedRef.current;
+    if (!targetId || sourceId === targetId) return;
+    const fromIdx = list.findIndex(i => i.id === sourceId);
+    const toIdx = list.findIndex(i => i.id === targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const movingDown = toIdx > fromIdx;
+
+    const withoutDragged = list.filter(i => i.id !== sourceId);
+    const targetIdx = withoutDragged.findIndex(i => i.id === targetId);
+    let prev, next;
+    if (movingDown) {
+      // dropped while moving downward past the target -> land right after it
+      prev = withoutDragged[targetIdx];
+      next = withoutDragged[targetIdx + 1] ?? null;
+    } else {
+      // dropped while moving upward onto the target -> land right before it
+      prev = targetIdx > 0 ? withoutDragged[targetIdx - 1] : null;
+      next = withoutDragged[targetIdx];
+    }
+    const prevKey = prev ? effectiveKey(prev) : (next ? effectiveKey(next) - 20 : 0);
+    const nextKey = next ? effectiveKey(next) : prevKey + 20;
+    const newKey = (prevKey + nextKey) / 2;
+
+    await updateEntityField(sourceId, "order", newKey);
+    onChanged();
+  }
+
+  useEffect(() => {
+    if (!dragId) return;
+
+    function handleMove(ev: PointerEvent) {
+      ev.preventDefault();
+      const under = findRowUnder(ev.clientX, ev.clientY);
+      const next = under && under !== dragIdRef.current ? under : null;
+      overIdRef.current = next;
+      setOverId(next);
+    }
+    function handleUp() {
+      const source = dragIdRef.current;
+      const target = overIdRef.current;
+      dragIdRef.current = null;
+      overIdRef.current = null;
+      setDragId(null);
+      setOverId(null);
+      if (source && target) commitDrop(source, target);
+    }
+
+    window.addEventListener("pointermove", handleMove, { passive: false });
+    window.addEventListener("pointerup", handleUp);
+    window.addEventListener("pointercancel", handleUp);
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+      window.removeEventListener("pointercancel", handleUp);
+    };
+  }, [dragId]);
+
+  function startDrag(id: string, ev: React.PointerEvent) {
+    ev.preventDefault();
+    dragIdRef.current = id;
+    setDragId(id);
+  }
+
+  return (
+    <>
+      {dragId && (
+        <div style={{position:"fixed", top:8, left:8, right:8, zIndex:50, background:"#C1503A", color:"#fff", padding:"8px 12px", borderRadius:8, fontSize:"0.75rem", fontFamily:"monospace"}}>
+          drag: {sorted.find(i=>i.id===dragId)?.name || dragId} → over: {overId ? (sorted.find(i=>i.id===overId)?.name || overId) : "(нет цели)"}
+        </div>
+      )}
+      {sorted.map(item => (
+        <div key={item.id} data-drag-id={item.id}
+          className={`drag-wrap ${overId === item.id ? "drag-over" : ""} ${dragId === item.id ? "dragging" : ""}`}>
+          <div className="drag-handle" onPointerDown={(ev) => startDrag(item.id, ev)}>⠿</div>
+          <div className="drag-content">
+            <EntityCard e={item} onChanged={onChanged} selectedDate={selectedDate} />
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
