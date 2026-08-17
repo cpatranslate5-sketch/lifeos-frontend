@@ -15,14 +15,14 @@ function proximityLabel(days: number): string {
   return `через ${days} ${word}`;
 }
 
-export default function DatesTab({ items, onChanged }: { items: Entity[]; onChanged: () => void }) {
+export default function DatesTab({ items, onChanged, profile }: { items: Entity[]; onChanged: () => void; profile: string }) {
   const [name, setName] = useState("");
   const [dateVal, setDateVal] = useState("");
 
   async function submit() {
     if (!name.trim() || !dateVal) return;
     const [, m, d] = dateVal.split("-").map(Number); // yyyy-mm-dd input, year ignored
-    await createEntity("anniversary", name.trim(), { month: m, day: d }, "life");
+    await createEntity("anniversary", name.trim(), { month: m, day: d }, "life", profile);
     setName(""); setDateVal("");
     onChanged();
   }

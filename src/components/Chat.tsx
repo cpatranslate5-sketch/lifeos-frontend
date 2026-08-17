@@ -2,18 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import { Message, fetchMessages, sendMessage, downloadExport } from "../api";
 import { todayStr } from "../dateUtils";
 
-export default function Chat({ onDataChanged, space }: { onDataChanged: () => void; space: string }) {
+export default function Chat({ onDataChanged, space, profile }: { onDataChanged: () => void; space: string; profile: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const conversationId = `${profile}:${space}`;
 
   useEffect(() => {
     setLoading(true);
-    fetchMessages(space).then(setMessages).catch(e => setError(e.message)).finally(() => setLoading(false));
-  }, [space]);
+    fetchMessages(conversationId).then(setMessages).catch(e => setError(e.message)).finally(() => setLoading(false));
+  }, [conversationId]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, sending]);
 
@@ -22,7 +23,7 @@ export default function Chat({ onDataChanged, space }: { onDataChanged: () => vo
     if (!content || sending) return;
     setSending(true); setError(null);
     try {
-      const newMsgs = await sendMessage(content, todayStr(), space, space);
+      const newMsgs = await sendMessage(content, todayStr(), conversationId, space, profile);
       setMessages(prev => [...prev, ...newMsgs]);
       setInput("");
       onDataChanged();

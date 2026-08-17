@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createEntity } from "../api";
 
-export default function QuickTaskAdd({ date, onAdded, space }: { date: string; onAdded: () => void; space: string }) {
+export default function QuickTaskAdd({ date, onAdded, space, profile }: { date: string; onAdded: () => void; space: string; profile: string }) {
   const [val, setVal] = useState("");
   const [time, setTime] = useState("");
 
@@ -9,7 +9,7 @@ export default function QuickTaskAdd({ date, onAdded, space }: { date: string; o
     if (!val.trim()) return;
     const attrs: Record<string, any> = { date };
     if (time) attrs.time = time;
-    await createEntity("task", val.trim(), attrs, space);
+    await createEntity("task", val.trim(), attrs, space, profile);
     setVal(""); setTime("");
     onAdded();
   }

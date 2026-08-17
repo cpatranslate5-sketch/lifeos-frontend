@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { getReflection, downloadExport } from "../api";
 import { TYPES } from "../types";
 
-export default function Reflection() {
+export default function Reflection({ profile }: { profile: string }) {
   const [data, setData] = useState<{ activity_by_type: Record<string, number>; stalled: string[] } | null>(null);
 
-  useEffect(() => { getReflection().then(setData); }, []);
+  useEffect(() => { getReflection(profile).then(setData); }, [profile]);
 
   return (
     <div className="view">

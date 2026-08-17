@@ -10,6 +10,7 @@ interface Props {
   onChanged: () => void;
   extraAttrs?: Record<string, any>;
   space?: string;
+  profile: string;
 }
 
 function sortKey(e: Entity): number {
@@ -18,12 +19,12 @@ function sortKey(e: Entity): number {
   return 1;
 }
 
-export default function ShelfTab({ title, placeholder, type, items, onChanged, extraAttrs, space }: Props) {
+export default function ShelfTab({ title, placeholder, type, items, onChanged, extraAttrs, space, profile }: Props) {
   const [val, setVal] = useState("");
 
   async function submit() {
     if (!val.trim()) return;
-    await createEntity(type, val.trim(), extraAttrs || {}, space || "life");
+    await createEntity(type, val.trim(), extraAttrs || {}, space || "life", profile);
     setVal("");
     onChanged();
   }

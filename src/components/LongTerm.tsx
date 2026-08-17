@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Entity, createEntity } from "../api";
 import EntityCard from "./EntityCard";
 
-export default function LongTerm({ items, space, onChanged }: { items: Entity[]; space: string; onChanged: () => void }) {
+export default function LongTerm({ items, space, profile, onChanged }: { items: Entity[]; space: string; profile: string; onChanged: () => void }) {
   const [val, setVal] = useState("");
 
   async function submit() {
     if (!val.trim()) return;
-    await createEntity("project", val.trim(), {}, space);
+    await createEntity("project", val.trim(), {}, space, profile);
     setVal("");
     onChanged();
   }

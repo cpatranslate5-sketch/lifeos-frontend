@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Lifephase, setLifephase } from "../api";
 
-export default function LifephaseModal({ current, onClose, onSaved }: { current: Lifephase | null; onClose: () => void; onSaved: () => void }) {
+export default function LifephaseModal({ current, onClose, onSaved, profile }: { current: Lifephase | null; onClose: () => void; onSaved: () => void; profile: string }) {
   const [focus, setFocus] = useState(current?.focus || "");
   const [priorities, setPriorities] = useState((current?.priorities || []).join("\n"));
   const [constraints, setConstraints] = useState((current?.constraints || []).join("\n"));
@@ -11,7 +11,7 @@ export default function LifephaseModal({ current, onClose, onSaved }: { current:
       focus,
       priorities: priorities.split("\n").filter(Boolean),
       constraints: constraints.split("\n").filter(Boolean),
-    });
+    }, profile);
     onSaved();
     onClose();
   }
