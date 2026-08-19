@@ -264,3 +264,5 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .suggestion-refresh{cursor:pointer;font-size:0.9rem;opacity:0.7;padding:2px 4px;}
 .suggestion-refresh:hover{opacity:1;}
 .diary-date-label{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);margin:14px 2px 4px;font-weight:600;}
+.diary-entry-text{font-size:0.9rem;cursor:text;border-radius:6px;padding:2px 4px;margin:-2px -4px 4px;}
+.diary-entry-text:hover{background:var(--bg);}
