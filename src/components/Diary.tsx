@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { DiaryEntry, fetchDiaryEntries, createDiaryEntry, addPhotosToDiaryEntry, deleteDiaryEntry, diaryPhotoUrl } from "../api";
+import { DiaryEntry, fetchDiaryEntries, createDiaryEntry, addPhotosToDiaryEntry, deleteDiaryEntry, diaryPhotoUrl, importDiaryExcel } from "../api";
 import { todayStr, addDaysStr } from "../dateUtils";
 
 const PEOPLE: [string, string][] = [["nemalenkiy", "НеМаленький"], ["kotyonok", "Котёнок"]];
@@ -26,6 +26,36 @@ function AddPhotoButton({ entryId, onAdded }: { entryId: string; onAdded: () => 
         onChange={e => handleChange(e.target.files)} />
       <span className="why" onClick={() => inputRef.current?.click()}>
         {busy ? "загружаю…" : "+ добавить фото"}
+      </span>
+    </>
+  );
+}
+
+function ImportButton({ onDone }: { onDone: () => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function handleChange(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setBusy(true);
+    try {
+      const res = await importDiaryExcel(files[0]);
+      alert(`Импорт завершён: добавлено ${res.created}, пропущено дублей ${res.skipped_duplicates}.`);
+      await onDone();
+    } catch (e: any) {
+      alert(`Не получилось импортировать: ${e.message}`);
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <>
+      <input ref={inputRef} type="file" accept=".xlsx" style={{ display: "none" }}
+        onChange={e => handleChange(e.target.files)} />
+      <span className="edit-link" onClick={() => inputRef.current?.click()}>
+        {busy ? "импортирую…" : "импорт из Excel"}
       </span>
     </>
   );
@@ -84,7 +114,10 @@ export default function Diary({ onSwitchFolder }: { onSwitchFolder: () => void }
     <div className="app">
       <div className="folder-bar">
         <span>PD</span>
-        <span className="why" onClick={onSwitchFolder}>сменить папку</span>
+        <div style={{ display: "flex", gap: 14 }}>
+          <ImportButton onDone={load} />
+          <span className="why" onClick={onSwitchFolder}>сменить папку</span>
+        </div>
       </div>
       <div className="space-switch">
         {PEOPLE.map(([k, label]) => (
