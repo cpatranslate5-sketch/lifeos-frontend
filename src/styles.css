@@ -277,3 +277,25 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .media-filter-option{display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;padding:2px 0;}
 .media-filter-option:hover{color:var(--text);}
 .media-filter-clear{font-size:0.72rem;color:var(--event);cursor:pointer;margin-top:6px;padding-top:6px;border-top:1px solid var(--line);}
+/* Explicit override — checkboxes inside genre/filter lists were inheriting
+   a global "input{width:100%}"-style rule from elsewhere, stretching them
+   and pushing the label text far to the right. Reset them back to normal. */
+.genre-option, .media-filter-option {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+.genre-option input[type="checkbox"], .media-filter-option input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 16px !important;
+  margin: 0 !important;
+  accent-color: var(--project);
+}
+.genre-option span, .media-filter-option span,
+.genre-picker label, .media-filter-dropdown label {
+  flex: 1 1 auto;
+  text-align: left;
+}
