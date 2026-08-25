@@ -18,12 +18,16 @@ function sortKey(e: Entity): number {
   return 1;
 }
 
+function toggleInList(list: string[], val: string): string[] {
+  return list.includes(val) ? list.filter(x => x !== val) : [...list, val];
+}
+
 export default function MediaTab({ title, placeholder, type, items, onChanged, profile }: Props) {
   const [val, setVal] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [genreFilter, setGenreFilter] = useState<string[]>([]);
-  const [geoFilter, setGeoFilter] = useState<string>("");
-  const [authorFilter, setAuthorFilter] = useState<string>("");
+  const [geoFilter, setGeoFilter] = useState<string[]>([]);
+  const [authorFilter, setAuthorFilter] = useState<string[]>([]);
   const [openDropdown, setOpenDropdown] = useState<"genre" | "geo" | "author" | null>(null);
 
   useEffect(() => {
@@ -40,10 +44,6 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
     onChanged();
   }
 
-  function toggleGenreFilter(g: string) {
-    setGenreFilter(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
-  }
-
   const authors = Array.from(new Set(items.map(e => e.attributes?.author || "Без автора"))).sort();
 
   const filtered = items.filter(e => {
@@ -52,16 +52,16 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
       const g: string[] = e.attributes?.genres || [];
       if (!genreFilter.some(f => g.includes(f))) return false;
     }
-    if (geoFilter && e.attributes?.geo !== geoFilter) return false;
-    if (authorFilter) {
+    if (geoFilter.length > 0 && !geoFilter.includes(e.attributes?.geo || "")) return false;
+    if (authorFilter.length > 0) {
       const a = e.attributes?.author || "Без автора";
-      if (a !== authorFilter) return false;
+      if (!authorFilter.includes(a)) return false;
     }
     return true;
   });
 
   const sorted = [...filtered].sort((a, b) => sortKey(a) - sortKey(b));
-  const anyFilterActive = !!searchTerm || genreFilter.length > 0 || !!geoFilter || !!authorFilter;
+  const anyFilterActive = !!searchTerm || genreFilter.length > 0 || geoFilter.length > 0 || authorFilter.length > 0;
 
   return (
     <div className="view">
@@ -86,7 +86,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
               <div className="media-filter-dropdown">
                 {genresFor(type).map(g => (
                   <label key={g} className="media-filter-option">
-                    <input type="checkbox" checked={genreFilter.includes(g)} onChange={() => toggleGenreFilter(g)} />
+                    <input type="checkbox" checked={genreFilter.includes(g)} onChange={() => setGenreFilter(toggleInList(genreFilter, g))} />
                     {g}
                   </label>
                 ))}
@@ -97,27 +97,28 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
         </div>
 
         <div style={{ position: "relative" }}>
-          <div className={`media-filter-btn ${geoFilter ? "active" : ""}`} onClick={() => setOpenDropdown(openDropdown === "geo" ? null : "geo")}>
-            Гео {geoFilter ? `(${geoFilter})` : ""}
+          <div className={`media-filter-btn ${geoFilter.length ? "active" : ""}`} onClick={() => setOpenDropdown(openDropdown === "geo" ? null : "geo")}>
+            Гео {geoFilter.length > 0 ? `(${geoFilter.length})` : ""}
           </div>
           {openDropdown === "geo" && (
             <>
               <div className="picker-overlay" onClick={() => setOpenDropdown(null)} />
               <div className="media-filter-dropdown">
                 {GEO_OPTIONS.map(g => (
-                  <div key={g} className="media-filter-option" onClick={() => { setGeoFilter(geoFilter === g ? "" : g); setOpenDropdown(null); }}>
-                    {geoFilter === g ? "✓ " : ""}{g}
-                  </div>
+                  <label key={g} className="media-filter-option">
+                    <input type="checkbox" checked={geoFilter.includes(g)} onChange={() => setGeoFilter(toggleInList(geoFilter, g))} />
+                    {g}
+                  </label>
                 ))}
-                {geoFilter && <div className="media-filter-clear" onClick={() => { setGeoFilter(""); setOpenDropdown(null); }}>сбросить</div>}
+                {geoFilter.length > 0 && <div className="media-filter-clear" onClick={() => setGeoFilter([])}>сбросить</div>}
               </div>
             </>
           )}
         </div>
 
         <div style={{ position: "relative" }}>
-          <div className={`media-filter-btn ${authorFilter ? "active" : ""}`} onClick={() => setOpenDropdown(openDropdown === "author" ? null : "author")}>
-            {authorLabelFor(type)} {authorFilter ? `(${authorFilter})` : ""}
+          <div className={`media-filter-btn ${authorFilter.length ? "active" : ""}`} onClick={() => setOpenDropdown(openDropdown === "author" ? null : "author")}>
+            {authorLabelFor(type)} {authorFilter.length > 0 ? `(${authorFilter.length})` : ""}
           </div>
           {openDropdown === "author" && (
             <>
@@ -125,18 +126,19 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
               <div className="media-filter-dropdown">
                 {authors.length === 0 && <div className="muted" style={{ fontSize: "0.75rem" }}>Пока нет записей.</div>}
                 {authors.map(a => (
-                  <div key={a} className="media-filter-option" onClick={() => { setAuthorFilter(authorFilter === a ? "" : a); setOpenDropdown(null); }}>
-                    {authorFilter === a ? "✓ " : ""}{a}
-                  </div>
+                  <label key={a} className="media-filter-option">
+                    <input type="checkbox" checked={authorFilter.includes(a)} onChange={() => setAuthorFilter(toggleInList(authorFilter, a))} />
+                    {a}
+                  </label>
                 ))}
-                {authorFilter && <div className="media-filter-clear" onClick={() => { setAuthorFilter(""); setOpenDropdown(null); }}>сбросить</div>}
+                {authorFilter.length > 0 && <div className="media-filter-clear" onClick={() => setAuthorFilter([])}>сбросить</div>}
               </div>
             </>
           )}
         </div>
 
         {anyFilterActive && (
-          <div className="media-filter-btn" onClick={() => { setSearchTerm(""); setGenreFilter([]); setGeoFilter(""); setAuthorFilter(""); }} style={{ color: "var(--event)" }}>
+          <div className="media-filter-btn" onClick={() => { setSearchTerm(""); setGenreFilter([]); setGeoFilter([]); setAuthorFilter([]); }} style={{ color: "var(--event)" }}>
             сбросить все
           </div>
         )}
