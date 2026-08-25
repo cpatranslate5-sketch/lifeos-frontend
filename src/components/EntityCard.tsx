@@ -171,8 +171,19 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep }:
 
       {isMedia && (
         <div className="media-criteria">
+          <div className="field media-criterion" onClick={() => !authorEditing && setAuthorEditing(true)}>
+            {authorEditing ? (
+              <>
+                <strong>{authorLabelFor(e.type)}:</strong>
+                <input autoFocus defaultValue={e.attributes?.author || ""} placeholder="Имя" onClick={(ev) => ev.stopPropagation()}
+                  onBlur={async (ev) => { await updateEntityField(e.id, "author", ev.target.value); setAuthorEditing(false); onChanged(); }}
+                  onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setAuthorEditing(false); }} />
+              </>
+            ) : <><strong>{authorLabelFor(e.type)}:</strong> {e.attributes?.author || "не указан"}</>}
+          </div>
+
           <div className="field media-criterion" style={{ position: "relative" }} onClick={() => setGenrePickerOpen(!genrePickerOpen)}>
-            Жанр: {(e.attributes?.genres || []).length > 0 ? (e.attributes.genres as string[]).join(", ") : "не указан"}
+            <strong>Жанр:</strong> {(e.attributes?.genres || []).length > 0 ? (e.attributes.genres as string[]).join(", ") : "не указан"}
             {genrePickerOpen && (
               <>
                 <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); setGenrePickerOpen(false); }} />
@@ -191,7 +202,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep }:
           <div className="field media-criterion" onClick={() => !geoEditing && setGeoEditing(true)}>
             {geoEditing ? (
               <>
-                Гео:
+                <strong>Гео:</strong>
                 <select autoFocus defaultValue={e.attributes?.geo || ""}
                   onChange={async (ev) => { await updateEntityField(e.id, "geo", ev.target.value); setGeoEditing(false); onChanged(); }}
                   onBlur={() => setGeoEditing(false)}
@@ -200,18 +211,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep }:
                   {GEO_OPTIONS.map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
               </>
-            ) : `Гео: ${e.attributes?.geo || "не указано"}`}
-          </div>
-
-          <div className="field media-criterion" onClick={() => !authorEditing && setAuthorEditing(true)}>
-            {authorEditing ? (
-              <>
-                {authorLabelFor(e.type)}:
-                <input autoFocus defaultValue={e.attributes?.author || ""} placeholder="Имя" onClick={(ev) => ev.stopPropagation()}
-                  onBlur={async (ev) => { await updateEntityField(e.id, "author", ev.target.value); setAuthorEditing(false); onChanged(); }}
-                  onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setAuthorEditing(false); }} />
-              </>
-            ) : `${authorLabelFor(e.type)}: ${e.attributes?.author || "не указан"}`}
+            ) : <><strong>Гео:</strong> {e.attributes?.geo || "не указано"}</>}
           </div>
         </div>
       )}
@@ -250,6 +250,15 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep }:
         <div className="trace">
           {trace.length === 0 ? "нет записей истории" :
             trace.map((t, i) => `${t.decision_trace?.action || t.field} — ${(t.decision_trace?.factors || []).join("; ")} (уверенность ${t.confidence})`).join("\n")}
+        </div>
+      )}
+      {isMedia && (
+        <div className="star-rating">
+          {[1, 2, 3, 4, 5].map(n => (
+            <span key={n} className="star" onClick={async () => { await updateEntityField(e.id, "rating", e.attributes?.rating === n ? null : n); onChanged(); }}>
+              {(e.attributes?.rating || 0) >= n ? "★" : "☆"}
+            </span>
+          ))}
         </div>
       )}
     </div>
