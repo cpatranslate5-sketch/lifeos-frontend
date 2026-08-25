@@ -302,3 +302,7 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .star-rating{display:flex;justify-content:flex-end;gap:2px;margin-top:6px;}
 .star{cursor:pointer;font-size:1rem;color:var(--muted);}
 .star:hover{color:var(--person);}
+.star-rating .star:nth-child(-n+5) { }
+.star{cursor:pointer;font-size:1rem;color:var(--muted) !important;}
+.star.filled{color:#D4AF37 !important;}
+.star:hover{color:#D4AF37 !important;}
