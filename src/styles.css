@@ -332,3 +332,15 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .page-btn.on{background:var(--project);border-color:var(--project);color:#14171F;font-weight:600;}
 .page-btn:hover{border-color:var(--project);}
 .suggestion-cover{width:40px;height:56px;object-fit:cover;border-radius:6px;flex-shrink:0;}
+.toast-host{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.toast{background:#14171F;color:#fff;padding:10px 20px;border-radius:20px;font-size:0.85rem;box-shadow:0 6px 20px rgba(0,0,0,0.4);animation:toast-in .15s ease-out;}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.rating-filter-row{display:flex;gap:3px;}
+.rating-star-btn{cursor:pointer;font-size:1rem;color:var(--muted);}
+.rating-star-btn.on{color:#D4AF37;}
+
+.criterion-link{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;}
+.criterion-link:hover{color:var(--project);}
+
+.pagination{margin-bottom:16px;}
