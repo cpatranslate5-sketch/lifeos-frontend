@@ -353,10 +353,10 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .side-decor-grid img{width:64px;height:92px;object-fit:cover;border-radius:8px;flex-shrink:0;opacity:1;}
 @media (max-width: 1200px){.side-decor-grid{display:none;}}
 .side-decor-grid{flex:none !important;display:grid !important;grid-template-columns:repeat(2, 64px);grid-auto-rows:92px;gap:8px;padding:16px 12px;height:100vh;align-content:start;overflow:hidden;}
-.side-decor-grid img{opacity:0.80;}
+.side-decor-grid img{opacity:0.85;}
 .side-decor-wrap{flex:none;width:136px;height:100vh;overflow:hidden;position:relative;}
 .side-decor-grid{flex:none !important;display:grid !important;grid-template-columns:repeat(2, 64px);grid-auto-rows:92px;gap:8px;padding:16px 12px;align-content:start;animation:side-decor-scroll 60s linear infinite;}
-.side-decor-grid img{opacity:0.8 !important;}
+.side-decor-grid img{opacity:0.85 !important;}
 @keyframes side-decor-scroll{
   from{transform:translateY(0);}
   to{transform:translateY(-50%);}
