@@ -348,3 +348,8 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .side-decor.left{left:0;background-position:left center;mask-image:linear-gradient(to right, black 60%, transparent 100%);}
 .side-decor.right{right:0;background-position:right center;mask-image:linear-gradient(to left, black 60%, transparent 100%);}
 @media (max-width: 1200px){.side-decor{display:none;}}
+.side-decor-grid{position:fixed;top:0;bottom:0;width:70px;display:flex;flex-direction:column;gap:8px;padding:16px 0;overflow:hidden;z-index:0;opacity:0.5;}
+.side-decor-grid img{width:70px;height:100px;object-fit:cover;border-radius:8px;flex-shrink:0;}
+.side-decor-grid.left{left:38px;mask-image:linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);}
+.side-decor-grid.right{right:38px;mask-image:linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);}
+@media (max-width: 1200px){.side-decor-grid{display:none;}}
