@@ -317,3 +317,9 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .status-chip{background:rgba(232,150,61,0.14) !important;border-color:rgba(232,150,61,0.4) !important;color:#E8963D !important;}
 .status-badge.new-season{border-color:rgba(232,150,61,0.35);color:#E8963D;}
 .status-badge.new-season.on{background:#E8963D;color:#14171F;border-color:#E8963D;}
+.card-with-cover{display:flex !important;gap:10px;align-items:flex-start;}
+.card-body{flex:1;min-width:0;}
+.cover-thumb{flex-shrink:0;width:64px;height:92px;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.cover-thumb img{width:100%;height:100%;object-fit:cover;}
+.cover-placeholder{font-size:1.4rem;opacity:0.5;}
+.cover-thumb:hover{border-color:var(--project);}
