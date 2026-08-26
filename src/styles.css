@@ -331,3 +331,4 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .page-btn{background:var(--card);border:1px solid var(--line);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:0.82rem;cursor:pointer;color:var(--muted);}
 .page-btn.on{background:var(--project);border-color:var(--project);color:#14171F;font-weight:600;}
 .page-btn:hover{border-color:var(--project);}
+.suggestion-cover{width:40px;height:56px;object-fit:cover;border-radius:6px;flex-shrink:0;}
