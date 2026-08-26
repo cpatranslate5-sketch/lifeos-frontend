@@ -324,3 +324,6 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .cover-placeholder{font-size:1.4rem;opacity:0.5;}
 .cover-thumb:hover{border-color:var(--project);}
 .cover-thumb:focus{outline:2px solid var(--project);outline-offset:1px;}
+.cover-thumb{position:relative;}
+.cover-pick-btn{position:absolute;bottom:2px;right:2px;background:rgba(20,23,31,0.75);border-radius:5px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;cursor:pointer;}
+.cover-pick-btn:hover{background:rgba(20,23,31,0.95);}
