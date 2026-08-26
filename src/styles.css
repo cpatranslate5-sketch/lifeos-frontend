@@ -323,3 +323,4 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .cover-thumb img{width:100%;height:100%;object-fit:cover;}
 .cover-placeholder{font-size:1.4rem;opacity:0.5;}
 .cover-thumb:hover{border-color:var(--project);}
+.cover-thumb:focus{outline:2px solid var(--project);outline-offset:1px;}
