@@ -22,6 +22,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep }:
   const [genrePickerOpen, setGenrePickerOpen] = useState(false);
   const [geoEditing, setGeoEditing] = useState(false);
   const [authorEditing, setAuthorEditing] = useState(false);
+  const [actorsEditing, setActorsEditing] = useState(false);
 
   useEffect(() => {
     if (!genrePickerOpen) return;
@@ -33,6 +34,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep }:
   const meta = TYPES[e.type] || { label: e.type, color: "var(--muted)", emoji: "•" };
   const isHabit = e.type === "habit";
   const isMedia = ["movie", "show", "book"].includes(e.type);
+  const isCast = ["movie", "show"].includes(e.type);
   const doneDates: string[] = e.attributes?.done_dates || [];
   const skippedDates: string[] = e.attributes?.skipped_dates || [];
   const isDoneToday = isHabit ? (selectedDate ? doneDates.includes(selectedDate) : false) : !!e.attributes?.done;
@@ -182,6 +184,24 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep }:
             ) : <><strong>{authorLabelFor(e.type)}:</strong> {e.attributes?.author || "не указан"}</>}
           </div>
 
+          {isCast && (
+            <div className="field media-criterion" onClick={() => !actorsEditing && setActorsEditing(true)}>
+              {actorsEditing ? (
+                <>
+                  <strong>Актёры:</strong>
+                  <input autoFocus defaultValue={(e.attributes?.actors || []).join(", ")} placeholder="Через запятую" onClick={(ev) => ev.stopPropagation()}
+                    onBlur={async (ev) => {
+                      const list = ev.target.value.split(",").map(s => s.trim()).filter(Boolean);
+                      await updateEntityField(e.id, "actors", list);
+                      setActorsEditing(false);
+                      onChanged();
+                    }}
+                    onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setActorsEditing(false); }} />
+                </>
+              ) : <><strong>Актёры:</strong> {(e.attributes?.actors || []).length > 0 ? (e.attributes.actors as string[]).join(", ") : "не указаны"}</>}
+            </div>
+          )}
+
           <div className="field media-criterion" style={{ position: "relative" }} onClick={() => setGenrePickerOpen(!genrePickerOpen)}>
             <strong>Жанр:</strong> {(e.attributes?.genres || []).length > 0 ? (e.attributes.genres as string[]).join(", ") : "не указан"}
             {genrePickerOpen && (
@@ -254,7 +274,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep }:
       )}
       {isMedia && (
         <div className="star-rating">
-          {[1, 2, 3, 4, 5].map(n => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
             <span key={n} className={`star ${(e.attributes?.rating || 0) >= n ? "filled" : ""}`}
               onClick={async () => { await updateEntityField(e.id, "rating", e.attributes?.rating === n ? null : n); onChanged(); }}>
               {(e.attributes?.rating || 0) >= n ? "★" : "☆"}
