@@ -364,3 +364,5 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 @media (max-width: 1200px){.side-decor-wrap{display:none;}}
 
 .side-decor-grid{height:auto !important;overflow:visible !important;}
+.side-decor-wrap{width:160px !important;}
+.side-decor-grid{animation-duration:25s !important;}
