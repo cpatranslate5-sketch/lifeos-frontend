@@ -315,3 +315,5 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .status-chip input[type="checkbox"]{width:13px !important;height:13px !important;flex:0 0 13px !important;margin:0 !important;}
 .status-chip.on{background:#E8963D !important;border-color:#E8963D !important;color:#14171F !important;font-weight:700 !important;}
 .status-chip{background:rgba(232,150,61,0.14) !important;border-color:rgba(232,150,61,0.4) !important;color:#E8963D !important;}
+.status-badge.new-season{border-color:rgba(232,150,61,0.35);color:#E8963D;}
+.status-badge.new-season.on{background:#E8963D;color:#14171F;border-color:#E8963D;}
