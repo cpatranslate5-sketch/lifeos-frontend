@@ -344,3 +344,7 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .criterion-link:hover{color:var(--project);}
 
 .pagination{margin-bottom:16px;}
+.side-decor{position:fixed;top:0;bottom:0;width:180px;background-size:auto 100%;background-repeat:no-repeat;opacity:0.35;z-index:0;pointer-events:none;filter:blur(0.5px);}
+.side-decor.left{left:0;background-position:left center;mask-image:linear-gradient(to right, black 60%, transparent 100%);}
+.side-decor.right{right:0;background-position:right center;mask-image:linear-gradient(to left, black 60%, transparent 100%);}
+@media (max-width: 1200px){.side-decor{display:none;}}
