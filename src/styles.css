@@ -314,3 +314,4 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .status-chip{display:inline-flex !important;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:5px 12px;width:auto !important;color:var(--muted);transition:background .12s,color .12s,border-color .12s;}
 .status-chip input[type="checkbox"]{width:13px !important;height:13px !important;flex:0 0 13px !important;margin:0 !important;}
 .status-chip.on{background:var(--movie);border-color:var(--movie);color:#14171F;font-weight:600;}
+.status-chip.on{background:#E8963D !important;border-color:#E8963D !important;color:#14171F !important;font-weight:700 !important;}
