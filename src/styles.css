@@ -308,3 +308,6 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .star:hover{color:#D4AF37 !important;}
 .genre-chip{display:inline-flex !important;align-items:center;gap:5px;font-size:0.76rem;cursor:pointer;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:4px 10px;width:auto !important;}
 .genre-chip input[type="checkbox"]{width:13px !important;height:13px !important;flex:0 0 13px !important;margin:0 !important;}
+.media-filter-dropdown, .genre-picker {
+  overscroll-behavior: contain;
+}
