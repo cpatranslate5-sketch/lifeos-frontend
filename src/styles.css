@@ -366,3 +366,4 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .side-decor-grid{height:auto !important;overflow:visible !important;}
 .side-decor-wrap{width:160px !important;}
 .side-decor-grid{animation-duration:25s !important;}
+.countdown-widget{background:linear-gradient(135deg, rgba(108,123,196,0.16), rgba(232,150,61,0.10));border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;}
