@@ -415,3 +415,25 @@ button:active, .page-btn:active, .status-chip:active, .genre-chip:active {
 .card{position:relative;}
 .bg-scope-modal button{display:block;width:100%;margin-bottom:8px;}
 .bg-scope-modal button:last-child{margin-bottom:0;}
+/* Убираем старую сплошную панель под весь текст — теперь у каждого поля своя заливка */
+.card-text-panel, .has-bg-fields { background: none; padding: 0; }
+
+.has-bg-fields .card-title-text,
+.has-bg-fields .field,
+.has-bg-fields .media-criterion {
+  display: inline-block;
+  background: rgba(255,255,255,0.82);
+  color: #14171F;
+  padding: 3px 10px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+.has-bg-fields .card-title-input {
+  background: rgba(255,255,255,0.9);
+  color: #14171F;
+}
+.has-bg-fields strong { color: #14171F; }
+
+.card.paste-mode {
+  box-shadow: 0 0 0 2px #4A7DFF, 0 6px 18px rgba(0,0,0,0.22);
+}
