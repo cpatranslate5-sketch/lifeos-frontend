@@ -463,3 +463,14 @@ button:active, .page-btn:active, .status-chip:active, .genre-chip:active {
 .has-bg-fields strong { color: #14171F !important; }
 
 .link-accent { color: var(--card-accent, inherit); }
+.has-bg-fields .card-title-text,
+.has-bg-fields .field,
+.has-bg-fields .media-criterion {
+  background: rgba(255,255,255,0.6) !important;
+}
+
+.card.paste-mode {
+  outline: 2px solid var(--project) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
