@@ -409,3 +409,9 @@ button:active, .page-btn:active, .status-chip:active, .genre-chip:active {
 }
 
 /* Основной акцентный жирный шрифт заголовков остаётся Fraunces (не трогаем) */
+.card-text-panel{background:rgba(20,23,31,0.72);border-radius:10px;padding:10px 12px;backdrop-filter:blur(2px);}
+.card-bg-clear{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:rgba(20,23,31,0.6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;line-height:1;cursor:pointer;z-index:5;opacity:0.55;}
+.card-bg-clear:hover{opacity:1;background:rgba(20,23,31,0.85);}
+.card{position:relative;}
+.bg-scope-modal button{display:block;width:100%;margin-bottom:8px;}
+.bg-scope-modal button:last-child{margin-bottom:0;}
