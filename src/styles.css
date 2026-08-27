@@ -437,3 +437,29 @@ button:active, .page-btn:active, .status-chip:active, .genre-chip:active {
 .card.paste-mode {
   box-shadow: 0 0 0 2px #4A7DFF, 0 6px 18px rgba(0,0,0,0.22);
 }
+/* Перекрываем предыдущую версию заливки полей — inline-block вызывал
+   "наезды" при разной высоте соседних блоков (особенно там, где внутри
+   поля есть <input>). display:block + width:fit-content держит каждую
+   плашку на своей строке ровно по ширине содержимого, без сдвигов. */
+.has-bg-fields .card-title-text,
+.has-bg-fields .field,
+.has-bg-fields .media-criterion {
+  display: block !important;
+  width: fit-content;
+  background: rgba(255,255,255,0.4) !important;
+  color: #14171F !important;
+  padding: 3px 10px !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+  box-sizing: border-box;
+}
+.has-bg-fields .field input,
+.has-bg-fields .field select {
+  background: transparent !important;
+  border: none !important;
+  color: #14171F !important;
+  padding: 0 !important;
+}
+.has-bg-fields strong { color: #14171F !important; }
+
+.link-accent { color: var(--card-accent, inherit); }
