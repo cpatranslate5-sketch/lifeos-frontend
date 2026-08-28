@@ -454,3 +454,9 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .card-middle.layout-even{justify-content:space-evenly;}
 .card-middle.layout-sequential{justify-content:flex-start;gap:10px;}
 .card-middle.layout-compact{justify-content:flex-start;gap:5px;padding:3px 0;}
+/* Задачи: чуть больше отступ перед нижними кнопками */
+.layout-sequential + .card-bottom{margin-top:8px !important;}
+
+/* Кино/Сериалы/Книги/Игры: своя раскладка — тот же межстрочный отступ,
+   но расстояние от названия до первой кнопки уменьшено примерно в 1,5 раза */
+.card-middle.layout-media{justify-content:flex-start;gap:10px;margin-top:-4px;}
