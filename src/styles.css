@@ -437,3 +437,4 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .dot-small{position:relative;top:-1px;}
 .mini-calendar-day.today{background:#4A9EFF;color:#14171F;font-weight:700;}
 .mini-calendar-day.today:hover{background:#4A9EFF;}
+.dot-small{position:relative;top:-3px !important;}
