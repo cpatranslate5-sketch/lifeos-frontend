@@ -508,3 +508,6 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 /* P.S. Ручка перетаскивания — растягивается на всю высоту карточки и центрируется */
 .date-list-row{align-items:stretch !important;}
 .drag-handle{display:flex !important;align-items:center;justify-content:center;padding:0 4px;}
+.bell-notice{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;border-radius:8px;padding:6px 8px;margin-bottom:4px;transition:background .1s;}
+.bell-notice:hover{background:rgba(255,255,255,0.08);}
+.bell-notice-arrow{opacity:0.5;flex-shrink:0;}
