@@ -511,3 +511,9 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .bell-notice{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;border-radius:8px;padding:6px 8px;margin-bottom:4px;transition:background .1s;}
 .bell-notice:hover{background:rgba(255,255,255,0.08);}
 .bell-notice-arrow{opacity:0.5;flex-shrink:0;}
+/* Уведомления v2: синее подчёркнутое название (кликабельно), крестик удаления справа */
+.bell-notice{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;border-radius:8px;padding:6px 8px;margin-bottom:4px;font-size:0.82rem;}
+.bell-notice-link{color:#4A9EFF;text-decoration:underline;cursor:pointer;font-weight:600;}
+.bell-notice-suffix{color:var(--muted);flex:1;}
+.bell-notice-dismiss{cursor:pointer;color:var(--muted);opacity:0.6;flex-shrink:0;margin-left:auto;}
+.bell-notice-dismiss:hover{opacity:1;color:var(--event);}
