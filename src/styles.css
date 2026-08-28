@@ -421,3 +421,16 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 /* Фиксированная ширина для поля времени (макс. 5 символов, напр. 19:00) */
 .field-row{display:flex;gap:8px;margin-bottom:4px;}
 .fixed-time-field input{width:52px;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:2px 4px;font-size:0.82rem;}
+.in-process-badge.on{background:#FFD400 !important;color:#14171F !important;border-color:#FFD400 !important;font-weight:700;}
+.dot-small{font-size:0.6em;margin-right:4px;vertical-align:middle;}
+
+.time-badge.on{background:#7FC8F8 !important;color:#14171F !important;border-color:#7FC8F8 !important;font-weight:600;}
+.time-badge.editing input{background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:5px 10px;font-size:0.78rem;width:60px;text-align:center;}
+
+.mini-calendar{position:absolute;top:22px;left:0;z-index:20;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;width:220px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+.mini-calendar-header{display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;font-weight:600;margin-bottom:8px;}
+.mini-calendar-weekdays{display:grid;grid-template-columns:repeat(7,1fr);font-size:0.68rem;color:var(--muted);text-align:center;margin-bottom:4px;}
+.mini-calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.mini-calendar-day{text-align:center;font-size:0.76rem;padding:5px 0;border-radius:6px;cursor:pointer;}
+.mini-calendar-day:hover{background:var(--project);color:#14171F;}
+.mini-calendar-day.disabled{color:var(--muted);opacity:0.3;cursor:default;pointer-events:none;}
