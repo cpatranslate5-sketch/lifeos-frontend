@@ -409,3 +409,9 @@ button:active, .page-btn:active, .status-chip:active, .genre-chip:active {
 }
 
 /* Основной акцентный жирный шрифт заголовков остаётся Fraunces (не трогаем) */
+/* Лайт-режим: гасим все переходы/анимации сайта ради производительности
+   на слабом интернете (особенно актуально на мобильном). */
+body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
+  transition: none !important;
+  animation: none !important;
+}
