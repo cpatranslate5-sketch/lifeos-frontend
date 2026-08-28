@@ -438,3 +438,12 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .mini-calendar-day.today{background:#4A9EFF;color:#14171F;font-weight:700;}
 .mini-calendar-day.today:hover{background:#4A9EFF;}
 .dot-small{position:relative;top:-2px !important;}
+/* Чекбокс — отдельная колонка, центрированная по высоте всей карточки */
+.check-column{display:flex;align-items:center;flex-shrink:0;}
+
+/* card-body теперь колонка: заголовок сверху, всё остальное распределяется
+   равномерно посередине, действия закреплены снизу */
+.card-body-flex{display:flex !important;flex-direction:column;}
+.card-top-title{flex-shrink:0;}
+.card-middle{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;gap:6px;padding:6px 0;}
+.card-bottom{flex-shrink:0;display:flex;flex-direction:column;gap:6px;}
