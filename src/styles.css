@@ -459,4 +459,4 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 
 /* Кино/Сериалы/Книги/Игры: своя раскладка — тот же межстрочный отступ,
    но расстояние от названия до первой кнопки уменьшено примерно в 1,5 раза */
-.card-middle.layout-media{justify-content:flex-start;gap:10px;margin-top:-4px;}
+.card-middle.layout-media{justify-content:flex-start;gap:10px;margin-top:-6px;}
