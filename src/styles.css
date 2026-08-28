@@ -414,3 +414,4 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
   transition: none !important;
   animation: none !important;
 }
+.in-process-badge.on{background:#E8D93D !important;color:#14171F !important;border-color:#E8D93D !important;font-weight:600;}
