@@ -415,3 +415,9 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
   animation: none !important;
 }
 .in-process-badge.on{background:#E8D93D !important;color:#14171F !important;border-color:#E8D93D !important;font-weight:600;}
+/* Насыщенный жёлто-оранжевый для "В процессе" */
+.in-process-badge.on{background:#F2B705 !important;color:#14171F !important;border-color:#F2B705 !important;font-weight:700;}
+
+/* Фиксированная ширина для поля времени (макс. 5 символов, напр. 19:00) */
+.field-row{display:flex;gap:8px;margin-bottom:4px;}
+.fixed-time-field input{width:52px;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:2px 4px;font-size:0.82rem;}
