@@ -533,3 +533,6 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .order-arrow{cursor:pointer;color:var(--muted);font-size:0.7rem;line-height:1;padding:4px;}
 .order-arrow:hover{color:var(--text);}
 .order-arrow.disabled{opacity:0.25;cursor:default;pointer-events:none;}
+.tomorrow-preview{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:16px;}
+.tomorrow-preview-row{display:flex;gap:10px;align-items:baseline;font-size:0.85rem;padding:3px 0;}
+.tomorrow-preview-time{color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0;min-width:38px;}
