@@ -517,3 +517,13 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .bell-notice-suffix{color:var(--muted);flex:1;}
 .bell-notice-dismiss{cursor:pointer;color:var(--muted);opacity:0.6;flex-shrink:0;margin-left:auto;}
 .bell-notice-dismiss:hover{opacity:1;color:var(--event);}
+.bell-title{font-weight:700;color:#14171F;margin-bottom:8px;}
+
+/* Уведомления v3: один текстовый блок вместо нескольких flex-элементов —
+   переносится как обычный абзац, без "по одному слову в строке" */
+.bell-notice{display:flex;align-items:flex-start;gap:8px;border-radius:8px;padding:6px 8px;margin-bottom:4px;}
+.bell-notice-text{flex:1;min-width:0;font-size:0.82rem;line-height:1.4;color:var(--muted);}
+.bell-notice-link{color:#4A9EFF;text-decoration:underline;cursor:pointer;font-weight:600;}
+.bell-notice-nowrap{white-space:nowrap;}
+.bell-notice-dismiss{cursor:pointer;color:var(--muted);opacity:0.6;flex-shrink:0;}
+.bell-notice-dismiss:hover{opacity:1;color:var(--event);}
