@@ -447,3 +447,10 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .card-top-title{flex-shrink:0;}
 .card-middle{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;gap:6px;padding:6px 0;}
 .card-bottom{flex-shrink:0;display:flex;flex-direction:column;gap:6px;}
+/* Три варианта раскладки середины карточки:
+   - even: как было (равномерно растянуто по всей высоте) — События, Спорт
+   - sequential: последовательно сверху вниз с ровным отступом — Задачи
+   - compact: то же, но отступ примерно вдвое меньше — Досуг, Быт, и всегда для Кино/Сериалов/Книг/Игр */
+.card-middle.layout-even{justify-content:space-evenly;}
+.card-middle.layout-sequential{justify-content:flex-start;gap:10px;}
+.card-middle.layout-compact{justify-content:flex-start;gap:5px;padding:3px 0;}
