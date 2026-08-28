@@ -527,3 +527,9 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .bell-notice-nowrap{white-space:nowrap;}
 .bell-notice-dismiss{cursor:pointer;color:var(--muted);opacity:0.6;flex-shrink:0;}
 .bell-notice-dismiss:hover{opacity:1;color:var(--event);}
+/* Кнопки ручной сортировки вверх/вниз — заменяют ненадёжный drag-and-drop,
+   работают одинаково на компьютере и на телефоне */
+.order-handle{display:flex;flex-direction:column;justify-content:center;gap:4px;flex-shrink:0;padding:0 2px;}
+.order-arrow{cursor:pointer;color:var(--muted);font-size:0.7rem;line-height:1;padding:4px;}
+.order-arrow:hover{color:var(--text);}
+.order-arrow.disabled{opacity:0.25;cursor:default;pointer-events:none;}
