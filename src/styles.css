@@ -373,7 +373,6 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;margin:0 0 12px
 .side-decor-grid{animation-duration:25s !important;}
 .countdown-widget{background:linear-gradient(135deg, rgba(108,123,196,0.16), rgba(232,150,61,0.10));border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;}
 /* ===== Визуальное обновление: шрифт + "живые" кнопки ===== */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
 body, input, textarea, select, .why, .edit-link, .field, .tab, .space-btn, .status-chip, .genre-chip {
   font-family: 'Manrope', -apple-system, sans-serif;
