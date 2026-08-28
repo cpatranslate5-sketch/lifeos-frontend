@@ -460,3 +460,39 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 /* Кино/Сериалы/Книги/Игры: своя раскладка — тот же межстрочный отступ,
    но расстояние от названия до первой кнопки уменьшено примерно в 1,5 раза */
 .card-middle.layout-media{justify-content:flex-start;gap:10px;margin-top:-10px;}
+/* 1. Общее/Жизнь/Работа — простое подчёркивание, без "живых" эффектов кнопок */
+.space-btn, .space-btn:hover, .space-btn:active{
+  background:none !important;
+  box-shadow:none !important;
+  transform:none !important;
+  filter:none !important;
+  border:none !important;
+  border-bottom:2px solid transparent !important;
+  border-radius:0 !important;
+}
+.space-btn.on{
+  border-bottom:2px solid var(--project) !important;
+  color:var(--text) !important;
+}
+
+/* 3. Ручка для перетаскивания вместо драга по всей карточке (чинит выделение текста) */
+.date-list-row{display:flex;align-items:flex-start;gap:6px;}
+.drag-handle{cursor:grab;color:var(--muted);font-size:1rem;padding-top:8px;user-select:none;flex-shrink:0;}
+.drag-handle:active{cursor:grabbing;}
+
+/* 4. Нижние кнопки карточки (Удалить, Перенести и т.п.) — та же "пилюля",
+   что у Время/В процессе: светло-серый фон, скруглённые углы, чёрный текст
+   (кроме тех, что уже явно окрашены в красный через inline-стиль). */
+.card-bottom .why{
+  background:#E3E3E8 !important;
+  color:#14171F !important;
+  border-radius:14px;
+  padding:5px 12px;
+  text-decoration:none !important;
+  display:inline-block;
+}
+.card-bottom .why:hover{filter:brightness(0.95);}
+
+/* 6. Колокольчик уведомлений */
+.bell-badge{position:absolute;top:0;right:0;background:var(--event);color:#fff;font-size:0.6rem;font-weight:700;border-radius:50%;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.bell-dropdown{position:absolute;top:38px;right:0;z-index:30;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;width:260px;max-height:320px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.5);text-align:left;}
