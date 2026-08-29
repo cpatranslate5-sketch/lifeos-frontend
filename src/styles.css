@@ -561,3 +561,9 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .weather-city-name{color:var(--muted);}
 .weather-icon{font-size:1.1rem;}
 .weather-temp{font-weight:700;}
+/* Ряд из двух виджетов (Предложение дня + Обратный отсчёт) вместо друг под другом */
+.widget-row{display:flex;gap:12px;margin-bottom:16px;align-items:stretch;}
+.widget-row > *{flex:1;min-width:0;margin-bottom:0 !important;}
+
+/* Тикающий таймер чч:мм:сс для событий ближе недели */
+.countdown-live-timer{font-variant-numeric:tabular-nums;font-size:0.8rem;color:var(--muted);margin-top:2px;}
