@@ -731,3 +731,24 @@ button:hover,
   border-radius: 0 !important;
   padding: 8px 4px !important;
 }
+/* 2. "На главную" — светло-синим */
+.folder-home-link{color:#7FC8F8 !important;background:none !important;font-weight:600;text-decoration:none !important;}
+
+/* 3. Средняя надпись даты — та же "пилюля", что у соседних кнопок, но жирным */
+.date-nav-current{
+  background:#E3E3E8;
+  color:#14171F;
+  border-radius:14px;
+  padding:5px 12px;
+  font-weight:700;
+}
+
+/* 4. Кнопка "+" при добавлении — светло-синяя */
+.btn-add-plus{background:#7FC8F8 !important;color:#14171F !important;}
+.btn-add-plus:hover{filter:brightness(0.95);}
+
+/* 6. Удалить/Отменить/Пропустить — красный фон, чёрный текст (вместо серого фона с красным текстом) */
+.why.danger-action{
+  background:#E08A8A !important;
+  color:#14171F !important;
+}
