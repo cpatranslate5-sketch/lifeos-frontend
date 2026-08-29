@@ -774,3 +774,13 @@ button:hover,
   background:#E08A8A !important;
   color:#14171F !important;
 }
+/* Более светлый синий вместо #4E82EF */
+.folder-home-link{background:#A9C2F8 !important;}
+.btn-add-plus{background:#A9C2F8 !important;}
+
+/* Перебиваем более старое (и более специфичное) правило .card-bottom .why.danger-action,
+   которое всё ещё красило текст в красный — используем тот же по силе селектор */
+.card-bottom .why.danger-action{
+  color:#14171F !important;
+  background:#E08A8A !important;
+}
