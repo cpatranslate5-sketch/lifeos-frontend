@@ -618,3 +618,28 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
   border-radius:8px;
   padding:4px 10px;
 }
+/* Финальные размеры — рассчитаны так, чтобы "365 дней" и "23:59:59" точно
+   помещались в одну строку даже при максимальных значениях. */
+.countdown-row{gap:8px !important;flex-wrap:nowrap !important;}
+.countdown-days{
+  border:1px solid var(--line) !important;
+  border-radius:8px !important;
+  padding:3px 8px !important;
+  font-size:0.9rem !important;
+  white-space:nowrap;
+}
+.digit-timer{margin-top:0 !important;gap:2px !important;}
+.digit-box{
+  width:19px !important;
+  height:27px !important;
+  font-size:0.95rem !important;
+  border-radius:4px !important;
+}
+.digit-sep{font-size:0.9rem !important;padding:0 !important;}
+
+.countdown-widget.countdown-centered .digit-timer{margin-top:8px !important;}
+.countdown-widget.countdown-centered .digit-box{
+  width:30px !important;
+  height:40px !important;
+  font-size:1.3rem !important;
+}
