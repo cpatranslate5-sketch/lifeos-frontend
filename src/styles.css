@@ -643,3 +643,30 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
   height:40px !important;
   font-size:1.3rem !important;
 }
+/* Countdown v3: верхняя треть — подпись по центру, нижние две трети — таймер
+   ДД:ЧЧ:ММ:СС с подписью под каждой парой цифр.
+   !important используется, т.к. в файле уже есть более ранние переопределения
+   размеров .digit-box из прошлых правок. */
+.countdown-widget{display:flex !important;flex-direction:column !important;min-height:150px;}
+.countdown-top{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;}
+.countdown-timer-row{flex:2;display:flex !important;align-items:flex-start;justify-content:center;gap:6px !important;flex-wrap:nowrap !important;}
+
+.countdown-unit{display:flex;flex-direction:column;align-items:center;}
+.countdown-unit-boxes{display:flex;gap:2px;}
+.countdown-unit-label{font-size:0.65rem;color:var(--muted);margin-top:4px;}
+.countdown-colon{align-self:flex-start;margin-top:8px !important;font-weight:700;color:var(--text);}
+
+.digit-box{
+  background:#fff !important;
+  color:#14171F !important;
+  font-weight:700 !important;
+  font-size:1.1rem !important;
+  font-variant-numeric:tabular-nums;
+  border-radius:5px !important;
+  width:22px !important;
+  height:30px !important;
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 4px rgba(0,0,0,0.2);
+}
