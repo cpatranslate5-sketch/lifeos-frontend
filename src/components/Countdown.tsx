@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Entity } from "../api";
-import { todayStr, daysUntilNext, addDaysStr } from "../dateUtils";
+import { todayStr, daysUntilNext, addDaysStr, moscowMidnightMs } from "../dateUtils";
 
 function toGenitive(name: string): string {
   if (/^день рождения/i.test(name)) {
@@ -55,7 +55,7 @@ export default function Countdown({ entities }: { entities: Entity[] }) {
   // Nearest by actual remaining time, then filter to the 99-day cap.
   const withDiff = candidates.map(c => ({
     ...c,
-    diffMs: new Date(c.targetDate + "T00:00:00").getTime() - now.getTime(),
+    diffMs: moscowMidnightMs(c.targetDate) - now.getTime(),
   })).filter(c => c.diffMs >= -999) // allow "today" (small negative jitter near midnight) but not stale past dates
     .sort((a, b) => a.diffMs - b.diffMs);
 

@@ -255,6 +255,9 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
 
       <div className={`card-middle layout-${effectiveLayout}`}>
       {e.attributes?.company && <div className="field">Компания: {e.attributes.company}</div>}
+      {e.type === "event" && e.attributes?.date && effectiveLayout !== "sequential" && (
+        <div className="field">Дата: {e.attributes.date}</div>
+      )}
 
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
         {!isHousehold && (isHabit || e.type === "event" || e.type === "task") && (
