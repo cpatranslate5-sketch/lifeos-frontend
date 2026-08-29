@@ -585,3 +585,27 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
   letter-spacing: 1px;
   text-shadow: 0 0 12px rgba(232,150,61,0.35);
 }
+.countdown-row{display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap;}
+.countdown-days{font-size:1rem;color:var(--text);}
+
+.digit-timer{display:flex;align-items:center;gap:2px;}
+.digit-box{
+  background:#fff;
+  color:#14171F;
+  font-weight:700;
+  font-size:1.1rem;
+  font-variant-numeric:tabular-nums;
+  border-radius:5px;
+  width:22px;
+  height:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 4px rgba(0,0,0,0.2);
+}
+.digit-sep{color:var(--text);font-weight:700;padding:0 1px;}
+
+/* Когда до события меньше суток — таймер один в центре карточки, крупнее */
+.countdown-widget.countdown-centered{display:flex;flex-direction:column;align-items:center;text-align:center;}
+.countdown-widget.countdown-centered .countdown-row{justify-content:center;}
+.countdown-widget.countdown-centered .digit-box{width:30px;height:40px;font-size:1.4rem;}
