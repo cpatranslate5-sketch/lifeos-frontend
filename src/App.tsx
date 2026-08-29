@@ -116,7 +116,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
   const [entities, setEntities] = useState<Entity[]>([]);
   const [selectedDate, setSelectedDate] = useState(todayStr());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">(() => (localStorage.getItem("lifeos_theme") as "dark" | "light") || "dark");
+  const [theme, setTheme] = useState<"dark" | "light">(() => (localStorage.getItem("lifeos_theme") as "dark" | "light") || "light");
   const [decorCovers, setDecorCovers] = useState<string[]>([]);
   const [notifTick, setNotifTick] = useState(0);
   const liteMode = useLiteMode();
@@ -324,6 +324,11 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
 export default function App() {
   const [hasToken, setHasToken] = useState(!!getToken());
   const [folder, setFolder] = useState<Folder | null>(null);
+
+  useEffect(() => {
+    const saved = (localStorage.getItem("lifeos_theme") as "dark" | "light") || "light";
+    document.body.classList.toggle("theme-light", saved === "light");
+  }, []);
 
   if (!hasToken) return <><TokenGate onReady={() => setHasToken(true)} /><ToastHost /></>;
 
