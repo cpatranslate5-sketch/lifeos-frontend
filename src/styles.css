@@ -670,3 +670,6 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
   justify-content:center;
   box-shadow:0 2px 4px rgba(0,0,0,0.2);
 }
+.countdown-widget{min-height:0 !important;}
+.countdown-top{padding:2px 0 !important;}
+.countdown-timer-row{padding-bottom:2px !important;}
