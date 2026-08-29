@@ -555,3 +555,9 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .weather-temp{font-weight:700;font-size:1.05rem;}
 .weather-label{color:var(--muted);}
 .weather-rain{margin-left:auto;color:#4A9EFF;font-size:0.8rem;}
+/* Погода v2: три фиксированных города в ряд, без гео-запроса */
+.weather-widget{display:flex;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:16px;flex-wrap:wrap;}
+.weather-city{display:flex;align-items:center;gap:6px;font-size:0.85rem;}
+.weather-city-name{color:var(--muted);}
+.weather-icon{font-size:1.1rem;}
+.weather-temp{font-weight:700;}
