@@ -752,3 +752,25 @@ button:hover,
   background:#E08A8A !important;
   color:#14171F !important;
 }
+/* 2. "На главную" — заливка синим #4E82EF, шрифт чёрный */
+.folder-home-link{
+  background:#4E82EF !important;
+  color:#14171F !important;
+  font-weight:600;
+}
+
+/* 3. Средняя надпись даты — тот же размер, что у соседних кнопок (наследует .why),
+   просто жирным поверх */
+.date-nav-current{
+  font-weight:700 !important;
+}
+
+/* 4. Кнопка "+" — заливка синим #4E82EF, шрифт чёрный (как договорились) */
+.btn-add-plus{background:#4E82EF !important;color:#14171F !important;}
+
+/* 6. Удалить/Отменить/Пропустить — фон красный, текст чёрный (гарантированно,
+   инлайн-цвет в коде тоже убран) */
+.why.danger-action{
+  background:#E08A8A !important;
+  color:#14171F !important;
+}
