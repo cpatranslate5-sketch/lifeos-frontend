@@ -567,3 +567,21 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 
 /* Тикающий таймер чч:мм:сс для событий ближе недели */
 .countdown-live-timer{font-variant-numeric:tabular-nums;font-size:0.8rem;color:var(--muted);margin-top:2px;}
+/* Убираем синий контур у "Предложения дня" — заменяем на нейтральную рамку,
+   как у остальных карточек */
+.suggestion-of-day{
+  border: 1px solid var(--line) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Таймер обратного отсчёта — крупнее и заметнее */
+.countdown-live-timer{
+  font-variant-numeric: tabular-nums;
+  font-size: 1.6rem !important;
+  font-weight: 700;
+  color: #E8963D;
+  margin-top: 6px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 12px rgba(232,150,61,0.35);
+}
