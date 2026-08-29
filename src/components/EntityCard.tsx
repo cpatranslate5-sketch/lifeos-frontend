@@ -29,7 +29,7 @@ interface Props {
 
 export default function EntityCard({ e, onChanged, selectedDate, showNextStep, profile, onFilterByCriterion, layout }: Props) {
   const liteMode = useLiteMode();
-  const [showTime, setShowTime] = useState(!!e.attributes?.time);
+  const [showTime, setShowTime] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [genrePickerOpen, setGenrePickerOpen] = useState(false);
   const [geoEditing, setGeoEditing] = useState(false);
