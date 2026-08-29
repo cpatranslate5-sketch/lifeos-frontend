@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Entity } from "../api";
-import { todayStr, daysUntilNext, addDaysStr, moscowMidnightMs } from "../dateUtils";
+import { todayStr, daysUntilNext, addDaysStr, moscowMidnightMs, moscowTimestampMs } from "../dateUtils";
 
 function toGenitive(name: string): string {
   if (/^день рождения/i.test(name)) {
@@ -33,7 +33,7 @@ export default function Countdown({ entities }: { entities: Entity[] }) {
   const today = todayStr();
   const [now, setNow] = useState(() => new Date());
 
-  const candidates: { name: string; targetDate: string }[] = [];
+  const candidates: { name: string; targetDate: string; targetTime?: string }[] = [];
 
   for (const e of entities) {
     if (e.type === "anniversary" && e.attributes?.month && e.attributes?.day) {
@@ -41,7 +41,7 @@ export default function Countdown({ entities }: { entities: Entity[] }) {
       candidates.push({ name: e.name, targetDate: addDaysStr(today, days) });
     }
     if (e.type === "event" && e.attributes?.date && e.attributes.date >= today) {
-      candidates.push({ name: e.name, targetDate: e.attributes.date });
+      candidates.push({ name: e.name, targetDate: e.attributes.date, targetTime: e.attributes.time });
     }
   }
 
@@ -55,8 +55,8 @@ export default function Countdown({ entities }: { entities: Entity[] }) {
   // Nearest by actual remaining time, then filter to the 99-day cap.
   const withDiff = candidates.map(c => ({
     ...c,
-    diffMs: moscowMidnightMs(c.targetDate) - now.getTime(),
-  })).filter(c => c.diffMs >= -999) // allow "today" (small negative jitter near midnight) but not stale past dates
+    diffMs: (c.targetTime ? moscowTimestampMs(c.targetDate, c.targetTime) : moscowMidnightMs(c.targetDate)) - now.getTime(),
+  })).filter(c => c.diffMs >= -999) // allow "today" (small negative jitter near the moment) but not stale past events
     .sort((a, b) => a.diffMs - b.diffMs);
 
   if (withDiff.length === 0) return null;
