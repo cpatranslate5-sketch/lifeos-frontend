@@ -785,3 +785,10 @@ button:hover,
   background:#E08A8A !important;
 }
 .folder-home-link, .btn-add-plus{font-weight:700 !important;}
+/* Возвращаем жёлтую подсветку "Смотрю/Читаю/Играю сейчас" — общее правило
+   для всех кнопок случайно перебило её, т.к. использовало !important */
+.status-badge.on{
+  background:#FFD400 !important;
+  color:#14171F !important;
+  font-weight:700;
+}
