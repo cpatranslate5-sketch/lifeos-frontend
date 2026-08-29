@@ -673,3 +673,61 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .countdown-widget{min-height:0 !important;}
 .countdown-top{padding:2px 0 !important;}
 .countdown-timer-row{padding-bottom:2px !important;}
+/* ===== Единая стилистика кнопок по всему сайту =====
+   Применяется к: настоящим <button>, ссылкам-действиям (.why, .edit-link),
+   бейджам-переключателям (.status-badge и его разновидности), фильтрам и
+   пагинации. НЕ применяется к: .space-btn (оставлен как отдельное
+   подчёркивание по вашей более ранней просьбе), маленьким иконкам
+   (theme-toggle, cover-pick-btn) — они не текстовые кнопки, а иконки. */
+button,
+.why,
+.edit-link,
+.status-badge,
+.media-filter-btn,
+.genre-chip,
+.page-btn {
+  background: #E3E3E8 !important;
+  color: #14171F !important;
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 5px 12px !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  display: inline-block;
+  transition: filter .1s ease;
+}
+button:hover,
+.why:hover,
+.edit-link:hover,
+.status-badge:hover,
+.media-filter-btn:hover,
+.genre-chip:hover,
+.page-btn:hover {
+  filter: brightness(0.95);
+}
+
+/* Особые условия — не трогаем: цветные "включено"-состояния */
+.status-badge.on,
+.status-chip.on,
+.time-badge.on,
+.in-process-badge.on,
+.genre-chip:has(input:checked),
+.page-btn.on,
+.space-btn.on {
+  filter: none !important;
+}
+
+/* Особые условия — не трогаем: красный текст опасных действий */
+.why.danger-action {
+  color: var(--event) !important;
+  background: #E3E3E8 !important;
+}
+
+/* Особые условия — не трогаем: подчёркивание Общее/Жизнь/Работа */
+.space-btn {
+  background: none !important;
+  color: inherit !important;
+  border-radius: 0 !important;
+  padding: 8px 4px !important;
+}
