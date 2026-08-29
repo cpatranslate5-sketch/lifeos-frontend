@@ -195,7 +195,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             <div className="card-title-text">{e.name}</div>
           </div>
           <div className="field">{e.attributes.day} {MONTHS_RU[e.attributes.month]}</div>
-          <div className="why danger-action" style={{ color: "var(--event)" }} onClick={handleDelete}>Удалить</div>
+          <div className="why danger-action" onClick={handleDelete}>Удалить</div>
         </div>
         {confirmState && (
           <div className="modal-bg" onClick={() => setConfirmState(null)}>
@@ -448,12 +448,12 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
           </div>
         )}
         {!["movie", "show", "book", "leisure", "game"].includes(e.type) && e.attributes?.status !== "skipped" && (
-          <div className="why danger-action" style={{ color: "var(--event)" }} onClick={skip}>{isHabit ? `Отменить на ${selectedDate}` : "Пропустить/отменить"}</div>
+          <div className="why danger-action" onClick={skip}>{isHabit ? `Отменить на ${selectedDate}` : "Пропустить/отменить"}</div>
         )}
         {profile && ["movie", "show", "book", "game", "leisure"].includes(e.type) && (
           <div className="why" onClick={copyToOtherFolder}>Скопировать в {profile === "kotyonok" ? "НеМаленький" : "Котёнок"}</div>
         )}
-        <div className="why danger-action" style={{ color: "var(--event)" }} onClick={handleDelete}>Удалить</div>
+        <div className="why danger-action" onClick={handleDelete}>Удалить</div>
         {hasRating && (
           <div className="star-rating" style={{ marginBottom: 0, marginLeft: "auto" }}>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
