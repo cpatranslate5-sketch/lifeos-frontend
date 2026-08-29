@@ -17,6 +17,19 @@ export function moscowMidnightMs(dateStr: string): number {
   return Date.UTC(y, m - 1, d, 0, 0, 0) - 3 * 3600000;
 }
 
+// Same idea, but for a specific "HH:MM" moment on that date (e.g. kickoff
+// time) rather than midnight — falls back to midnight if no time is given.
+export function moscowTimestampMs(dateStr: string, timeStr?: string): number {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  let h = 0, min = 0;
+  if (timeStr) {
+    const parts = timeStr.split(":").map(Number);
+    h = parts[0] || 0;
+    min = parts[1] || 0;
+  }
+  return Date.UTC(y, m - 1, d, h, min, 0) - 3 * 3600000;
+}
+
 export function addDaysStr(dateStr: string, days: number): string {
   const [y, m, d] = dateStr.split("-").map(Number);
   const dt = new Date(y, m - 1, d + days);
