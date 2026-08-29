@@ -1,6 +1,20 @@
+// "Сегодня" во всём приложении привязано к московскому времени (GMT+3),
+// а не к часовому поясу браузера — так дата не "гуляет" в зависимости от
+// того, где именно открыт сайт. Date.now() всегда абсолютный момент времени
+// (не зависит от локали), поэтому достаточно сдвинуть его на +3 часа и
+// читать через UTC-геттеры — так избегаем двойного сдвига через локальный
+// часовой пояс браузера.
 export function todayStr(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const d = new Date(Date.now() + 3 * 3600000);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+}
+
+// UTC-timestamp of 00:00 Moscow time (GMT+3) on the given date — used for
+// live countdowns so "midnight" always means Moscow midnight, regardless of
+// where the browser itself is physically located.
+export function moscowMidnightMs(dateStr: string): number {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return Date.UTC(y, m - 1, d, 0, 0, 0) - 3 * 3600000;
 }
 
 export function addDaysStr(dateStr: string, days: number): string {
