@@ -550,3 +550,8 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .tomorrow-preview-list{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
 .tomorrow-preview-row{display:flex;gap:10px;align-items:baseline;font-size:0.82rem;padding:3px 0;}
 .tomorrow-preview-time{color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0;min-width:38px;}
+.weather-widget{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:0.9rem;}
+.weather-icon{font-size:1.3rem;}
+.weather-temp{font-weight:700;font-size:1.05rem;}
+.weather-label{color:var(--muted);}
+.weather-rain{margin-left:auto;color:#4A9EFF;font-size:0.8rem;}
