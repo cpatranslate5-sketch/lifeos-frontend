@@ -609,3 +609,12 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .countdown-widget.countdown-centered{display:flex;flex-direction:column;align-items:center;text-align:center;}
 .countdown-widget.countdown-centered .countdown-row{justify-content:center;}
 .countdown-widget.countdown-centered .digit-box{width:30px;height:40px;font-size:1.4rem;}
+.digit-timer{margin-top:8px;}
+.digit-box{width:26px !important;height:36px !important;font-size:1.3rem !important;}
+.countdown-widget.countdown-centered .digit-box{width:36px !important;height:48px !important;font-size:1.6rem !important;}
+
+.countdown-days{
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:4px 10px;
+}
