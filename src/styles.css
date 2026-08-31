@@ -834,3 +834,7 @@ button:hover,
   max-height:280px !important;
   overflow-y:auto !important;
 }
+.media-filter-dropdown{
+  max-height:280px !important;
+  overflow-y:auto !important;
+}
