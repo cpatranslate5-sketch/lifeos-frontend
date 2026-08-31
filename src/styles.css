@@ -819,7 +819,27 @@ button:hover,
   padding:0 !important;
   line-height:1;
 }
-
+/* Собственный квадратик-чекбокс для фильтров вместо нативного —
+   полностью управляется напрямую из кода, не зависит от того,
+   как конкретный браузер рисует настоящие чекбоксы */
+.custom-checkbox{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:16px;
+  height:16px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  margin-right:8px;
+  flex-shrink:0;
+  font-size:0.7rem;
+  color:#fff;
+  vertical-align:middle;
+}
+.custom-checkbox.checked{
+  background:var(--project);
+  border-color:var(--project);
+}
 .edit-pencil{margin-left:6px;opacity:0.4;cursor:pointer;font-size:0.85rem;}
 .edit-pencil:hover{opacity:1;}
 
