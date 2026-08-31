@@ -19,6 +19,10 @@ function yearBucket(y: number): string {
 
 const YEAR_BUCKET_ORDER = ["1900-1949", "1950-1959", "1960-1969", "1970-1979", "1980-1989", "1990-1999", "2000-2009", "2010-2019", "2020-2029", "2030-2039"];
 
+function centuryBucket(y: number): string {
+  return `${Math.ceil(y / 100)}-й век`;
+}
+
 const LOOKALIKES: Record<string, string> = {
   a: "а", b: "в", c: "с", e: "е", h: "н", k: "к", m: "м", o: "о", p: "р", t: "т", x: "х", y: "у",
 };
@@ -249,6 +253,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   const [openDropdown, setOpenDropdown] = useState<"genre" | "geo" | "year" | "author" | "actor" | "rating" | "status" | null>(null);
   const [page, setPage] = useState(1);
   const isCast = type === "movie" || type === "show";
+  const isBook = type === "book";
   const [doneLabelDone, doneLabelNotDone] = DONE_LABEL[type] || ["Просмотрено", "Непросмотрено"];
 
   useEffect(() => { setPage(1); }, [searchTerm, genreFilter, geoFilter, yearFilter, authorFilter, actorFilter, ratingFilter, statusFilter]);
@@ -278,8 +283,13 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const presentBuckets = new Set(items.map(e => e.attributes?.year).filter(Boolean).map(y => yearBucket(Number(y))));
-  const years = YEAR_BUCKET_ORDER.filter(b => presentBuckets.has(b)).reverse();
+  const years = isBook
+    ? Array.from(new Set(items.map(e => e.attributes?.year).filter(Boolean).map(y => Math.ceil(Number(y) / 100))))
+        .sort((a, b) => b - a).map(c => `${c}-й век`)
+    : (() => {
+        const presentBuckets = new Set(items.map(e => e.attributes?.year).filter(Boolean).map(y => yearBucket(Number(y))));
+        return YEAR_BUCKET_ORDER.filter(b => presentBuckets.has(b)).reverse();
+      })();
 
   const authors = Array.from(new Set(items.flatMap(e => authorsOf(e)))).sort();
   const allActors = Array.from(new Set(items.flatMap(e => (e.attributes?.actors || []) as string[]))).sort();
@@ -291,7 +301,11 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
       if (!genreFilter.some(f => g.includes(f))) return false;
     }
     if (geoFilter.length > 0 && !geoFilter.includes(e.attributes?.geo || "")) return false;
-    if (yearFilter.length > 0 && (!e.attributes?.year || !yearFilter.includes(yearBucket(Number(e.attributes.year))))) return false;
+    if (yearFilter.length > 0) {
+      if (!e.attributes?.year) return false;
+      const bucketLabel = isBook ? centuryBucket(Number(e.attributes.year)) : yearBucket(Number(e.attributes.year));
+      if (!yearFilter.includes(bucketLabel)) return false;
+    }
     if (authorFilter.length > 0) {
       if (!authorFilter.some(f => authorsOf(e).includes(f))) return false;
     }
@@ -382,7 +396,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
 
         <div style={{ position: "relative" }}>
           <div className={`media-filter-btn ${yearFilter.length ? "active" : ""}`} onClick={() => setOpenDropdown(openDropdown === "year" ? null : "year")}>
-            Год {yearFilter.length > 0 ? `(${yearFilter.length})` : ""}
+            {isBook ? "Век" : "Год"} {yearFilter.length > 0 ? `(${yearFilter.length})` : ""}
           </div>
           {openDropdown === "year" && (
             <>
