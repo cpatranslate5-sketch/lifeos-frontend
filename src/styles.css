@@ -805,3 +805,9 @@ button:hover,
 /* Затемняющий фон под всплывающим календарём переноса — теперь на весь экран,
    раз само окно выводится через портал в конец документа */
 .picker-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9998;}
+/* "Время" (когда назначено) — зелёным, с более сильным селектором, чтобы
+   больше не зависеть от порядка правил в файле относительно .status-badge.on */
+.status-badge.time-badge.on{
+  background:#6FCF97 !important;
+  color:#14171F !important;
+}
