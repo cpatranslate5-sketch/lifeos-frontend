@@ -353,7 +353,8 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             </>
           ) : <><strong>Год:</strong> {e.attributes?.year ? (
             <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "year", e.attributes.year)}>{e.attributes.year}</span>
-          ) : "не указан"}</>}
+          ) : "не указан"}
+          <span className="edit-pencil" onClick={(ev) => { ev.stopPropagation(); setYearEditing(true); }} title="Изменить">✎</span></>}
         </div>
       )}
 
@@ -368,7 +369,8 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             </>
           ) : <><strong>Разработчик:</strong> {e.attributes?.developer ? (
             <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "author", e.attributes.developer)}>{e.attributes.developer}</span>
-          ) : "не указан"}</>}
+          ) : "не указан"}
+          <span className="edit-pencil" onClick={(ev) => { ev.stopPropagation(); setDeveloperEditing(true); }} title="Изменить">✎</span></>}
         </div>
       )}
 
@@ -388,6 +390,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
                 {e.attributes?.year ? (
                   <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "year", e.attributes.year)}>{e.attributes.year}</span>
                 ) : "не указан"}
+                <span className="edit-pencil" onClick={(ev) => { ev.stopPropagation(); setYearEditing(true); }} title="Изменить">✎</span>
               </>
             )}
           </div>
@@ -414,6 +417,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
                     <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "author", a)}>{a}</span>
                   </span>
                 )) : "не указан"}
+                <span className="edit-pencil" onClick={(ev) => { ev.stopPropagation(); setAuthorEditing(true); }} title="Изменить">✎</span>
               </>
             )}
           </div>
@@ -487,6 +491,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
                 {e.attributes?.geo ? (
                   <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "geo", e.attributes.geo)}>{e.attributes.geo}</span>
                 ) : "не указано"}
+                <span className="edit-pencil" onClick={(ev) => { ev.stopPropagation(); setGeoEditing(true); }} title="Изменить">✎</span>
               </>
             )}
           </div>
