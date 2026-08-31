@@ -828,3 +828,9 @@ button:hover,
 }
 .edit-pencil{margin-left:6px;opacity:0.4;cursor:pointer;font-size:0.85rem;}
 .edit-pencil:hover{opacity:1;}
+/* Выпадающий список фильтров — прокрутка, если пунктов много (актуально
+   для нового списка веков/диапазонов у книг) */
+.media-filter-dropdown{
+  max-height:280px !important;
+  overflow-y:auto !important;
+}
