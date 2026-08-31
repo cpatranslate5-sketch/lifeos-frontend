@@ -815,3 +815,14 @@ button:hover,
   background:#C9A9F5 !important;
   color:#14171F !important;
 }
+/* Кнопки пагинации — центрируем цифры по-настоящему (flex), а не просто
+   отступами, плюс делаем чуть компактнее */
+.page-btn{
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  padding:0 !important;
+  line-height:1;
+}
