@@ -799,3 +799,6 @@ button:hover,
 .mini-calendar{top:100% !important;margin-top:4px;z-index:50 !important;}
 
 .move-time-picker{position:absolute;top:100%;margin-top:4px;left:0;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;width:220px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+/* Затемняющий фон под всплывающим календарём переноса — теперь на весь экран,
+   раз само окно выводится через портал в конец документа */
+.picker-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9998;}
