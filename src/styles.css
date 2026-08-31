@@ -811,3 +811,7 @@ button:hover,
   background:#6FCF97 !important;
   color:#14171F !important;
 }
+.status-badge.time-badge.on{
+  background:#C9A9F5 !important;
+  color:#14171F !important;
+}
