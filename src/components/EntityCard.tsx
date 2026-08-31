@@ -38,6 +38,8 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const [developerEditing, setDeveloperEditing] = useState(false);
   const [actorsEditing, setActorsEditing] = useState(false);
   const [movePickerOpen, setMovePickerOpen] = useState(false);
+  const [pendingMoveDate, setPendingMoveDate] = useState<string | null>(null);
+  const [moveTimeInput, setMoveTimeInput] = useState("");
 
   useEffect(() => {
     if (!genrePickerOpen) return;
@@ -131,15 +133,33 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
 
   const moveMinDate = todayStr();
 
-  async function moveTo(targetDate: string) {
+  function pickMoveDate(targetDate: string) {
+    setPendingMoveDate(targetDate);
+    setMoveTimeInput(e.attributes?.time || "");
+  }
+
+  function cancelMove() {
+    setMovePickerOpen(false);
+    setPendingMoveDate(null);
+  }
+
+  async function confirmMove() {
+    if (!pendingMoveDate) return;
+    const targetDate = pendingMoveDate;
+    const targetTime = moveTimeInput.trim();
     if (isHabit && selectedDate) {
       const nextSkipped = skippedDates.includes(selectedDate) ? skippedDates : [...skippedDates, selectedDate];
       await updateEntityField(e.id, "skipped_dates", nextSkipped);
-      await createEntity("task", `${e.name} (перенесено)`, { date: targetDate }, e.space, profile || "nemalenkiy");
+      const attrs: Record<string, any> = { date: targetDate };
+      if (targetTime) attrs.time = targetTime;
+      if (e.attributes?.cover_path) attrs.cover_path = e.attributes.cover_path;
+      await createEntity("task", `${e.name} (перенесено)`, attrs, e.space, profile || "nemalenkiy");
     } else {
       await updateEntityField(e.id, "date", targetDate);
+      await updateEntityField(e.id, "time", targetTime);
     }
     setMovePickerOpen(false);
+    setPendingMoveDate(null);
     showToast("Перенесено");
     onChanged();
   }
@@ -476,10 +496,25 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         {(["task", "event"].includes(e.type) || isHabit) && (
           <div className="why" style={{ position: "relative" }} onClick={() => setMovePickerOpen(!movePickerOpen)}>
             Перенести
-            {movePickerOpen && (
+            {movePickerOpen && !pendingMoveDate && (
               <>
-                <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); setMovePickerOpen(false); }} />
-                <MiniCalendar minDate={moveMinDate} onSelect={moveTo} />
+                <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); cancelMove(); }} />
+                <MiniCalendar minDate={moveMinDate} onSelect={pickMoveDate} />
+              </>
+            )}
+            {movePickerOpen && pendingMoveDate && (
+              <>
+                <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); cancelMove(); }} />
+                <div className="move-time-picker" onClick={(ev) => ev.stopPropagation()}>
+                  <div className="muted" style={{ fontSize: "0.75rem", marginBottom: 6 }}>Перенос на {pendingMoveDate}</div>
+                  <input type="text" value={moveTimeInput} onChange={(ev) => setMoveTimeInput(ev.target.value)}
+                    placeholder="Время, напр. 19:00 (необязательно)" maxLength={5}
+                    style={{ background: "var(--bg)", border: "1px solid var(--line)", borderRadius: 8, color: "var(--text)", padding: 6, marginBottom: 8, width: "100%", boxSizing: "border-box" }} />
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={confirmMove}>Перенести</button>
+                    <button className="cancel" onClick={cancelMove}>Отмена</button>
+                  </div>
+                </div>
               </>
             )}
           </div>
