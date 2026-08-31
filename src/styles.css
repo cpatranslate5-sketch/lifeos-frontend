@@ -802,21 +802,14 @@ button:hover,
 /* Затемняющий фон под всплывающим календарём переноса — теперь на весь экран,
    раз само окно выводится через портал в конец документа */
 .picker-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9998;}
-/* Затемняющий фон под всплывающим календарём переноса — теперь на весь экран,
-   раз само окно выводится через портал в конец документа */
-.picker-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9998;}
-/* "Время" (когда назначено) — зелёным, с более сильным селектором, чтобы
-   больше не зависеть от порядка правил в файле относительно .status-badge.on */
-.status-badge.time-badge.on{
-  background:#6FCF97 !important;
-  color:#14171F !important;
-}
+
+/* "Время" (когда назначено) */
 .status-badge.time-badge.on{
   background:#C9A9F5 !important;
   color:#14171F !important;
 }
-/* Кнопки пагинации — центрируем цифры по-настоящему (flex), а не просто
-   отступами, плюс делаем чуть компактнее */
+
+/* Кнопки пагинации — центрируем цифры по-настоящему (flex), плюс компактнее */
 .page-btn{
   display:flex !important;
   align-items:center;
@@ -825,6 +818,8 @@ button:hover,
   height:28px;
   padding:0 !important;
   line-height:1;
+}
+
 .edit-pencil{margin-left:6px;opacity:0.4;cursor:pointer;font-size:0.85rem;}
 .edit-pencil:hover{opacity:1;}
 
