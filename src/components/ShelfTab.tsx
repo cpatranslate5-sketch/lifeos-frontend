@@ -2,6 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { Entity, createEntity, uploadEntityCover, entityCoverUrl } from "../api";
 import EntityCard, { FilterKind } from "./EntityCard";
 
+function yearBucket(y: number): string {
+  if (y < 1950) return "1900-1949";
+  if (y < 1960) return "1950-1959";
+  if (y < 1970) return "1960-1969";
+  if (y < 1980) return "1970-1979";
+  if (y < 1990) return "1980-1989";
+  if (y < 2000) return "1990-1999";
+  if (y < 2010) return "2000-2009";
+  if (y < 2020) return "2010-2019";
+  if (y < 2030) return "2020-2029";
+  return "2030-2039";
+}
+
+const YEAR_BUCKET_ORDER = ["1900-1949", "1950-1959", "1960-1969", "1970-1979", "1980-1989", "1990-1999", "2000-2009", "2010-2019", "2020-2029", "2030-2039"];
+
 interface Props {
   title: string;
   placeholder: string;
@@ -178,7 +193,8 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
   }
 
   const developers = Array.from(new Set(items.map(e => e.attributes?.developer).filter(Boolean))).sort();
-  const years = Array.from(new Set(items.map(e => e.attributes?.year).filter(Boolean))).sort((a, b) => Number(b) - Number(a));
+  const presentBuckets = new Set(items.map(e => e.attributes?.year).filter(Boolean).map(y => yearBucket(Number(y))));
+  const years = YEAR_BUCKET_ORDER.filter(b => presentBuckets.has(b)).reverse();
 
   const filtered = isGame ? items.filter(e => {
     if (ratingFilter.length > 0 && !ratingFilter.includes(e.attributes?.rating || 0)) return false;
@@ -187,7 +203,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
       if (!(statusFilter.includes("done") && isDone) && !(statusFilter.includes("not_done") && !isDone)) return false;
     }
     if (developerFilter.length > 0 && !developerFilter.includes(e.attributes?.developer || "")) return false;
-    if (yearFilter.length > 0 && !yearFilter.includes(String(e.attributes?.year || ""))) return false;
+    if (yearFilter.length > 0 && (!e.attributes?.year || !yearFilter.includes(yearBucket(Number(e.attributes.year))))) return false;
     return true;
   }) : items;
 
@@ -295,7 +311,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
                     {years.length === 0 && <div className="muted" style={{ fontSize: "0.75rem" }}>Пока нет записей.</div>}
                     {years.map(y => (
                       <label key={y} className="media-filter-option">
-                        <input type="checkbox" checked={yearFilter.includes(String(y))} onChange={() => setYearFilter(toggleInList(yearFilter, String(y)))} />
+                        <input type="checkbox" checked={yearFilter.includes(y)} onChange={() => setYearFilter(toggleInList(yearFilter, y))} />
                         {y}
                       </label>
                     ))}

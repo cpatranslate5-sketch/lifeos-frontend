@@ -4,6 +4,21 @@ import EntityCard, { FilterKind } from "./EntityCard";
 import { genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { showToast } from "../toast";
 
+function yearBucket(y: number): string {
+  if (y < 1950) return "1900-1949";
+  if (y < 1960) return "1950-1959";
+  if (y < 1970) return "1960-1969";
+  if (y < 1980) return "1970-1979";
+  if (y < 1990) return "1980-1989";
+  if (y < 2000) return "1990-1999";
+  if (y < 2010) return "2000-2009";
+  if (y < 2020) return "2010-2019";
+  if (y < 2030) return "2020-2029";
+  return "2030-2039";
+}
+
+const YEAR_BUCKET_ORDER = ["1900-1949", "1950-1959", "1960-1969", "1970-1979", "1980-1989", "1990-1999", "2000-2009", "2010-2019", "2020-2029", "2030-2039"];
+
 const LOOKALIKES: Record<string, string> = {
   a: "а", b: "в", c: "с", e: "е", h: "н", k: "к", m: "м", o: "о", p: "р", t: "т", x: "х", y: "у",
 };
@@ -263,7 +278,8 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const years = Array.from(new Set(items.map(e => e.attributes?.year).filter(Boolean))).sort((a, b) => Number(b) - Number(a));
+  const presentBuckets = new Set(items.map(e => e.attributes?.year).filter(Boolean).map(y => yearBucket(Number(y))));
+  const years = YEAR_BUCKET_ORDER.filter(b => presentBuckets.has(b)).reverse();
 
   const authors = Array.from(new Set(items.flatMap(e => authorsOf(e)))).sort();
   const allActors = Array.from(new Set(items.flatMap(e => (e.attributes?.actors || []) as string[]))).sort();
@@ -275,7 +291,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
       if (!genreFilter.some(f => g.includes(f))) return false;
     }
     if (geoFilter.length > 0 && !geoFilter.includes(e.attributes?.geo || "")) return false;
-    if (yearFilter.length > 0 && !yearFilter.includes(String(e.attributes?.year || ""))) return false;
+    if (yearFilter.length > 0 && (!e.attributes?.year || !yearFilter.includes(yearBucket(Number(e.attributes.year))))) return false;
     if (authorFilter.length > 0) {
       if (!authorFilter.some(f => authorsOf(e).includes(f))) return false;
     }
@@ -375,7 +391,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
                 {years.length === 0 && <div className="muted" style={{ fontSize: "0.75rem" }}>Пока нет записей.</div>}
                 {years.map(y => (
                   <label key={y} className="media-filter-option">
-                    <input type="checkbox" checked={yearFilter.includes(String(y))} onChange={() => setYearFilter(toggleInList(yearFilter, String(y)))} />
+                    <input type="checkbox" checked={yearFilter.includes(y)} onChange={() => setYearFilter(toggleInList(yearFilter, y))} />
                     {y}
                   </label>
                 ))}
