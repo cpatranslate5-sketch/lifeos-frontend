@@ -343,21 +343,6 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
       )}
 
       {e.type === "game" && (
-        <div className="field media-criterion" onClick={() => !developerEditing && setDeveloperEditing(true)}>
-          {developerEditing ? (
-            <>
-              <strong>Разработчик:</strong>
-              <input autoFocus defaultValue={e.attributes?.developer || ""} placeholder="Название студии" onClick={(ev) => ev.stopPropagation()}
-                onBlur={async (ev) => { await updateEntityField(e.id, "developer", ev.target.value); setDeveloperEditing(false); onChanged(); }}
-                onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setDeveloperEditing(false); }} />
-            </>
-          ) : <><strong>Разработчик:</strong> {e.attributes?.developer ? (
-            <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "author", e.attributes.developer)}>{e.attributes.developer}</span>
-          ) : "не указан"}</>}
-        </div>
-      )}
-
-      {e.type === "game" && (
         <div className="field media-criterion" onClick={() => !yearEditing && setYearEditing(true)}>
           {yearEditing ? (
             <>
@@ -372,8 +357,41 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         </div>
       )}
 
+      {e.type === "game" && (
+        <div className="field media-criterion" onClick={() => !developerEditing && setDeveloperEditing(true)}>
+          {developerEditing ? (
+            <>
+              <strong>Разработчик:</strong>
+              <input autoFocus defaultValue={e.attributes?.developer || ""} placeholder="Название студии" onClick={(ev) => ev.stopPropagation()}
+                onBlur={async (ev) => { await updateEntityField(e.id, "developer", ev.target.value); setDeveloperEditing(false); onChanged(); }}
+                onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setDeveloperEditing(false); }} />
+            </>
+          ) : <><strong>Разработчик:</strong> {e.attributes?.developer ? (
+            <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "author", e.attributes.developer)}>{e.attributes.developer}</span>
+          ) : "не указан"}</>}
+        </div>
+      )}
+
       {isMedia && (
         <div className="media-criteria">
+          <div className="field media-criterion" onClick={() => !yearEditing && setYearEditing(true)}>
+            {yearEditing ? (
+              <>
+                <strong>Год:</strong>
+                <input autoFocus type="text" inputMode="numeric" maxLength={4} defaultValue={e.attributes?.year || ""} placeholder="напр. 2024" onClick={(ev) => ev.stopPropagation()}
+                  onBlur={async (ev) => { await updateEntityField(e.id, "year", ev.target.value.trim()); setYearEditing(false); onChanged(); }}
+                  onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setYearEditing(false); }} />
+              </>
+            ) : (
+              <>
+                <strong>Год:</strong>{" "}
+                {e.attributes?.year ? (
+                  <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "year", e.attributes.year)}>{e.attributes.year}</span>
+                ) : "не указан"}
+              </>
+            )}
+          </div>
+
           <div className="field media-criterion" onClick={() => !authorEditing && setAuthorEditing(true)}>
             {authorEditing ? (
               <>
@@ -469,24 +487,6 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
                 {e.attributes?.geo ? (
                   <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "geo", e.attributes.geo)}>{e.attributes.geo}</span>
                 ) : "не указано"}
-              </>
-            )}
-          </div>
-
-          <div className="field media-criterion" onClick={() => !yearEditing && setYearEditing(true)}>
-            {yearEditing ? (
-              <>
-                <strong>Год:</strong>
-                <input autoFocus type="text" inputMode="numeric" maxLength={4} defaultValue={e.attributes?.year || ""} placeholder="напр. 2024" onClick={(ev) => ev.stopPropagation()}
-                  onBlur={async (ev) => { await updateEntityField(e.id, "year", ev.target.value.trim()); setYearEditing(false); onChanged(); }}
-                  onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setYearEditing(false); }} />
-              </>
-            ) : (
-              <>
-                <strong>Год:</strong>{" "}
-                {e.attributes?.year ? (
-                  <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "year", e.attributes.year)}>{e.attributes.year}</span>
-                ) : "не указан"}
               </>
             )}
           </div>
