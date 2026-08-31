@@ -838,3 +838,9 @@ button:hover,
   max-height:280px !important;
   overflow-y:auto !important;
 }
+/* Возвращаем спискам фильтров (Жанр, Гео, Век и т.п.) более высокий приоритет,
+   чем у полноэкранного фона закрытия — иначе фон перехватывает клики по чекбоксам */
+.media-filter-dropdown, .genre-picker{
+  z-index:9999 !important;
+  position:relative;
+}
