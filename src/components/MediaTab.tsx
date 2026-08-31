@@ -19,8 +19,46 @@ function yearBucket(y: number): string {
 
 const YEAR_BUCKET_ORDER = ["1900-1949", "1950-1959", "1960-1969", "1970-1979", "1980-1989", "1990-1999", "2000-2009", "2010-2019", "2020-2029", "2030-2039"];
 
-function centuryBucket(y: number): string {
-  return `${Math.ceil(y / 100)}-й век`;
+function toRoman(num: number): string {
+  const map: [number, string][] = [
+    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
+    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
+    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+  ];
+  let result = "";
+  for (const [val, sym] of map) {
+    while (num >= val) { result += sym; num -= val; }
+  }
+  return result;
+}
+
+// Для книг: точные диапазоны для последних ~2 веков, а для всего, что
+// раньше 1800 года — по векам римскими цифрами.
+const BOOK_YEAR_RANGES: [number, number, string][] = [
+  [2030, 2039, "2030-2039"],
+  [2020, 2029, "2020-2029"],
+  [2010, 2019, "2010-2019"],
+  [2000, 2009, "2000-2009"],
+  [1990, 1999, "1990-1999"],
+  [1980, 1989, "1980-1989"],
+  [1970, 1979, "1970-1979"],
+  [1960, 1969, "1960-1969"],
+  [1950, 1959, "1950-1959"],
+  [1940, 1949, "1940-1949"],
+  [1930, 1939, "1930-1939"],
+  [1920, 1929, "1920-1929"],
+  [1910, 1919, "1910-1919"],
+  [1900, 1909, "1900-1909"],
+  [1850, 1899, "1850-1899"],
+  [1800, 1849, "1800-1849"],
+];
+
+function bookYearBucket(y: number): string {
+  for (const [lo, hi, label] of BOOK_YEAR_RANGES) {
+    if (y >= lo && y <= hi) return label;
+  }
+  if (y < 1800) return `${toRoman(Math.ceil(y / 100))} век`;
+  return String(y);
 }
 
 const LOOKALIKES: Record<string, string> = {
@@ -284,8 +322,13 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   }
 
   const years = isBook
-    ? Array.from(new Set(items.map(e => e.attributes?.year).filter(Boolean).map(y => Math.ceil(Number(y) / 100))))
-        .sort((a, b) => b - a).map(c => `${c}-й век`)
+    ? (() => {
+        const bookYears = items.map(e => e.attributes?.year).filter(Boolean).map(Number);
+        const explicitPresent = BOOK_YEAR_RANGES.filter(([lo, hi]) => bookYears.some(y => y >= lo && y <= hi)).map(([, , label]) => label);
+        const centuriesPresent = Array.from(new Set(bookYears.filter(y => y < 1800).map(y => Math.ceil(y / 100))))
+          .sort((a, b) => b - a).map(c => `${toRoman(c)} век`);
+        return [...explicitPresent, ...centuriesPresent];
+      })()
     : (() => {
         const presentBuckets = new Set(items.map(e => e.attributes?.year).filter(Boolean).map(y => yearBucket(Number(y))));
         return YEAR_BUCKET_ORDER.filter(b => presentBuckets.has(b)).reverse();
@@ -303,7 +346,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
     if (geoFilter.length > 0 && !geoFilter.includes(e.attributes?.geo || "")) return false;
     if (yearFilter.length > 0) {
       if (!e.attributes?.year) return false;
-      const bucketLabel = isBook ? centuryBucket(Number(e.attributes.year)) : yearBucket(Number(e.attributes.year));
+      const bucketLabel = isBook ? bookYearBucket(Number(e.attributes.year)) : yearBucket(Number(e.attributes.year));
       if (!yearFilter.includes(bucketLabel)) return false;
     }
     if (authorFilter.length > 0) {
