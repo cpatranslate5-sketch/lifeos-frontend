@@ -406,8 +406,8 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
               <div className="picker-overlay" onClick={() => setOpenDropdown(null)} />
               <div className="media-filter-dropdown">
                 {genresFor(type).map(g => (
-                  <label key={g} className="media-filter-option">
-                    <input type="checkbox" checked={genreFilter.includes(g)} onChange={() => setGenreFilter(toggleInList(genreFilter, g))} />
+                  <label key={g} className="media-filter-option" onClick={() => setGenreFilter(toggleInList(genreFilter, g))}>
+                    <input type="checkbox" checked={genreFilter.includes(g)} readOnly onClick={(ev) => ev.preventDefault()} />
                     {g}
                   </label>
                 ))}
@@ -426,8 +426,8 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
               <div className="picker-overlay" onClick={() => setOpenDropdown(null)} />
               <div className="media-filter-dropdown">
                 {GEO_OPTIONS.map(g => (
-                  <label key={g} className="media-filter-option">
-                    <input type="checkbox" checked={geoFilter.includes(g)} onChange={() => setGeoFilter(toggleInList(geoFilter, g))} />
+                  <label key={g} className="media-filter-option" onClick={() => setGeoFilter(toggleInList(geoFilter, g))}>
+                    <input type="checkbox" checked={geoFilter.includes(g)} readOnly onClick={(ev) => ev.preventDefault()} />
                     {g}
                   </label>
                 ))}
@@ -447,8 +447,8 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
               <div className="media-filter-dropdown">
                 {years.length === 0 && <div className="muted" style={{ fontSize: "0.75rem" }}>Пока нет записей.</div>}
                 {years.map(y => (
-                  <label key={y} className="media-filter-option">
-                    <input type="checkbox" checked={yearFilter.includes(y)} onChange={() => setYearFilter(toggleInList(yearFilter, y))} />
+                  <label key={y} className="media-filter-option" onClick={() => setYearFilter(toggleInList(yearFilter, y))}>
+                    <input type="checkbox" checked={yearFilter.includes(y)} readOnly onClick={(ev) => ev.preventDefault()} />
                     {y}
                   </label>
                 ))}
@@ -468,8 +468,8 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
               <div className="media-filter-dropdown">
                 {authors.length === 0 && <div className="muted" style={{ fontSize: "0.75rem" }}>Пока нет записей.</div>}
                 {authors.map(a => (
-                  <label key={a} className="media-filter-option">
-                    <input type="checkbox" checked={authorFilter.includes(a)} onChange={() => setAuthorFilter(toggleInList(authorFilter, a))} />
+                  <label key={a} className="media-filter-option" onClick={() => setAuthorFilter(toggleInList(authorFilter, a))}>
+                    <input type="checkbox" checked={authorFilter.includes(a)} readOnly onClick={(ev) => ev.preventDefault()} />
                     {a}
                   </label>
                 ))}
@@ -490,8 +490,8 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
                 <div className="media-filter-dropdown">
                   {allActors.length === 0 && <div className="muted" style={{ fontSize: "0.75rem" }}>Пока нет записей.</div>}
                   {allActors.map(a => (
-                    <label key={a} className="media-filter-option">
-                      <input type="checkbox" checked={actorFilter.includes(a)} onChange={() => setActorFilter(toggleInList(actorFilter, a))} />
+                    <label key={a} className="media-filter-option" onClick={() => setActorFilter(toggleInList(actorFilter, a))}>
+                      <input type="checkbox" checked={actorFilter.includes(a)} readOnly onClick={(ev) => ev.preventDefault()} />
                       {a}
                     </label>
                   ))}
@@ -511,8 +511,8 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
               <div className="picker-overlay" onClick={() => setOpenDropdown(null)} />
               <div className="media-filter-dropdown" style={{ left: "auto", right: 0 }}>
                 {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map(n => (
-                  <label key={n} className="media-filter-option">
-                    <input type="checkbox" checked={ratingFilter.includes(n)} onChange={() => setRatingFilter(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n])} />
+                  <label key={n} className="media-filter-option" onClick={() => setRatingFilter(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n])}>
+                    <input type="checkbox" checked={ratingFilter.includes(n)} readOnly onClick={(ev) => ev.preventDefault()} />
                     {n} {starWord(n)}
                   </label>
                 ))}
@@ -530,12 +530,12 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
             <>
               <div className="picker-overlay" onClick={() => setOpenDropdown(null)} />
               <div className="media-filter-dropdown" style={{ left: "auto", right: 0 }}>
-                <label className="media-filter-option">
-                  <input type="checkbox" checked={statusFilter.includes("done")} onChange={() => setStatusFilter(prev => prev.includes("done") ? prev.filter(x => x !== "done") : [...prev, "done"])} />
+                <label className="media-filter-option" onClick={() => setStatusFilter(prev => prev.includes("done") ? prev.filter(x => x !== "done") : [...prev, "done"])}>
+                  <input type="checkbox" checked={statusFilter.includes("done")} readOnly onClick={(ev) => ev.preventDefault()} />
                   {doneLabelDone}
                 </label>
-                <label className="media-filter-option">
-                  <input type="checkbox" checked={statusFilter.includes("not_done")} onChange={() => setStatusFilter(prev => prev.includes("not_done") ? prev.filter(x => x !== "not_done") : [...prev, "not_done"])} />
+                <label className="media-filter-option" onClick={() => setStatusFilter(prev => prev.includes("not_done") ? prev.filter(x => x !== "not_done") : [...prev, "not_done"])}>
+                  <input type="checkbox" checked={statusFilter.includes("not_done")} readOnly onClick={(ev) => ev.preventDefault()} />
                   {doneLabelNotDone}
                 </label>
                 {statusFilter.length > 0 && <div className="media-filter-clear" onClick={() => setStatusFilter([])}>Сбросить</div>}
