@@ -826,3 +826,5 @@ button:hover,
   padding:0 !important;
   line-height:1;
 }
+.edit-pencil{margin-left:6px;opacity:0.4;cursor:pointer;font-size:0.85rem;}
+.edit-pencil:hover{opacity:1;}
