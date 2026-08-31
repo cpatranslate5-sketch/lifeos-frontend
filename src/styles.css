@@ -851,3 +851,24 @@ button:hover,
   max-height:280px !important;
   overflow-y:auto !important;
 }
+/* Делаем цвета явными и контрастными, вместо переменной темы, которая
+   могла резолвиться в слишком светлый оттенок */
+.custom-checkbox{
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+  width:16px !important;
+  height:16px !important;
+  border:1px solid #999 !important;
+  border-radius:4px !important;
+  margin-right:8px;
+  flex-shrink:0;
+  font-size:0.7rem;
+  color:#fff !important;
+  background:#fff;
+  vertical-align:middle;
+}
+.custom-checkbox.checked{
+  background:#4E82EF !important;
+  border-color:#4E82EF !important;
+}
