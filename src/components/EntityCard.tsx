@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Entity, updateEntityField, renameEntity, deleteEntity, createEntity, uploadEntityCover, entityCoverUrl, propagateCover } from "../api";
 import { TYPES, genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { todayStr, addDaysStr } from "../dateUtils";
@@ -40,6 +41,16 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const [movePickerOpen, setMovePickerOpen] = useState(false);
   const [pendingMoveDate, setPendingMoveDate] = useState<string | null>(null);
   const [moveTimeInput, setMoveTimeInput] = useState("");
+  const moveButtonRef = useRef<HTMLDivElement>(null);
+  const [moveAnchor, setMoveAnchor] = useState<{ top: number; left: number } | null>(null);
+
+  function openMovePicker() {
+    if (moveButtonRef.current) {
+      const rect = moveButtonRef.current.getBoundingClientRect();
+      setMoveAnchor({ top: rect.bottom + 4, left: rect.left });
+    }
+    setMovePickerOpen(!movePickerOpen);
+  }
 
   useEffect(() => {
     if (!genrePickerOpen) return;
@@ -494,28 +505,29 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
       <div className="card-bottom">
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         {(["task", "event"].includes(e.type) || isHabit) && (
-          <div className="why" style={{ position: "relative" }} onClick={() => setMovePickerOpen(!movePickerOpen)}>
+          <div className="why" ref={moveButtonRef} onClick={openMovePicker}>
             Перенести
-            {movePickerOpen && !pendingMoveDate && (
+            {movePickerOpen && moveAnchor && createPortal(
               <>
                 <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); cancelMove(); }} />
-                <MiniCalendar minDate={moveMinDate} onSelect={pickMoveDate} />
-              </>
-            )}
-            {movePickerOpen && pendingMoveDate && (
-              <>
-                <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); cancelMove(); }} />
-                <div className="move-time-picker" onClick={(ev) => ev.stopPropagation()}>
-                  <div className="muted" style={{ fontSize: "0.75rem", marginBottom: 6 }}>Перенос на {pendingMoveDate}</div>
-                  <input type="text" value={moveTimeInput} onChange={(ev) => setMoveTimeInput(ev.target.value)}
-                    placeholder="Время, напр. 19:00 (необязательно)" maxLength={5}
-                    style={{ background: "var(--bg)", border: "1px solid var(--line)", borderRadius: 8, color: "var(--text)", padding: 6, marginBottom: 8, width: "100%", boxSizing: "border-box" }} />
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={confirmMove}>Перенести</button>
-                    <button className="cancel" onClick={cancelMove}>Отмена</button>
+                {!pendingMoveDate ? (
+                  <div style={{ position: "fixed", top: moveAnchor.top, left: moveAnchor.left, zIndex: 9999 }} onClick={(ev) => ev.stopPropagation()}>
+                    <MiniCalendar minDate={moveMinDate} onSelect={pickMoveDate} />
                   </div>
-                </div>
-              </>
+                ) : (
+                  <div className="move-time-picker" style={{ position: "fixed", top: moveAnchor.top, left: moveAnchor.left, zIndex: 9999 }} onClick={(ev) => ev.stopPropagation()}>
+                    <div className="muted" style={{ fontSize: "0.75rem", marginBottom: 6 }}>Перенос на {pendingMoveDate}</div>
+                    <input type="text" value={moveTimeInput} onChange={(ev) => setMoveTimeInput(ev.target.value)}
+                      placeholder="Время, напр. 19:00 (необязательно)" maxLength={5}
+                      style={{ background: "var(--bg)", border: "1px solid var(--line)", borderRadius: 8, color: "var(--text)", padding: 6, marginBottom: 8, width: "100%", boxSizing: "border-box" }} />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={confirmMove}>Перенести</button>
+                      <button className="cancel" onClick={cancelMove}>Отмена</button>
+                    </div>
+                  </div>
+                )}
+              </>,
+              document.body
             )}
           </div>
         )}
