@@ -1,5 +1,5 @@
 const PROFILE_KEY = "lifeos_profile";
-export type Folder = "nemalenkiy" | "kotyonok" | "pd";
+export type Folder = "nemalenkiy" | "kotyonok" | "ilyusha" | "pd";
 export function getSavedFolder(): Folder | null {
   return (localStorage.getItem(PROFILE_KEY) as Folder) || null;
 }
@@ -21,6 +21,10 @@ export default function ProfileGate({ onPick }: { onPick: (folder: Folder) => vo
         <div className="folder-card" onClick={() => onPick("kotyonok")}>
           <div className="folder-emoji">🐱</div>
           <div>Котёнок</div>
+        </div>
+        <div className="folder-card" onClick={() => onPick("ilyusha")}>
+          <div className="folder-emoji">🧒</div>
+          <div>Илюша</div>
         </div>
         <div className="folder-card" onClick={() => onPick("pd")}>
           <div className="folder-emoji">📔</div>
