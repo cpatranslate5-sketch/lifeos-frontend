@@ -145,6 +145,17 @@ export async function checkHealth(): Promise<boolean> {
   } catch { return false; }
 }
 
+// --- Folder passwords ---
+
+export async function checkFolderPassword(folder: string, password: string): Promise<boolean> {
+  try {
+    await req("/folder-auth", { method: "POST", body: JSON.stringify({ folder, password }) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // --- Diary (PD folder) ---
 
 export async function fetchDiaryEntries(date: string, profile?: string): Promise<DiaryEntry[]> {
