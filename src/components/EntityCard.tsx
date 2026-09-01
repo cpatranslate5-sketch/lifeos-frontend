@@ -66,7 +66,9 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const isCast = ["movie", "show"].includes(e.type);
   const doneDates: string[] = e.attributes?.done_dates || [];
   const skippedDates: string[] = e.attributes?.skipped_dates || [];
+  const inProcessDates: string[] = e.attributes?.in_process_dates || [];
   const isDoneToday = isHabit ? (selectedDate ? doneDates.includes(selectedDate) : false) : !!e.attributes?.done;
+  const isInProcessToday = isHabit ? (selectedDate ? inProcessDates.includes(selectedDate) : false) : !!e.attributes?.in_process;
   const canCheck = ["task", "event", "movie", "show", "book", "game", "leisure", "habit"].includes(e.type);
   const isHousehold = e.attributes?.category === "household";
   const effectiveLayout = hasRating ? "media" : (layout || "even");
@@ -127,6 +129,16 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
     onChanged();
   }
 
+  async function toggleInProcess() {
+    if (isHabit && selectedDate) {
+      const next = isInProcessToday ? inProcessDates.filter(d => d !== selectedDate) : [...inProcessDates, selectedDate];
+      await updateEntityField(e.id, "in_process_dates", next);
+    } else {
+      await updateEntityField(e.id, "in_process", !e.attributes?.in_process);
+    }
+    onChanged();
+  }
+
   function skip() {
     setConfirmState({
       message: `Пропустить/отменить «${e.name}»?`,
@@ -178,7 +190,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   async function copyToOtherFolder() {
     const target = profile === "kotyonok" ? "nemalenkiy" : "kotyonok";
     const targetLabel = target === "kotyonok" ? "Котёнок" : "НеМаленький";
-    const { done, done_dates, status, rating, reminder_marker, skipped_dates, ...catalogAttrs } = e.attributes || {};
+    const { done, done_dates, status, rating, reminder_marker, skipped_dates, in_process_dates, ...catalogAttrs } = e.attributes || {};
     await createEntity(e.type, e.name, catalogAttrs, "life", target);
     showToast(`Скопировано в «${targetLabel}»`);
   }
@@ -307,9 +319,9 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         )}
 
         {!isHousehold && (e.type === "task" || isHabit) && !e.attributes?.done && (
-          <div className={`status-badge in-process-badge ${e.attributes?.in_process ? "on" : ""}`}
-            onClick={async () => { await updateEntityField(e.id, "in_process", !e.attributes?.in_process); onChanged(); }}>
-            {e.attributes?.in_process ? <><span className="dot-small">🟢</span> В процессе</> : "В процессе"}
+          <div className={`status-badge in-process-badge ${isInProcessToday ? "on" : ""}`}
+            onClick={toggleInProcess}>
+            {isInProcessToday ? <><span className="dot-small">🟢</span> В процессе</> : "В процессе"}
           </div>
         )}
       </div>
