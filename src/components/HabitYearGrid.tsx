@@ -1,31 +1,9 @@
 import { Entity } from "../api";
 import { habitStatusOn, computeStreak, computeBestStreak } from "../habitUtils";
-import { todayStr, addDaysStr } from "../dateUtils";
+import { todayStr } from "../dateUtils";
 
 const MONTH_NAMES = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
-
-function weekRatio(e: Entity, weekStart: string, today: string, earliestDone: string | null): number | null {
-  let scheduled = 0, done = 0;
-  let cursor = weekStart;
-  for (let i = 0; i < 7; i++) {
-    let status = habitStatusOn(e, cursor, today);
-    if (status === "missed" && earliestDone && cursor < earliestDone) status = "na";
-    if (status === "done") { scheduled++; done++; }
-    else if (status === "missed") { scheduled++; }
-    cursor = addDaysStr(cursor, 1);
-  }
-  if (scheduled === 0) return null;
-  return done / scheduled;
-}
-
-function bucketClass(ratio: number | null): string {
-  if (ratio === null) return "na";
-  if (ratio === 0) return "r0";
-  if (ratio < 0.4) return "r1";
-  if (ratio < 0.7) return "r2";
-  if (ratio < 1) return "r3";
-  return "r4";
-}
+const DAY_NUMBERS = Array.from({ length: 31 }, (_, i) => i + 1);
 
 export default function HabitYearGrid({ e, year, onClose }: { e: Entity; year: number; onClose: () => void }) {
   const today = todayStr();
@@ -33,26 +11,6 @@ export default function HabitYearGrid({ e, year, onClose }: { e: Entity; year: n
   const best = computeBestStreak(e, today);
   const doneDates: string[] = e.attributes?.done_dates || [];
   const earliestDone = doneDates.length > 0 ? [...doneDates].sort()[0] : null;
-
-  // 52 недель подряд от 1 января — простая, приблизительная разбивка
-  // (не выровнена по календарным неделям пн-вс), зато весь год влезает в
-  // одну компактную полосу.
-  const weeks: { start: string; ratio: number | null }[] = [];
-  let cursor = `${year}-01-01`;
-  const yearEnd = `${year}-12-31`;
-  while (cursor <= yearEnd) {
-    weeks.push({ start: cursor, ratio: weekRatio(e, cursor, today, earliestDone) });
-    cursor = addDaysStr(cursor, 7);
-  }
-
-  // Группируем недели по месяцу их начала — просто для подписи слева.
-  const monthGroups: { month: number; weeks: typeof weeks }[] = [];
-  for (const w of weeks) {
-    const m = Number(w.start.slice(5, 7)) - 1;
-    const last = monthGroups[monthGroups.length - 1];
-    if (last && last.month === m) last.weeks.push(w);
-    else monthGroups.push({ month: m, weeks: [w] });
-  }
 
   return (
     <div className="modal-bg" onClick={onClose}>
@@ -62,27 +20,37 @@ export default function HabitYearGrid({ e, year, onClose }: { e: Entity; year: n
           {year} год · 🔥 сейчас {current} подряд{best > current ? ` · рекорд ${best}` : best > 0 ? " (это и есть рекорд)" : ""}
         </div>
 
-        <div className="habit-heatmap">
-          {monthGroups.map((g, i) => (
-            <div key={i} className="habit-heatmap-row">
-              <div className="habit-year-month-label">{MONTH_NAMES[g.month]}</div>
-              <div className="habit-heatmap-cells">
-                {g.weeks.map((w, wi) => (
-                  <div key={wi} className={`habit-heatmap-cell ${bucketClass(w.ratio)}`} title={w.start} />
-                ))}
-              </div>
+        <div className="habit-year-grid">
+          <div className="habit-year-row habit-year-header">
+            <div className="habit-year-month-label" />
+            <div className="habit-year-days">
+              {DAY_NUMBERS.map(d => <div key={d} className="habit-year-daynum">{d}</div>)}
             </div>
-          ))}
+          </div>
+          {MONTH_NAMES.map((mName, mi) => {
+            const daysInMonth = new Date(year, mi + 1, 0).getDate();
+            return (
+              <div key={mi} className="habit-year-row">
+                <div className="habit-year-month-label">{mName}</div>
+                <div className="habit-year-days">
+                  {DAY_NUMBERS.map(d => {
+                    if (d > daysInMonth) return <div key={d} className="habit-year-cell habit-year-empty" />;
+                    const dateStr = `${year}-${String(mi + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                    let status = habitStatusOn(e, dateStr, today);
+                    if (status === "missed" && earliestDone && dateStr < earliestDone) status = "na";
+                    return <div key={d} className={`habit-year-cell habit-year-${status}`} title={dateStr} />;
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <div className="habit-year-legend">
-          <span>меньше</span>
-          <span className="habit-heatmap-cell r0" />
-          <span className="habit-heatmap-cell r1" />
-          <span className="habit-heatmap-cell r2" />
-          <span className="habit-heatmap-cell r3" />
-          <span className="habit-heatmap-cell r4" />
-          <span>больше</span>
+          <span><span className="habit-year-cell habit-year-done" /> выполнено</span>
+          <span><span className="habit-year-cell habit-year-missed" /> пропущено</span>
+          <span><span className="habit-year-cell habit-year-future" /> ещё впереди</span>
+          <span><span className="habit-year-cell habit-year-na" /> не по расписанию</span>
         </div>
 
         <button className="cancel" style={{ marginTop: 14 }} onClick={onClose}>Закрыть</button>
