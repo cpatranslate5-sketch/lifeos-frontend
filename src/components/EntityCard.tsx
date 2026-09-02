@@ -4,7 +4,8 @@ import { Entity, updateEntityField, renameEntity, deleteEntity, createEntity, up
 import { TYPES, genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { todayStr, addDaysStr } from "../dateUtils";
 import { showToast } from "../toast";
-import { computeStreak } from "../habitUtils";
+import { computeStreak, computeBestStreak } from "../habitUtils";
+import HabitYearGrid from "./HabitYearGrid";
 import { useLiteMode } from "../liteMode";
 import MiniCalendar from "./MiniCalendar";
 
@@ -77,6 +78,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const [coverLightbox, setCoverLightbox] = useState(false);
   const [confirmState, setConfirmState] = useState<{ message: string; onYes: () => void } | null>(null);
   const [propagatePrompt, setPropagatePrompt] = useState(false);
+  const [showYearGrid, setShowYearGrid] = useState(false);
   const [propagateKeyword, setPropagateKeyword] = useState("");
 
   function clickCriterion(ev: React.MouseEvent, kind: FilterKind, value: string) {
@@ -333,8 +335,14 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         <div className="field" style={{ color: "var(--event)" }}>не отмечена как повторяющаяся!</div>
       )}
       {isHabit && e.attributes?.irregular && <div className="field" style={{ color: "var(--event)" }}>нерегулярно — не всегда случается</div>}
-      {isHabit && e.space === "life" && computeStreak(e, todayStr()) >= 2 && (
-        <div className="field" style={{ color: "#E8963D" }}>🔥 {computeStreak(e, todayStr())} подряд</div>
+      {isHabit && e.space === "life" && (computeStreak(e, todayStr()) >= 2 || computeBestStreak(e, todayStr()) >= 2) && (
+        <div className="field" style={{ color: "#E8963D", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span>
+            🔥 {computeStreak(e, todayStr())} подряд
+            {computeBestStreak(e, todayStr()) > computeStreak(e, todayStr()) && ` · рекорд ${computeBestStreak(e, todayStr())}`}
+          </span>
+          <span className="edit-link" onClick={() => setShowYearGrid(true)}>Год</span>
+        </div>
       )}
 
       {["movie", "show", "book", "game"].includes(e.type) && !e.attributes?.done && (
@@ -591,6 +599,9 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             </div>
           </div>
         </div>
+      )}
+      {showYearGrid && (
+        <HabitYearGrid e={e} year={Number(todayStr().slice(0, 4))} onClose={() => setShowYearGrid(false)} />
       )}
       </div>
     </div>
