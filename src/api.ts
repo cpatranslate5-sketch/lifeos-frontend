@@ -156,6 +156,20 @@ export async function checkFolderPassword(folder: string, password: string): Pro
   }
 }
 
+export async function setFolderPassword(folder: string, password: string): Promise<void> {
+  await req("/folder-set-password", { method: "POST", body: JSON.stringify({ folder, password }) });
+}
+
+export async function folderHasPassword(folder: string): Promise<boolean> {
+  try {
+    const res = await req(`/folder-has-password?folder=${encodeURIComponent(folder)}`);
+    const data = await res.json();
+    return !!data.has_password;
+  } catch {
+    return false;
+  }
+}
+
 // --- Diary (PD folder) ---
 
 export async function fetchDiaryEntries(date: string, profile?: string): Promise<DiaryEntry[]> {
