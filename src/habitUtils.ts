@@ -66,3 +66,48 @@ export function computeStreak(e: Entity, todayStr: string): number {
   }
   return streak;
 }
+
+/**
+ * Longest-ever streak, scanning forward through the whole history of
+ * done_dates rather than just the trailing run from today. Always
+ * recomputed from the raw data (nothing stored separately), so it can
+ * never drift out of sync with done_dates/recurrence changes.
+ */
+export function computeBestStreak(e: Entity, todayStr: string): number {
+  const doneDates: string[] = e.attributes?.done_dates || [];
+  if (doneDates.length === 0) return 0;
+  const earliest = [...doneDates].sort()[0];
+  let best = 0;
+  let current = 0;
+  let cursor = earliest;
+  let guard = 0;
+  while (cursor <= todayStr && guard < 20000) {
+    if (matchesRecurrence(e, cursor)) {
+      if (doneDates.includes(cursor)) {
+        current++;
+        if (current > best) best = current;
+      } else {
+        current = 0;
+      }
+    }
+    cursor = addDaysStr(cursor, 1);
+    guard++;
+  }
+  return best;
+}
+
+/**
+ * Per-day status for the year grid: "done" (completed), "missed"
+ * (scheduled but not done/explicitly skipped, and the day has already
+ * passed), "future" (scheduled but the day hasn't happened yet), or "na"
+ * (not on the recurrence schedule at all that day).
+ */
+export type HabitDayStatus = "done" | "missed" | "future" | "na";
+
+export function habitStatusOn(e: Entity, dateStr: string, todayStr: string): HabitDayStatus {
+  if (!matchesRecurrence(e, dateStr)) return "na";
+  const doneDates: string[] = e.attributes?.done_dates || [];
+  if (doneDates.includes(dateStr)) return "done";
+  if (dateStr > todayStr) return "future";
+  return "missed";
+}

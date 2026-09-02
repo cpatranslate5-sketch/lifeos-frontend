@@ -349,3 +349,18 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 
 .lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
 .lightbox-img{max-width:100%;max-height:100%;border-radius:8px;object-fit:contain;}
+
+/* Годовая сетка привычки — тепловая карта по месяцам */
+.habit-year-modal{max-width:520px;}
+.habit-year-grid{max-height:50vh;overflow-y:auto;margin-bottom:12px;}
+.habit-year-row{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.habit-year-month-label{width:32px;flex-shrink:0;font-size:0.7rem;color:var(--muted);}
+.habit-year-days{display:flex;flex-wrap:wrap;gap:3px;}
+.habit-year-cell{width:12px;height:12px;border-radius:3px;background:var(--line);flex-shrink:0;}
+.habit-year-cell.habit-year-done{background:#F2B705;}
+.habit-year-cell.habit-year-missed{background:var(--event);}
+.habit-year-cell.habit-year-future{background:var(--bg);border:1px solid var(--line);}
+.habit-year-cell.habit-year-na{background:transparent;}
+.habit-year-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:0.7rem;color:var(--muted);align-items:center;}
+.habit-year-legend span{display:inline-flex;align-items:center;gap:5px;}
+.habit-year-legend .habit-year-cell{width:10px;height:10px;}
