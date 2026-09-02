@@ -352,17 +352,19 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 
 /* Годовая сетка привычки — тепловая карта по неделям (интенсивность
    цвета = насколько последовательно выполнялась привычка в ту неделю) */
-.habit-year-modal{max-width:560px;}
-.habit-heatmap{max-height:50vh;overflow-y:auto;margin-bottom:12px;}
-.habit-heatmap-row{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.habit-year-modal{max-width:640px;}
+.habit-year-grid{max-height:55vh;overflow:auto;margin-bottom:12px;}
+.habit-year-row{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.habit-year-row.habit-year-header{margin-bottom:6px;}
 .habit-year-month-label{width:32px;flex-shrink:0;font-size:0.7rem;color:var(--muted);}
-.habit-heatmap-cells{display:flex;flex-wrap:wrap;gap:3px;}
-.habit-heatmap-cell{width:14px;height:14px;border-radius:3px;flex-shrink:0;background:var(--line);}
-.habit-heatmap-cell.na{background:transparent;}
-.habit-heatmap-cell.r0{background:var(--line);}
-.habit-heatmap-cell.r1{background:#C6E8B5;}
-.habit-heatmap-cell.r2{background:#8FCB6B;}
-.habit-heatmap-cell.r3{background:#4FA65C;}
-.habit-heatmap-cell.r4{background:#2D7A3A;}
-.habit-year-legend{display:flex;flex-wrap:wrap;gap:5px;font-size:0.7rem;color:var(--muted);align-items:center;}
-.habit-year-legend .habit-heatmap-cell{width:11px;height:11px;}
+.habit-year-days{display:flex;gap:3px;}
+.habit-year-daynum{width:12px;flex-shrink:0;font-size:0.6rem;color:var(--muted);text-align:center;}
+.habit-year-cell{width:12px;height:12px;border-radius:3px;background:var(--line);flex-shrink:0;}
+.habit-year-cell.habit-year-empty{background:transparent;}
+.habit-year-cell.habit-year-done{background:#4FA65C;}
+.habit-year-cell.habit-year-missed{background:var(--event);}
+.habit-year-cell.habit-year-future{background:var(--bg);border:1px solid var(--line);}
+.habit-year-cell.habit-year-na{background:transparent;}
+.habit-year-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:0.7rem;color:var(--muted);align-items:center;}
+.habit-year-legend span{display:inline-flex;align-items:center;gap:5px;}
+.habit-year-legend .habit-year-cell{width:10px;height:10px;}
