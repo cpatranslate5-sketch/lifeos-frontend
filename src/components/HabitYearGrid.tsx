@@ -8,6 +8,8 @@ export default function HabitYearGrid({ e, year, onClose }: { e: Entity; year: n
   const today = todayStr();
   const current = computeStreak(e, today);
   const best = computeBestStreak(e, today);
+  const doneDates: string[] = e.attributes?.done_dates || [];
+  const earliestDone = doneDates.length > 0 ? [...doneDates].sort()[0] : null;
 
   return (
     <div className="modal-bg" onClick={onClose}>
@@ -27,7 +29,10 @@ export default function HabitYearGrid({ e, year, onClose }: { e: Entity; year: n
                   {Array.from({ length: daysInMonth }, (_, di) => {
                     const d = di + 1;
                     const dateStr = `${year}-${String(mi + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-                    const status = habitStatusOn(e, dateStr, today);
+                    let status = habitStatusOn(e, dateStr, today);
+                    // Дней до первого выполнения карточки как бы ещё не существовало —
+                    // не считаем их "пропущенными".
+                    if (status === "missed" && earliestDone && dateStr < earliestDone) status = "na";
                     return <div key={d} className={`habit-year-cell habit-year-${status}`} title={dateStr} />;
                   })}
                 </div>

@@ -341,7 +341,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             🔥 {computeStreak(e, todayStr())} подряд
             {computeBestStreak(e, todayStr()) > computeStreak(e, todayStr()) && ` · рекорд ${computeBestStreak(e, todayStr())}`}
           </span>
-          <span className="edit-link" onClick={() => setShowYearGrid(true)}>Год</span>
+          <span style={{ color: "#E8963D", textDecoration: "underline", cursor: "pointer" }} onClick={() => setShowYearGrid(true)}>За всё время</span>
         </div>
       )}
 
