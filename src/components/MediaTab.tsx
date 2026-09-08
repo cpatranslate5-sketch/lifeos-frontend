@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Entity, createEntity, uploadEntityCover, entityCoverUrl } from "../api";
+import { Entity, createEntity, uploadEntityCover, entityCoverUrl, enrichTmdb } from "../api";
 import EntityCard, { FilterKind } from "./EntityCard";
 import { genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { showToast } from "../toast";
@@ -293,6 +293,24 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   const isCast = type === "movie" || type === "show";
   const isBook = type === "book";
   const [doneLabelDone, doneLabelNotDone] = DONE_LABEL[type] || ["Просмотрено", "Непросмотрено"];
+  const [enriching, setEnriching] = useState(false);
+
+  async function handleEnrich() {
+    setEnriching(true);
+    try {
+      const res = await enrichTmdb(profile, "life");
+      if (res.total_candidates === 0) {
+        showToast("Нечего заполнять — у всех карточек уже есть жанры");
+      } else {
+        showToast(`Заполнено: ${res.enriched} из ${res.total_candidates}`);
+      }
+      onChanged();
+    } catch {
+      showToast("Не удалось связаться с TMDB");
+    } finally {
+      setEnriching(false);
+    }
+  }
 
   useEffect(() => { setPage(1); }, [searchTerm, genreFilter, geoFilter, yearFilter, authorFilter, actorFilter, ratingFilter, statusFilter]);
 
@@ -388,6 +406,12 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
         <button onClick={() => setShowStats(true)} style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: "pointer" }}>
           📊 Статистика
         </button>
+        {isCast && (
+          <button onClick={handleEnrich} disabled={enriching}
+            style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
+            {enriching ? "Заполняю…" : "🎬 Заполнить автоматически"}
+          </button>
+        )}
       </div>
 
       {showAdd && <AddModal type={type} profile={profile} onClose={() => setShowAdd(false)} onAdded={onChanged} />}
