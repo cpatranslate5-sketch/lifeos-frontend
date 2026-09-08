@@ -160,6 +160,15 @@ export async function setFolderPassword(folder: string, password: string): Promi
   await req("/folder-set-password", { method: "POST", body: JSON.stringify({ folder, password }) });
 }
 
+export async function changeFolderPassword(folder: string, oldPassword: string, newPassword: string): Promise<boolean> {
+  try {
+    await req("/folder-change-password", { method: "POST", body: JSON.stringify({ folder, old_password: oldPassword, new_password: newPassword }) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function folderHasPassword(folder: string): Promise<boolean> {
   try {
     const res = await req(`/folder-has-password?folder=${encodeURIComponent(folder)}`);
