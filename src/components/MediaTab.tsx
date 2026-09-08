@@ -406,10 +406,10 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
         <button onClick={() => setShowStats(true)} style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: "pointer" }}>
           📊 Статистика
         </button>
-        {isCast && (
+        {["movie", "show", "book"].includes(type) && (
           <button onClick={handleEnrich} disabled={enriching}
             style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
-            {enriching ? "Заполняю…" : "🎬 Заполнить автоматически"}
+            {enriching ? "Заполняю…" : "🎬 Заполнить пустые карточки"}
           </button>
         )}
       </div>

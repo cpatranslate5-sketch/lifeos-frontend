@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Entity, updateEntityField, renameEntity, deleteEntity, createEntity, uploadEntityCover, entityCoverUrl, propagateCover } from "../api";
+import { Entity, updateEntityField, renameEntity, deleteEntity, createEntity, uploadEntityCover, entityCoverUrl, propagateCover, enrichEntity } from "../api";
 import { TYPES, genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { todayStr, addDaysStr } from "../dateUtils";
 import { showToast } from "../toast";
@@ -75,6 +75,20 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const effectiveLayout = hasRating ? "media" : (layout || "even");
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [coverUploading, setCoverUploading] = useState(false);
+  const [enrichingSelf, setEnrichingSelf] = useState(false);
+
+  async function handleEnrichSelf() {
+    setEnrichingSelf(true);
+    try {
+      await enrichEntity(e.id);
+      showToast("Заполнено");
+      onChanged();
+    } catch {
+      showToast("Не удалось найти по названию");
+    } finally {
+      setEnrichingSelf(false);
+    }
+  }
   const [coverLightbox, setCoverLightbox] = useState(false);
   const [confirmState, setConfirmState] = useState<{ message: string; onYes: () => void } | null>(null);
   const [propagatePrompt, setPropagatePrompt] = useState(false);
@@ -561,6 +575,11 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         )}
         {profile && ["movie", "show", "book", "game", "leisure"].includes(e.type) && (
           <div className="why" onClick={copyToOtherFolder}>Скопировать в {profile === "kotyonok" ? "НеМаленький" : "Котёнок"}</div>
+        )}
+        {isMedia && (e.attributes?.genres || []).length === 0 && (
+          <div className="why" onClick={enrichingSelf ? undefined : handleEnrichSelf} style={{ opacity: enrichingSelf ? 0.6 : 1 }}>
+            {enrichingSelf ? "Заполняю…" : "🎬 Заполнить карточку автоматически"}
+          </div>
         )}
         <div className="why danger-action" onClick={handleDelete}>Удалить</div>
         {hasRating && (
