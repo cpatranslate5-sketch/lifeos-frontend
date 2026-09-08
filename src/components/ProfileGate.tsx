@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { checkFolderPassword, setFolderPassword, folderHasPassword } from "../api";
+import { checkFolderPassword, setFolderPassword, changeFolderPassword, folderHasPassword } from "../api";
 
 const PROFILE_KEY = "lifeos_profile";
 export type Folder = "nemalenkiy" | "kotyonok" | "ilyusha" | "pd";
@@ -35,6 +35,12 @@ export default function ProfileGate({ onPick }: { onPick: (folder: Folder) => vo
   const [confirmPassword, setConfirmPassword] = useState("");
   const [setError_, setSetError] = useState("");
 
+  const [changingFolder, setChangingFolder] = useState<Folder | null>(null);
+  const [oldPasswordInput, setOldPasswordInput] = useState("");
+  const [newPasswordChange, setNewPasswordChange] = useState("");
+  const [confirmPasswordChange, setConfirmPasswordChange] = useState("");
+  const [changeError, setChangeError] = useState("");
+
   async function tryPick(folder: Folder) {
     if (isRemembered(folder)) { onPick(folder); return; }
     setChecking(true);
@@ -66,13 +72,28 @@ export default function ProfileGate({ onPick }: { onPick: (folder: Folder) => vo
     ev.stopPropagation();
     const already = await folderHasPassword(folder);
     if (already) {
-      alert("У этой папки уже есть пароль. Чтобы сменить его, сначала войдите с текущим паролем — смена пароля изнутри пока не реализована.");
+      setChangingFolder(folder);
+      setOldPasswordInput("");
+      setNewPasswordChange("");
+      setConfirmPasswordChange("");
+      setChangeError("");
       return;
     }
     setSettingFolder(folder);
     setNewPassword("");
     setConfirmPassword("");
     setSetError("");
+  }
+
+  async function submitChangePassword() {
+    if (!changingFolder) return;
+    if (!newPasswordChange.trim()) { setChangeError("Новый пароль не может быть пустым"); return; }
+    if (newPasswordChange !== confirmPasswordChange) { setChangeError("Пароли не совпадают"); return; }
+    const ok = await changeFolderPassword(changingFolder, oldPasswordInput, newPasswordChange);
+    if (!ok) { setChangeError("Текущий пароль неверен"); return; }
+    remember(changingFolder);
+    setChangingFolder(null);
+    onPick(changingFolder);
   }
 
   async function submitNewPassword() {
@@ -125,6 +146,25 @@ export default function ProfileGate({ onPick }: { onPick: (folder: Folder) => vo
             <div>
               <button onClick={submitNewPassword}>Сохранить и войти</button>
               <button className="cancel" onClick={() => setSettingFolder(null)}>Отмена</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {changingFolder && (
+        <div className="modal-bg" onClick={() => setChangingFolder(null)}>
+          <div className="modal" onClick={ev => ev.stopPropagation()}>
+            <div style={{ marginBottom: 12 }}>Сменить пароль для «{FOLDERS.find(f => f.id === changingFolder)?.label}»</div>
+            <input type="password" autoFocus value={oldPasswordInput} onChange={ev => { setOldPasswordInput(ev.target.value); setChangeError(""); }}
+              placeholder="Текущий пароль" style={{ marginBottom: 10 }} />
+            <input type="password" value={newPasswordChange} onChange={ev => { setNewPasswordChange(ev.target.value); setChangeError(""); }}
+              placeholder="Новый пароль" style={{ marginBottom: 10 }} />
+            <input type="password" value={confirmPasswordChange} onChange={ev => { setConfirmPasswordChange(ev.target.value); setChangeError(""); }}
+              onKeyDown={ev => { if (ev.key === "Enter") submitChangePassword(); }} placeholder="Повторите новый пароль" />
+            {changeError && <div className="field" style={{ color: "var(--event)", marginBottom: 10 }}>{changeError}</div>}
+            <div>
+              <button onClick={submitChangePassword}>Сохранить и войти</button>
+              <button className="cancel" onClick={() => setChangingFolder(null)}>Отмена</button>
             </div>
           </div>
         </div>
