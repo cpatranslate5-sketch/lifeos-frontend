@@ -298,7 +298,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   async function handleEnrich() {
     setEnriching(true);
     try {
-      const res = await enrichTmdb(profile, "life");
+      const res = await enrichTmdb(profile, type, "life");
       if (res.total_candidates === 0) {
         showToast("Нечего заполнять — у всех карточек уже есть жанры");
       } else if (res.not_found.length > 0) {
