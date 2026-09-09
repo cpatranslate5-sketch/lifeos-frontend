@@ -585,7 +585,13 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
       {e.space === "work" && (
         <div className="field">
           <textarea defaultValue={e.attributes?.comment || ""} placeholder="Комментарий…" rows={2}
-            onBlur={async (ev) => { await updateEntityField(e.id, "comment", ev.target.value); onChanged(); }} />
+            onBlur={async (ev) => {
+              const v = ev.target.value;
+              if (v === (e.attributes?.comment || "")) return;
+              await updateEntityField(e.id, "comment", v);
+              showToast("Сохранено");
+              onChanged();
+            }} />
         </div>
       )}
       </div>
