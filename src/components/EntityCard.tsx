@@ -242,6 +242,22 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   if (e.type === "anniversary") {
     return (
       <div className="card card-with-cover" style={e.attributes?.card_color ? { background: e.attributes.card_color } : undefined}>
+        <div className="card-color-corner" onClick={() => setColorPickerOpen(!colorPickerOpen)} title="Цвет карточки">
+          🎨
+          {colorPickerOpen && (
+            <>
+              <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); setColorPickerOpen(false); }} />
+              <div className="color-picker" onClick={(ev) => ev.stopPropagation()}>
+                {CARD_COLORS.map(c => (
+                  <div key={c.value} className="color-swatch" style={{ background: c.value }} title={c.name}
+                    onClick={async () => { await updateEntityField(e.id, "card_color", c.value); setColorPickerOpen(false); onChanged(); }} />
+                ))}
+                <div className="color-swatch color-swatch-none" title="Без цвета"
+                  onClick={async () => { await updateEntityField(e.id, "card_color", null); setColorPickerOpen(false); onChanged(); }}>✕</div>
+              </div>
+            </>
+          )}
+        </div>
         <div className="cover-thumb" tabIndex={0} onPaste={handleCoverPaste}
           onDoubleClick={() => e.attributes?.cover_path && !liteMode && setCoverLightbox(true)}
           title="Нажмите сюда и вставьте (Ctrl+V) скопированную картинку, двойной клик — открыть на весь экран">
@@ -265,25 +281,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             <div className="card-title-text">{e.name}</div>
           </div>
           <div className="field">{e.attributes.day} {MONTHS_RU[e.attributes.month]}</div>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <div className="why" style={{ position: "relative" }} onClick={() => setColorPickerOpen(!colorPickerOpen)}>
-              🎨 Цвет
-              {colorPickerOpen && (
-                <>
-                  <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); setColorPickerOpen(false); }} />
-                  <div className="color-picker" onClick={(ev) => ev.stopPropagation()}>
-                    {CARD_COLORS.map(c => (
-                      <div key={c.value} className="color-swatch" style={{ background: c.value }} title={c.name}
-                        onClick={async () => { await updateEntityField(e.id, "card_color", c.value); setColorPickerOpen(false); onChanged(); }} />
-                    ))}
-                    <div className="color-swatch color-swatch-none" title="Без цвета"
-                      onClick={async () => { await updateEntityField(e.id, "card_color", null); setColorPickerOpen(false); onChanged(); }}>✕</div>
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="why danger-action" onClick={handleDelete}>Удалить</div>
-          </div>
+          <div className="why danger-action" onClick={handleDelete}>Удалить</div>
         </div>
         {confirmState && (
           <div className="modal-bg" onClick={() => setConfirmState(null)}>
@@ -304,6 +302,22 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
 
   return (
     <div className="card card-with-cover" style={e.attributes?.card_color ? { background: e.attributes.card_color } : undefined}>
+      <div className="card-color-corner" onClick={() => setColorPickerOpen(!colorPickerOpen)} title="Цвет карточки">
+        🎨
+        {colorPickerOpen && (
+          <>
+            <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); setColorPickerOpen(false); }} />
+            <div className="color-picker" onClick={(ev) => ev.stopPropagation()}>
+              {CARD_COLORS.map(c => (
+                <div key={c.value} className="color-swatch" style={{ background: c.value }} title={c.name}
+                  onClick={async () => { await updateEntityField(e.id, "card_color", c.value); setColorPickerOpen(false); onChanged(); }} />
+              ))}
+              <div className="color-swatch color-swatch-none" title="Без цвета"
+                onClick={async () => { await updateEntityField(e.id, "card_color", null); setColorPickerOpen(false); onChanged(); }}>✕</div>
+            </div>
+          </>
+        )}
+      </div>
       <div className="cover-thumb" tabIndex={0} onPaste={handleCoverPaste}
         onDoubleClick={() => e.attributes?.cover_path && !liteMode && setCoverLightbox(true)}
         title="Нажмите сюда и вставьте (Ctrl+V) скопированную картинку, двойной клик — открыть на весь экран">
@@ -570,8 +584,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
 
       {e.space === "work" && (
         <div className="field">
-          Примечание:
-          <textarea defaultValue={e.attributes?.comment || ""} placeholder="комментарий…" rows={2}
+          <textarea defaultValue={e.attributes?.comment || ""} placeholder="Комментарий…" rows={2}
             onBlur={async (ev) => { await updateEntityField(e.id, "comment", ev.target.value); onChanged(); }} />
         </div>
       )}
@@ -617,22 +630,6 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             {enrichingSelf ? "Заполняю…" : "🎬 Заполнить карточку автоматически"}
           </div>
         )}
-        <div className="why" style={{ position: "relative" }} onClick={() => setColorPickerOpen(!colorPickerOpen)}>
-          🎨 Цвет
-          {colorPickerOpen && (
-            <>
-              <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); setColorPickerOpen(false); }} />
-              <div className="color-picker" onClick={(ev) => ev.stopPropagation()}>
-                {CARD_COLORS.map(c => (
-                  <div key={c.value} className="color-swatch" style={{ background: c.value }} title={c.name}
-                    onClick={async () => { await updateEntityField(e.id, "card_color", c.value); setColorPickerOpen(false); onChanged(); }} />
-                ))}
-                <div className="color-swatch color-swatch-none" title="Без цвета"
-                  onClick={async () => { await updateEntityField(e.id, "card_color", null); setColorPickerOpen(false); onChanged(); }}>✕</div>
-              </div>
-            </>
-          )}
-        </div>
         <div className="why danger-action" onClick={handleDelete}>Удалить</div>
         {hasRating && (
           <div className="star-rating" style={{ marginBottom: 0, marginLeft: "auto" }}>
