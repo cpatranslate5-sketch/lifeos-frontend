@@ -33,6 +33,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const liteMode = useLiteMode();
   const [showTime, setShowTime] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
+  const [commentEditing, setCommentEditing] = useState(false);
   const [genrePickerOpen, setGenrePickerOpen] = useState(false);
   const [geoEditing, setGeoEditing] = useState(false);
   const [yearEditing, setYearEditing] = useState(false);
@@ -584,14 +585,22 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
 
       {e.space === "work" && (
         <div className="field">
-          <textarea defaultValue={e.attributes?.comment || ""} placeholder="Комментарий…" rows={2}
-            onBlur={async (ev) => {
-              const v = ev.target.value;
-              if (v === (e.attributes?.comment || "")) return;
-              await updateEntityField(e.id, "comment", v);
-              showToast("Сохранено");
-              onChanged();
-            }} />
+          {commentEditing ? (
+            <textarea autoFocus defaultValue={e.attributes?.comment || ""} placeholder="Комментарий…" rows={2}
+              onBlur={async (ev) => {
+                const v = ev.target.value;
+                if (v !== (e.attributes?.comment || "")) {
+                  await updateEntityField(e.id, "comment", v);
+                  showToast("Сохранено");
+                  onChanged();
+                }
+                setCommentEditing(false);
+              }} />
+          ) : (
+            <div className="comment-display" onClick={() => setCommentEditing(true)}>
+              {e.attributes?.comment || "Комментарий…"}
+            </div>
+          )}
         </div>
       )}
       </div>
