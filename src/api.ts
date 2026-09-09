@@ -278,8 +278,8 @@ export async function markSport(keyword: string, profile: string, space = "life"
   return res.json();
 }
 
-export async function enrichTmdb(profile: string, type: string, space = "life"): Promise<{ enriched: number; total_candidates: number; not_found: string[] }> {
-  const res = await req("/entities/enrich-tmdb", { method: "POST", body: JSON.stringify({ profile, type, space }) });
+export async function enrichTmdb(profile: string, type: string, space = "life", force = false): Promise<{ enriched: number; total_candidates: number; not_found: string[] }> {
+  const res = await req("/entities/enrich-tmdb", { method: "POST", body: JSON.stringify({ profile, type, space, force }) });
   return res.json();
 }
 
