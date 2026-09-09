@@ -108,7 +108,7 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .thinking{color:var(--muted);font-style:italic;font-size:0.8rem;padding:4px 0;}
 
 /* ===== Карточки — базовое ===== */
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:6px;transition:box-shadow .15s ease;}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:6px;transition:box-shadow .15s ease;}
 .card:hover{box-shadow:0 6px 18px rgba(0,0,0,0.22);}
 
 .card-top{display:flex;align-items:flex-start;gap:6px;margin-bottom:2px;}
@@ -369,8 +369,10 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .habit-year-legend span{display:inline-flex;align-items:center;gap:5px;}
 .habit-year-legend .habit-year-cell{width:10px;height:10px;}
 
-/* Палитра выбора цвета карточки */
-.color-picker{position:absolute;top:100%;margin-top:4px;left:0;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;gap:6px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+/* Иконка выбора цвета карточки — в правом верхнем углу */
+.card-color-corner{position:absolute;top:6px;right:8px;cursor:pointer;font-size:0.85rem;opacity:0.45;z-index:2;}
+.card-color-corner:hover{opacity:1;}
+.color-picker{position:absolute;top:100%;margin-top:4px;right:0;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;gap:6px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
 .color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,0.15);}
 .color-swatch:hover{transform:scale(1.1);}
 .color-swatch-none{display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);font-size:0.7rem;}
