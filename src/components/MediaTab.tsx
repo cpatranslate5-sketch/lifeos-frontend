@@ -298,11 +298,10 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   const [doneLabelDone, doneLabelNotDone] = DONE_LABEL[type] || ["Просмотрено", "Непросмотрено"];
   const [enriching, setEnriching] = useState(false);
 
-  async function handleEnrich(force: boolean) {
-    if (force && !window.confirm("Обновить ВСЕ карточки заново из TMDB? Это перезапишет уже указанные год/жанр/актёров/гео (кроме уже загруженной обложки) свежими данными.")) return;
+  async function handleEnrich() {
     setEnriching(true);
     try {
-      const res = await enrichTmdb(profile, type, "life", force);
+      const res = await enrichTmdb(profile, type, "life");
       if (res.total_candidates === 0) {
         showToast("Карточки уже заполнены");
       } else if (res.not_found.length > 0) {
@@ -413,16 +412,10 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
           📊 Статистика
         </button>
         {["movie", "show", "book"].includes(type) && (
-          <>
-            <button onClick={() => handleEnrich(false)} disabled={enriching}
-              style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
-              {enriching ? "Заполняю…" : "🎬 Заполнить пустые карточки"}
-            </button>
-            <button onClick={() => handleEnrich(true)} disabled={enriching}
-              style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
-              {enriching ? "Обновляю…" : "🔄 Обновить все карточки"}
-            </button>
-          </>
+          <button onClick={handleEnrich} disabled={enriching}
+            style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
+            {enriching ? "Заполняю…" : "🎬 Заполнить пустые карточки"}
+          </button>
         )}
       </div>
 
