@@ -108,7 +108,7 @@ const STATUS_LABEL: Record<string, string> = {
 function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: string; onClose: () => void; onAdded: () => void }) {
   const [val, setVal] = useState("");
   const [newAuthor, setNewAuthor] = useState("");
-  const [newGeo, setNewGeo] = useState("");
+  const [newGeo, setNewGeo] = useState<string[]>([]);
   const [newGenres, setNewGenres] = useState<string[]>([]);
   const [newActors, setNewActors] = useState("");
   const [newInProgress, setNewInProgress] = useState(false);
@@ -140,7 +140,7 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
     if (!val.trim()) return;
     const attrs: Record<string, any> = {};
     if (newAuthor.trim()) attrs.author = newAuthor.split(",").map(s => s.trim()).filter(Boolean);
-    if (newGeo) attrs.geo = newGeo;
+    if (newGeo.length > 0) attrs.geo = newGeo;
     if (newGenres.length > 0) attrs.genres = newGenres;
     if (isCast && newActors.trim()) attrs.actors = newActors.split(",").map(s => s.trim()).filter(Boolean);
     if (newInProgress) attrs.status = "in_progress";
@@ -174,12 +174,15 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
         <label className="muted">{authorLabelFor(type)}</label>
         <input value={newAuthor} onChange={e => setNewAuthor(e.target.value)} placeholder="Через запятую, если несколько" />
 
-        <label className="muted">Гео</label>
-        <select value={newGeo} onChange={e => setNewGeo(e.target.value)}
-          style={{ width: "100%", background: "var(--bg)", border: "1px solid var(--line)", borderRadius: 8, color: "var(--text)", padding: 8, marginBottom: 10 }}>
-          <option value="">не указано</option>
-          {GEO_OPTIONS.map(g => <option key={g} value={g}>{g}</option>)}
-        </select>
+        <label className="muted">Гео (можно несколько)</label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", margin: "4px 0 10px" }}>
+          {GEO_OPTIONS.map(g => (
+            <label key={g} className="genre-chip">
+              <input type="checkbox" checked={newGeo.includes(g)} onChange={() => setNewGeo(toggleInList(newGeo, g))} />
+              {g}
+            </label>
+          ))}
+        </div>
 
         {isCast && (
           <>
@@ -266,10 +269,10 @@ function StatsModal({ type, items, onClose }: { type: string; items: Entity[]; o
         )}
 
         <div style={{ fontWeight: 600, margin: "10px 0 4px" }}>По гео</div>
-        {topCounts(items.map(e => e.attributes?.geo).filter(Boolean)).map(([g, n]) => (
+        {topCounts(items.flatMap(e => (e.attributes?.geo as string[]) || [])).map(([g, n]) => (
           <div key={g} className="field">{g} — {n}</div>
         ))}
-        {items.every(e => !e.attributes?.geo) && <div className="muted">нет данных</div>}
+        {items.every(e => ((e.attributes?.geo as string[]) || []).length === 0) && <div className="muted">нет данных</div>}
 
         <button className="cancel" style={{ marginTop: 14 }} onClick={onClose}>Закрыть</button>
       </div>
@@ -295,12 +298,13 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   const [doneLabelDone, doneLabelNotDone] = DONE_LABEL[type] || ["Просмотрено", "Непросмотрено"];
   const [enriching, setEnriching] = useState(false);
 
-  async function handleEnrich() {
+  async function handleEnrich(force: boolean) {
+    if (force && !window.confirm("Обновить ВСЕ карточки заново из TMDB? Это перезапишет уже указанные год/жанр/актёров/гео (кроме уже загруженной обложки) свежими данными.")) return;
     setEnriching(true);
     try {
-      const res = await enrichTmdb(profile, type, "life");
+      const res = await enrichTmdb(profile, type, "life", force);
       if (res.total_candidates === 0) {
-        showToast("Нечего заполнять — у всех карточек уже есть жанры");
+        showToast("Карточки уже заполнены");
       } else if (res.not_found.length > 0) {
         showToast(`Заполнено: ${res.enriched} из ${res.total_candidates}. Не найдено: ${res.not_found.join(", ")}`);
       } else {
@@ -363,7 +367,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
       const g: string[] = e.attributes?.genres || [];
       if (!genreFilter.some(f => g.includes(f))) return false;
     }
-    if (geoFilter.length > 0 && !geoFilter.includes(e.attributes?.geo || "")) return false;
+    if (geoFilter.length > 0 && !geoFilter.some(f => ((e.attributes?.geo as string[]) || []).includes(f))) return false;
     if (yearFilter.length > 0) {
       if (!e.attributes?.year) return false;
       const bucketLabel = isBook ? bookYearBucket(Number(e.attributes.year)) : yearBucket(Number(e.attributes.year));
@@ -409,10 +413,16 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
           📊 Статистика
         </button>
         {["movie", "show", "book"].includes(type) && (
-          <button onClick={handleEnrich} disabled={enriching}
-            style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
-            {enriching ? "Заполняю…" : "🎬 Заполнить пустые карточки"}
-          </button>
+          <>
+            <button onClick={() => handleEnrich(false)} disabled={enriching}
+              style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
+              {enriching ? "Заполняю…" : "🎬 Заполнить пустые карточки"}
+            </button>
+            <button onClick={() => handleEnrich(true)} disabled={enriching}
+              style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
+              {enriching ? "Обновляю…" : "🔄 Обновить все карточки"}
+            </button>
+          </>
         )}
       </div>
 

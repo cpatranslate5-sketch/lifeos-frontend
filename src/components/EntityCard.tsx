@@ -35,7 +35,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const [editingTitle, setEditingTitle] = useState(false);
   const [commentEditing, setCommentEditing] = useState(false);
   const [genrePickerOpen, setGenrePickerOpen] = useState(false);
-  const [geoEditing, setGeoEditing] = useState(false);
+  const [geoPickerOpen, setGeoPickerOpen] = useState(false);
   const [yearEditing, setYearEditing] = useState(false);
   const [authorEditing, setAuthorEditing] = useState(false);
   const [developerEditing, setDeveloperEditing] = useState(false);
@@ -60,6 +60,13 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [genrePickerOpen]);
+
+  useEffect(() => {
+    if (!geoPickerOpen) return;
+    function onKey(ev: KeyboardEvent) { if (ev.key === "Escape") setGeoPickerOpen(false); }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [geoPickerOpen]);
 
   const meta = TYPES[e.type] || { label: e.type, color: "var(--muted)", emoji: "•" };
   const isHabit = e.type === "habit";
@@ -237,6 +244,16 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
     const current: string[] = e.attributes?.genres || [];
     const next = current.includes(g) ? current.filter(x => x !== g) : [...current, g];
     await updateEntityField(e.id, "genres", next);
+    onChanged();
+  }
+
+  async function toggleGeo(g: string) {
+    // Старые карточки могли сохранить гео одной строкой, а не списком —
+    // на всякий случай приводим к списку перед изменением.
+    const raw = e.attributes?.geo;
+    const current: string[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
+    const next = current.includes(g) ? current.filter(x => x !== g) : [...current, g];
+    await updateEntityField(e.id, "geo", next);
     onChanged();
   }
 
@@ -550,25 +567,33 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             )}
           </div>
 
-          <div className="field media-criterion" onClick={() => !geoEditing && setGeoEditing(true)}>
-            {geoEditing ? (
+          <div className="field media-criterion" style={{ position: "relative" }} onClick={() => setGeoPickerOpen(!geoPickerOpen)}>
+            <strong>Гео:</strong>{" "}
+            {(() => {
+              const raw = e.attributes?.geo;
+              const geoList: string[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
+              return geoList.length > 0 ? geoList.map((g, i) => (
+                <span key={g}>
+                  {i > 0 && ", "}
+                  <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "geo", g)}>{g}</span>
+                </span>
+              )) : "не указано";
+            })()}
+            {geoPickerOpen && (
               <>
-                <strong>Гео:</strong>
-                <select autoFocus defaultValue={e.attributes?.geo || ""}
-                  onChange={async (ev) => { await updateEntityField(e.id, "geo", ev.target.value); setGeoEditing(false); onChanged(); }}
-                  onBlur={() => setGeoEditing(false)}
-                  onKeyDown={(ev) => { if (ev.key === "Escape") setGeoEditing(false); }}>
-                  <option value="">не указано</option>
-                  {GEO_OPTIONS.map(g => <option key={g} value={g}>{g}</option>)}
-                </select>
-              </>
-            ) : (
-              <>
-                <strong>Гео:</strong>{" "}
-                {e.attributes?.geo ? (
-                  <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "geo", e.attributes.geo)}>{e.attributes.geo}</span>
-                ) : "не указано"}
-                <span className="edit-pencil" onClick={(ev) => { ev.stopPropagation(); setGeoEditing(true); }} title="Изменить">✎</span>
+                <div className="picker-overlay" onClick={(ev) => { ev.stopPropagation(); setGeoPickerOpen(false); }} />
+                <div className="genre-picker" onClick={(ev) => ev.stopPropagation()}>
+                  {GEO_OPTIONS.map(g => {
+                    const raw = e.attributes?.geo;
+                    const geoList: string[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
+                    return (
+                      <label key={g} className="genre-option">
+                        <input type="checkbox" checked={geoList.includes(g)} onChange={() => toggleGeo(g)} />
+                        {g}
+                      </label>
+                    );
+                  })}
+                </div>
               </>
             )}
           </div>
