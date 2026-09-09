@@ -368,3 +368,9 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .habit-year-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:0.7rem;color:var(--muted);align-items:center;}
 .habit-year-legend span{display:inline-flex;align-items:center;gap:5px;}
 .habit-year-legend .habit-year-cell{width:10px;height:10px;}
+
+/* Палитра выбора цвета карточки */
+.color-picker{position:absolute;top:100%;margin-top:4px;left:0;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;gap:6px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+.color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,0.15);}
+.color-swatch:hover{transform:scale(1.1);}
+.color-swatch-none{display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);font-size:0.7rem;}
