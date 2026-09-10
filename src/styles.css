@@ -378,3 +378,8 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,0.15);}
 .color-swatch:hover{transform:scale(1.1);}
 .color-swatch-none{display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);font-size:0.7rem;}
+
+/* Множественный выбор карточек — чекбокс слева от карточки + панель действий снизу */
+.date-list-row{display:flex;align-items:flex-start;gap:8px;}
+.select-check{width:18px;height:18px;flex-shrink:0;margin-top:12px;cursor:pointer;accent-color:var(--project);}
+.bulk-action-bar{position:sticky;bottom:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:10px;box-shadow:0 -4px 16px rgba(0,0,0,0.2);}
