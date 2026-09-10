@@ -115,7 +115,11 @@ export default function DateList({ items, selectedDate, onChanged }: { items: En
   function openMovePicker() {
     if (moveButtonRef.current) {
       const rect = moveButtonRef.current.getBoundingClientRect();
-      setMoveAnchor({ top: rect.bottom + 4, left: rect.left });
+      const estimatedHeight = 300; // с запасом под календарь или окно времени
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const top = spaceBelow < estimatedHeight ? Math.max(8, rect.top - estimatedHeight - 4) : rect.bottom + 4;
+      const left = Math.min(rect.left, window.innerWidth - 236);
+      setMoveAnchor({ top, left: Math.max(8, left) });
     }
     setPendingMoveDate(null);
     setMoveTimeInput("");

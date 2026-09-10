@@ -49,7 +49,11 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   function openMovePicker() {
     if (moveButtonRef.current) {
       const rect = moveButtonRef.current.getBoundingClientRect();
-      setMoveAnchor({ top: rect.bottom + 4, left: rect.left });
+      const estimatedHeight = 300;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const top = spaceBelow < estimatedHeight ? Math.max(8, rect.top - estimatedHeight - 4) : rect.bottom + 4;
+      const left = Math.min(rect.left, window.innerWidth - 236);
+      setMoveAnchor({ top, left: Math.max(8, left) });
     }
     setMovePickerOpen(!movePickerOpen);
   }
