@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Entity, updateEntityField, renameEntity, deleteEntity, createEntity, uploadEntityCover, entityCoverUrl, propagateCover, enrichEntity } from "../api";
+import { Entity, updateEntityField, renameEntity, deleteEntity, createEntity, uploadEntityCover, entityCoverUrl, propagateCover, enrichEntity, autoImageEntity } from "../api";
 import { TYPES, genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { todayStr, addDaysStr } from "../dateUtils";
 import { showToast } from "../toast";
@@ -88,6 +88,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [coverUploading, setCoverUploading] = useState(false);
   const [enrichingSelf, setEnrichingSelf] = useState(false);
+  const [autoImaging, setAutoImaging] = useState(false);
 
   async function handleEnrichSelf() {
     setEnrichingSelf(true);
@@ -99,6 +100,19 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
       showToast("Не удалось найти по названию");
     } finally {
       setEnrichingSelf(false);
+    }
+  }
+
+  async function handleAutoImage() {
+    setAutoImaging(true);
+    try {
+      await autoImageEntity(e.id);
+      showToast("Фото добавлено");
+      onChanged();
+    } catch {
+      showToast("Не удалось найти подходящее фото");
+    } finally {
+      setAutoImaging(false);
     }
   }
   const [coverLightbox, setCoverLightbox] = useState(false);
@@ -672,6 +686,11 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         {isMedia && (e.attributes?.genres || []).length === 0 && (
           <div className="why" onClick={enrichingSelf ? undefined : handleEnrichSelf} style={{ opacity: enrichingSelf ? 0.6 : 1 }}>
             {enrichingSelf ? "Заполняю…" : "🎬 Заполнить карточку автоматически"}
+          </div>
+        )}
+        {["task", "event", "leisure", "habit"].includes(e.type) && !e.attributes?.cover_path && (
+          <div className="why" onClick={autoImaging ? undefined : handleAutoImage} style={{ opacity: autoImaging ? 0.6 : 1 }}>
+            {autoImaging ? "Ищу фото…" : "🖼️ Добавить фото автоматически"}
           </div>
         )}
         <div className="why danger-action" onClick={handleDelete}>Удалить</div>
