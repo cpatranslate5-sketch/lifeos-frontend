@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Entity, renameEntity, bulkDeleteEntities } from "../api";
+import { Entity, renameEntity, bulkDeleteEntities, backfillImages } from "../api";
 import { TYPES } from "../types";
+import { showToast } from "../toast";
 
 export default function Manage({ entities, onChanged }: { entities: Entity[]; onChanged: () => void }) {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [filling, setFilling] = useState(false);
 
   const filtered = entities.filter(e => {
     if (search && !e.name.toLowerCase().includes(search.toLowerCase())) return false;
@@ -39,6 +41,28 @@ export default function Manage({ entities, onChanged }: { entities: Entity[]; on
     onChanged();
   }
 
+  async function handleBackfillImages() {
+    const profile = entities[0]?.profile;
+    const space = entities[0]?.space;
+    if (!profile || !space) return;
+    setFilling(true);
+    try {
+      const res = await backfillImages(profile, space);
+      if (res.total_candidates === 0) {
+        showToast("Пустых обложек не найдено");
+      } else if (res.not_found.length > 0) {
+        showToast(`Заполнено: ${res.filled} из ${res.total_candidates}. Не найдено фото: ${res.not_found.join(", ")}`);
+      } else {
+        showToast(`Заполнено: ${res.filled} из ${res.total_candidates}`);
+      }
+      onChanged();
+    } catch {
+      showToast("Не удалось связаться с Unsplash");
+    } finally {
+      setFilling(false);
+    }
+  }
+
   return (
     <div className="view">
       <h1>Управление</h1>
@@ -50,6 +74,11 @@ export default function Manage({ entities, onChanged }: { entities: Entity[]; on
           <option value="">Все типы</option>
           {types.map(t => <option key={t} value={t}>{TYPES[t]?.label || t}</option>)}
         </select>
+      </div>
+
+      <div className="edit-link" style={{ marginBottom: 10, display: "inline-block", cursor: filling ? "default" : "pointer", opacity: filling ? 0.6 : 1 }}
+        onClick={filling ? undefined : handleBackfillImages}>
+        {filling ? "Подбираю фото…" : "🖼️ Заполнить пустые обложки"}
       </div>
 
       {selected.size > 0 && (
