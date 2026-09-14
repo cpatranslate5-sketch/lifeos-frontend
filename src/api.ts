@@ -292,3 +292,8 @@ export async function backfillImages(profile: string, space = "life"): Promise<{
   const res = await req("/entities/backfill-images", { method: "POST", body: JSON.stringify({ profile, space }) });
   return res.json();
 }
+
+export async function autoImageEntity(id: string): Promise<Entity> {
+  const res = await req(`/entities/${id}/auto-image`, { method: "POST" });
+  return res.json();
+}
