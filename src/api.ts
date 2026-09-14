@@ -287,3 +287,8 @@ export async function enrichEntity(id: string): Promise<Entity> {
   const res = await req(`/entities/${id}/enrich`, { method: "POST" });
   return res.json();
 }
+
+export async function backfillImages(profile: string, space = "life"): Promise<{ filled: number; total_candidates: number; not_found: string[] }> {
+  const res = await req("/entities/backfill-images", { method: "POST", body: JSON.stringify({ profile, space }) });
+  return res.json();
+}
