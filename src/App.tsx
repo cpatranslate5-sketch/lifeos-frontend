@@ -19,6 +19,7 @@ import Manage from "./components/Manage";
 import DatesTab from "./components/DatesTab";
 import Diary from "./components/Diary";
 import ToastHost from "./components/ToastHost";
+import WeeklyReport from "./components/WeeklyReport";
 import ProfileGate, { Folder, saveFolder, clearSavedFolder } from "./components/ProfileGate";
 import { getToken, setToken, checkHealth, fetchEntities, createEntity, entityCoverUrl, Entity } from "./api";
 import { todayStr, addDaysStr, weekdayOf } from "./dateUtils";
@@ -119,6 +120,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
   const [theme, setTheme] = useState<"dark" | "light">(() => (localStorage.getItem("lifeos_theme") as "dark" | "light") || "light");
   const [decorCovers, setDecorCovers] = useState<string[]>([]);
   const [notifTick, setNotifTick] = useState(0);
+  const [showWeeklyReport, setShowWeeklyReport] = useState(false);
   const liteMode = useLiteMode();
 
   useEffect(() => {
@@ -241,6 +243,9 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
         <div className={`space-btn ${space === "general" ? "on" : ""}`} onClick={() => switchSpace("general")}>Общее</div>
         <div className={`space-btn ${space === "life" ? "on" : ""}`} onClick={() => switchSpace("life")}>Жизнь</div>
         <div className={`space-btn ${space === "work" ? "on" : ""}`} onClick={() => switchSpace("work")}>Работа</div>
+        <div className="theme-toggle" onClick={() => setShowWeeklyReport(true)} title="Итоги недели">
+          📊
+        </div>
         <div className="theme-toggle" onClick={() => setTheme(t => t === "dark" ? "light" : "dark")} title="Сменить тему">
           {theme === "dark" ? "☀️" : "🌙"}
         </div>
@@ -317,6 +322,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
           </div>
         </div>
       )}
+      {showWeeklyReport && <WeeklyReport profile={profile} onClose={() => setShowWeeklyReport(false)} />}
     </div>
   );
 }
