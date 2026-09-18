@@ -244,7 +244,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
         <div className={`space-btn ${space === "life" ? "on" : ""}`} onClick={() => switchSpace("life")}>Жизнь</div>
         <div className={`space-btn ${space === "work" ? "on" : ""}`} onClick={() => switchSpace("work")}>Работа</div>
         <div className="theme-toggle" onClick={() => setShowWeeklyReport(true)} title="Итоги недели">
-          📊
+          🔥
         </div>
         <div className="theme-toggle" onClick={() => setTheme(t => t === "dark" ? "light" : "dark")} title="Сменить тему">
           {theme === "dark" ? "☀️" : "🌙"}
