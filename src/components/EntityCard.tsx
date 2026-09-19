@@ -557,6 +557,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
                       <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "actor", a)}>{a}</span>
                     </span>
                   )) : "не указаны"}
+                  <span className="edit-pencil" onClick={(ev) => { ev.stopPropagation(); setActorsEditing(true); }} title="Изменить">✎</span>
                 </>
               )}
             </div>
