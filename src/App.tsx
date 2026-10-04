@@ -10,6 +10,7 @@ import SuggestionOfDay from "./components/SuggestionOfDay";
 import EventOfDay from "./components/EventOfDay";
 import Countdown from "./components/Countdown";
 import SportTab from "./components/SportTab";
+import WarmupTab, { WarmupBanner } from "./components/WarmupTab";
 import SpiderDrop from "./components/SpiderDrop";
 import { useLiteMode, setLiteMode } from "./liteMode";
 import NotificationBell from "./components/NotificationBell";
@@ -25,7 +26,7 @@ import { getToken, setToken, checkHealth, fetchEntities, createEntity, entityCov
 import { todayStr, addDaysStr, weekdayOf } from "./dateUtils";
 
 const LIFE_TABS = [
-  ["chat", "Чат"], ["date", "Задачи"], ["dates", "События"], ["sport", "Спорт"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
+  ["chat", "Чат"], ["date", "Задачи"], ["warmup", "Разминка"], ["dates", "События"], ["sport", "Спорт"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
   ["games", "Игры"], ["leisure", "Досуг"], ["household", "Быт"], ["reflection", "Рефлексия"],
   ["manage", "Управление"],
 ] as const;
@@ -35,7 +36,7 @@ const WORK_TABS = [
 ] as const;
 
 const GENERAL_TABS = [
-  ["date", "Задачи"],
+  ["date", "Задачи"], ["warmup", "Разминка"],
   ["dates", "События"], ["sport", "Спорт"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
   ["games", "Игры"], ["leisure", "Досуг"], ["household", "Быт"],
 ] as const;
@@ -284,6 +285,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
           {selectedDate === todayValue && (
             <>
               <WeatherWidget />
+              {(space === "life" || space === "general") && <WarmupBanner items={entities} onOpen={() => setTab("warmup")} />}
               {(space === "life" || space === "general") && (
                 <div className="widget-row">
                   <SuggestionOfDay entities={entities} />
@@ -310,6 +312,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
       {tab === "leisure" && <ShelfTab title="Досуг" placeholder="Игра, футбол, поездка…" type="leisure" items={leisureItems} onChanged={refresh} profile={profile} layout="compact" />}
       {tab === "household" && <ShelfTab title="Быт" placeholder="Дело по дому…" type="task" items={household} onChanged={refresh} extraAttrs={{ category: "household" }} profile={profile} layout="compact" />}
       {tab === "dates" && <DatesTab items={anniversaries} onChanged={refresh} profile={profile} />}
+      {tab === "warmup" && <WarmupTab items={entities} onChanged={refresh} profile={profile} />}
       {tab === "sport" && <SportTab items={sportEvents} onChanged={refresh} profile={profile} />}
       {tab === "reflection" && <Reflection profile={profile} />}
       {tab === "manage" && <Manage entities={entities} onChanged={refresh} />}

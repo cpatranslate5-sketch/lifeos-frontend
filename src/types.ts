@@ -12,6 +12,7 @@ export const TYPES: Record<string, { label: string; color: string; emoji: string
   leisure: { label: "Досуг",         color: "var(--leisure)", emoji: "🎈" },
   order:   { label: "Заказ",         color: "var(--order)",   emoji: "📦" },
   anniversary: { label: "Дата",      color: "var(--anniversary)", emoji: "🎉" },
+  warmup:  { label: "Разминка",      color: "var(--goal)",    emoji: "🧠" },
 };
 
 export const ALL_EMOJI: string[] = [
