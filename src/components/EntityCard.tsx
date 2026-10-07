@@ -80,8 +80,21 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const doneDates: string[] = e.attributes?.done_dates || [];
   const skippedDates: string[] = e.attributes?.skipped_dates || [];
   const inProcessDates: string[] = e.attributes?.in_process_dates || [];
-  const isDoneToday = isHabit ? (selectedDate ? doneDates.includes(selectedDate) : false) : !!e.attributes?.done;
-  const isInProcessToday = isHabit ? (selectedDate ? inProcessDates.includes(selectedDate) : false) : !!e.attributes?.in_process;
+  const serverDoneToday = isHabit ? (selectedDate ? doneDates.includes(selectedDate) : false) : !!e.attributes?.done;
+  const serverInProcessToday = isHabit ? (selectedDate ? inProcessDates.includes(selectedDate) : false) : !!e.attributes?.in_process;
+  // Мгновенный отклик: показываем новое состояние сразу после нажатия,
+  // не дожидаясь, пока с сервера заново загрузятся все карточки.
+  const [optDone, setOptDone] = useState<boolean | null>(null);
+  const [optInProcess, setOptInProcess] = useState<boolean | null>(null);
+  const [savingDone, setSavingDone] = useState(false);
+  const [savingInProcess, setSavingInProcess] = useState(false);
+  // Свежие данные с сервера заменяют мгновенный отклик — но не посреди сохранения.
+  useEffect(() => {
+    if (!savingDone) setOptDone(null);
+    if (!savingInProcess) setOptInProcess(null);
+  }, [e]); // eslint-disable-line react-hooks/exhaustive-deps
+  const isDoneToday = optDone ?? serverDoneToday;
+  const isInProcessToday = optInProcess ?? serverInProcessToday;
   const canCheck = ["task", "event", "movie", "show", "book", "game", "leisure", "habit"].includes(e.type);
   const isHousehold = e.attributes?.category === "household";
   const effectiveLayout = hasRating ? "media" : (layout || "even");
@@ -172,21 +185,45 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   }
 
   async function toggleDone() {
-    if (isHabit && selectedDate) {
-      const next = isDoneToday ? doneDates.filter(d => d !== selectedDate) : [...doneDates, selectedDate];
-      await updateEntityField(e.id, "done_dates", next);
-    } else {
-      await updateEntityField(e.id, "done", !e.attributes?.done);
+    if (savingDone) return; // повторное нажатие во время сохранения не сбивает отметку
+    const nextValue = !isDoneToday;
+    setOptDone(nextValue);
+    setSavingDone(true);
+    try {
+      if (isHabit && selectedDate) {
+        const rest = doneDates.filter(d => d !== selectedDate);
+        await updateEntityField(e.id, "done_dates", nextValue ? [...rest, selectedDate] : rest);
+      } else {
+        await updateEntityField(e.id, "done", nextValue);
+      }
+    } catch {
+      setOptDone(null);
+      showToast("Не сохранилось — проверь интернет и попробуй ещё раз");
+      return;
+    } finally {
+      setSavingDone(false);
     }
     onChanged();
   }
 
   async function toggleInProcess() {
-    if (isHabit && selectedDate) {
-      const next = isInProcessToday ? inProcessDates.filter(d => d !== selectedDate) : [...inProcessDates, selectedDate];
-      await updateEntityField(e.id, "in_process_dates", next);
-    } else {
-      await updateEntityField(e.id, "in_process", !e.attributes?.in_process);
+    if (savingInProcess) return;
+    const nextValue = !isInProcessToday;
+    setOptInProcess(nextValue);
+    setSavingInProcess(true);
+    try {
+      if (isHabit && selectedDate) {
+        const rest = inProcessDates.filter(d => d !== selectedDate);
+        await updateEntityField(e.id, "in_process_dates", nextValue ? [...rest, selectedDate] : rest);
+      } else {
+        await updateEntityField(e.id, "in_process", nextValue);
+      }
+    } catch {
+      setOptInProcess(null);
+      showToast("Не сохранилось — проверь интернет и попробуй ещё раз");
+      return;
+    } finally {
+      setSavingInProcess(false);
     }
     onChanged();
   }
