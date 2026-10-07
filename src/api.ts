@@ -54,8 +54,28 @@ async function req(path: string, opts: RequestInit = {}) {
     ...opts,
     headers: { "Content-Type": "application/json", ...authHeaders(), ...(opts.headers || {}) },
   });
+  if (res.status === 401) {
+    // Токен устарел или неверный (не путать с неверным паролем папки — у него другой текст).
+    const body = await res.clone().text().catch(() => "");
+    if (body.includes("Invalid or missing token")) {
+      localStorage.removeItem(TOKEN_KEY);
+      try { sessionStorage.setItem("lifeos_auth_error", "1"); } catch { /* не критично */ }
+      window.location.reload();
+    }
+  }
   if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
   return res;
+}
+
+// Проверка токена при входе: сервер ответит 401, если токен не подходит.
+export async function verifyToken(token: string): Promise<"ok" | "bad" | "offline"> {
+  try {
+    const res = await fetch(`${API_URL}/entities?type=__token_check`, { headers: { Authorization: `Bearer ${token}` } });
+    if (res.status === 401) return "bad";
+    return res.ok ? "ok" : "offline";
+  } catch {
+    return "offline";
+  }
 }
 
 export async function fetchMessages(conversationId = "default"): Promise<Message[]> {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chat from "./components/Chat";
 import DateList from "./components/DateList";
 import ShelfTab from "./components/ShelfTab";
@@ -22,7 +22,7 @@ import Diary from "./components/Diary";
 import ToastHost from "./components/ToastHost";
 import WeeklyReport from "./components/WeeklyReport";
 import ProfileGate, { Folder, saveFolder, clearSavedFolder } from "./components/ProfileGate";
-import { getToken, setToken, checkHealth, fetchEntities, createEntity, entityCoverUrl, Entity } from "./api";
+import { getToken, setToken, verifyToken, checkHealth, fetchEntities, createEntity, entityCoverUrl, Entity } from "./api";
 import { todayStr, addDaysStr, weekdayOf } from "./dateUtils";
 
 const LIFE_TABS = [
@@ -100,13 +100,36 @@ function itemsForDate(entities: Entity[], dateStr: string, isToday: boolean): En
 function TokenGate({ onReady }: { onReady: () => void }) {
   const [tokenInput, setTokenInput] = useState("");
   const [apiUp, setApiUp] = useState<boolean | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(() => {
+    try {
+      if (sessionStorage.getItem("lifeos_auth_error")) {
+        sessionStorage.removeItem("lifeos_auth_error");
+        return "Сервер не принял сохранённый токен — войдите заново.";
+      }
+    } catch { /* не критично */ }
+    return null;
+  });
   useEffect(() => { checkHealth().then(setApiUp); }, []);
+  async function login() {
+    const t = tokenInput.trim();
+    if (!t || checking) return;
+    setChecking(true);
+    setAuthError(null);
+    const result = await verifyToken(t);
+    setChecking(false);
+    if (result === "ok") { setToken(t); onReady(); }
+    else if (result === "bad") setAuthError("Токен не подошёл — проверьте, что он совпадает с APP_AUTH_TOKEN на сервере.");
+    else setAuthError("Не удалось связаться с сервером, попробуйте ещё раз.");
+  }
   return (
     <div className="token-gate">
       <h1>Life OS</h1>
       <p>Введите личный токен доступа (см. backend/.env, APP_AUTH_TOKEN).</p>
-      <input type="password" value={tokenInput} onChange={e => setTokenInput(e.target.value)} placeholder="Токен доступа" />
-      <button onClick={() => { setToken(tokenInput.trim()); onReady(); }} disabled={!tokenInput.trim()}>Войти</button>
+      <input type="password" value={tokenInput} onChange={e => setTokenInput(e.target.value)} placeholder="Токен доступа"
+        onKeyDown={e => { if (e.key === "Enter") login(); }} />
+      <button onClick={login} disabled={!tokenInput.trim() || checking}>{checking ? "Проверяю…" : "Войти"}</button>
+      {authError && <p className="error-banner">{authError}</p>}
       {apiUp === false && <p className="error-banner">Не удаётся связаться с сервером — проверьте, что backend запущен.</p>}
     </div>
   );
@@ -193,12 +216,19 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
     }
   }
 
+  // Номер последнего запущенного обновления: если обновления наложились,
+  // применяем только самое свежее, чтобы старый ответ не откатывал новые отметки.
+  const refreshSeq = useRef(0);
+
   async function refresh() {
+    const mySeq = ++refreshSeq.current;
     const ents = await fetchEntities(undefined, space === "general" ? undefined : space, profile);
+    if (mySeq !== refreshSeq.current) return;
     if (space === "life") {
       await generateAnniversaryReminders(ents);
       await generateBagReminders(ents);
       const ents2 = await fetchEntities(undefined, space, profile);
+      if (mySeq !== refreshSeq.current) return;
       setEntities(ents2);
     } else {
       setEntities(ents);
