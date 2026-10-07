@@ -107,8 +107,21 @@ export async function createEntity(type: string, name: string, attributes: Recor
 }
 
 export async function updateEntityField(id: string, key: string, value: any): Promise<Entity> {
-  const res = await req(`/entities/${id}/field`, { method: "PATCH", body: JSON.stringify({ key, value }) });
-  return res.json();
+  // Запись поля безопасно повторять (это «поставить значение», а не «прибавить»),
+  // поэтому при обрыве связи или сбое сервера пробуем ещё до 3 раз.
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (attempt > 0) await new Promise(r => setTimeout(r, 300 * attempt));
+    try {
+      const res = await req(`/entities/${id}/field`, { method: "PATCH", body: JSON.stringify({ key, value }) });
+      return await res.json();
+    } catch (err) {
+      lastErr = err;
+      // 4xx (кроме сбоев сервера) повторять бессмысленно
+      if (err instanceof Error && / failed: 4\d\d$/.test(err.message)) break;
+    }
+  }
+  throw lastErr;
 }
 
 export async function renameEntity(id: string, name: string): Promise<Entity> {
