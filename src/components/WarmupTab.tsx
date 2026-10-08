@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Entity, createEntity, updateEntityField } from "../api";
+import WarmupStats from "./WarmupStats";
 import { todayStr } from "../dateUtils";
 import { showToast } from "../toast";
 
@@ -296,6 +297,7 @@ function MorningNote() {
 export default function WarmupTab({ items, onChanged, profile }: { items: Entity[]; onChanged: () => void; profile: string }) {
   const today = todayStr();
   const [step, setStep] = useState<Step>("intro");
+  const [view, setView] = useState<"warmup" | "stats">("warmup");
   const [mode, setMode] = useState<Mode>("full");
   const [result, setResult] = useState<WarmupResult>({ mode: "full" });
   const [mainTask, setMainTask] = useState("");
@@ -366,6 +368,15 @@ export default function WarmupTab({ items, onChanged, profile }: { items: Entity
       <h1>Разминка</h1>
 
       {step === "intro" && (
+        <div className="wtab-switch">
+          <span className={view === "warmup" ? "on" : ""} onClick={() => setView("warmup")}>Разминка</span>
+          <span className={view === "stats" ? "on" : ""} onClick={() => setView("stats")}>📈 Статистика</span>
+        </div>
+      )}
+
+      {step === "intro" && view === "stats" && <WarmupStats items={items} />}
+
+      {step === "intro" && view === "warmup" && (
         <>
           <div className="warmup-hero">
             <div className="suggestion-label">Утренний вход в рабочий режим</div>
@@ -434,11 +445,14 @@ export default function WarmupTab({ items, onChanged, profile }: { items: Entity
               <button type="button" className="btn-add-plus" onClick={addMainTask}>+</button>
             </div>
           )}
-          <div className="warmup-skip" onClick={() => setStep("intro")}>← К памятке</div>
+          <div className="warmup-done-links">
+            <div className="warmup-skip" onClick={() => { setView("warmup"); setStep("intro"); }}>← К памятке</div>
+            <div className="warmup-skip" onClick={() => { setView("stats"); setStep("intro"); }}>📈 Статистика →</div>
+          </div>
         </div>
       )}
 
-      {history.length > 0 && step === "intro" && (
+      {history.length > 0 && step === "intro" && view === "warmup" && (
         <>
           <div className="diary-date-label">Последние разминки</div>
           <div className="warmup-history">
