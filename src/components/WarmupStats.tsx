@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Entity } from "../api";
-import { todayStr, addDaysStr } from "../dateUtils";
+import { todayStr, addDaysStr, weekdayOf } from "../dateUtils";
 
 // ============================================================
 // Статистика разминок: динамика по каждому упражнению.
@@ -85,7 +85,7 @@ function computeTrend(points: Point[], m: Metric): Trend {
 }
 
 // ---------- Линейный график с точками и скользящим средним ----------
-function TrendChart({ points, m }: { points: Point[]; m: Metric }) {
+function TrendChart({ points, m, baseline }: { points: Point[]; m: Pick<Metric, "title" | "fmt">; baseline?: number }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(320);
   const [hover, setHover] = useState<number | null>(null);
@@ -99,7 +99,7 @@ function TrendChart({ points, m }: { points: Point[]; m: Metric }) {
   }, []);
 
   const H = 150, padL = 34, padR = 10, padT = 10, padB = 22;
-  const vals = points.flatMap(p => [p.value, p.avg]);
+  const vals = [...points.flatMap(p => [p.value, p.avg]), ...(baseline !== undefined ? [baseline] : [])];
   let lo = Math.min(...vals), hi = Math.max(...vals);
   if (hi - lo < 1) { lo -= 1; hi += 1; }
   const span = hi - lo;
@@ -137,6 +137,10 @@ function TrendChart({ points, m }: { points: Point[]; m: Metric }) {
         {points.length > 0 && <>
           <text x={x(0)} y={H - 6} textAnchor={points.length === 1 ? "middle" : "start"} className="wstat-axis">{shortDate(points[0].date)}</text>
           {points.length > 1 && <text x={x(points.length - 1)} y={H - 6} textAnchor="end" className="wstat-axis">{shortDate(points[points.length - 1].date)}</text>}
+        </>}
+        {baseline !== undefined && <>
+          <line x1={padL} x2={width - padR} y1={y(baseline)} y2={y(baseline)} className="wstat-baseline" />
+          <text x={width - padR} y={y(baseline) - 4} textAnchor="end" className="wstat-axis">обычный уровень</text>
         </>}
         {hp && <line x1={x(hover!)} x2={x(hover!)} y1={padT} y2={padT + innerH} className="wstat-crosshair" />}
         {points.map((p, i) => (
@@ -197,6 +201,179 @@ function MetricCard({ entries, m }: { entries: Entity[]; m: Metric }) {
   );
 }
 
+
+// ============================================================
+// Общая картина: индекс формы (все упражнения одним числом),
+// регулярность (календарь + серии) и дни недели.
+// ============================================================
+
+const MIN_FOR_MEDIAN = 3;
+
+function median(xs: number[]) {
+  const s = [...xs].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+
+// 100 = твой обычный уровень (медиана за всё время по каждому упражнению).
+// 110 = в среднем на 10% лучше обычного, 90 = на 10% хуже.
+function computeIndex(all: Entity[]): Map<string, { value: number; n: number }> {
+  const medians = new Map<string, number>();
+  for (const m of METRICS) {
+    const vals = all.map(e => m.get(e.attributes)).filter((v): v is number => v !== null && v > 0);
+    if (vals.length >= MIN_FOR_MEDIAN) medians.set(m.key, median(vals));
+  }
+  const res = new Map<string, { value: number; n: number }>();
+  for (const e of all) {
+    const ratios: number[] = [];
+    for (const m of METRICS) {
+      const med = medians.get(m.key);
+      const v = m.get(e.attributes);
+      if (!med || v === null || v <= 0) continue;
+      const r = m.lowerIsBetter ? med / v : v / med;
+      ratios.push(Math.min(1.5, Math.max(0.5, r)));
+    }
+    if (ratios.length) res.set(e.attributes.date, { value: mean(ratios) * 100, n: ratios.length });
+  }
+  return res;
+}
+
+function streaks(dates: Set<string>, today: string) {
+  let current = 0;
+  let d = dates.has(today) ? today : addDaysStr(today, -1);
+  while (dates.has(d)) { current++; d = addDaysStr(d, -1); }
+  const sorted = [...dates].sort();
+  let best = 0, run = 0, prev = "";
+  for (const s of sorted) {
+    run = prev && addDaysStr(prev, 1) === s ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = s;
+  }
+  return { current, best };
+}
+
+const WD = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+
+function isFull(a: Record<string, any>) {
+  return a.mode === "full" || typeof a.math_correct === "number" || typeof a.stroop_correct === "number";
+}
+
+function Overview({ all, entries, days, today }: { all: Entity[]; entries: Entity[]; days: number | null; today: string }) {
+  const index = useMemo(() => computeIndex(all), [all]);
+
+  const points: Point[] = useMemo(() => {
+    const raw = entries
+      .map(e => ({ date: e.attributes.date as string, idx: index.get(e.attributes.date) }))
+      .filter((p): p is { date: string; idx: { value: number; n: number } } => !!p.idx);
+    return raw.map((p, i) => {
+      const win = raw.slice(Math.max(0, i - AVG_WINDOW + 1), i + 1).map(x => x.idx.value);
+      return { date: p.date, value: p.idx.value, avg: mean(win), extra: `упражнений: ${p.idx.n}` };
+    });
+  }, [entries, index]);
+
+  const doneDates = useMemo(() => new Set(all.map(e => e.attributes.date as string)), [all]);
+  const byDate = useMemo(() => new Map(all.map(e => [e.attributes.date as string, e])), [all]);
+  const { current, best } = streaks(doneDates, today);
+
+  // Календарь: для «всего времени» показываем последние 18 недель.
+  const calDays = days ?? 126;
+  const start = addDaysStr(today, -(calDays - 1));
+  const gridStart = addDaysStr(start, -weekdayOf(start)); // выравниваем по понедельнику
+  const firstDate = all.length ? (all[0].attributes.date as string) : today;
+  const cells: { date: string; kind: "full" | "short" | "none" | "future" | "before" }[] = [];
+  for (let d = gridStart; d <= addDaysStr(today, 6 - weekdayOf(today)); d = addDaysStr(d, 1)) {
+    const e = byDate.get(d);
+    cells.push({
+      date: d,
+      // дни до самой первой разминки не считаем пропусками
+      kind: d > today ? "future" : d < start || d < firstDate ? "before" : e ? (isFull(e.attributes) ? "full" : "short") : "none",
+    });
+  }
+  const weeks = Math.ceil(cells.length / 7);
+  const inRange = cells.filter(c => c.kind !== "future" && c.kind !== "before").length;
+  const doneInRange = cells.filter(c => c.kind === "full" || c.kind === "short").length;
+  const pctDone = inRange ? Math.round((doneInRange / inRange) * 100) : 0;
+
+  // Дни недели: средний индекс, если по дню хотя бы 2 разминки.
+  const wd = WD.map((_, i) => {
+    const vals = points.filter(p => weekdayOf(p.date) === i).map(p => p.value);
+    return vals.length >= 2 ? mean(vals) : null;
+  });
+  const wdVals = wd.filter((v): v is number => v !== null);
+  const showWd = wdVals.length >= 3;
+  const wdBest = showWd ? wd.indexOf(Math.max(...wdVals)) : -1;
+  const wdWorst = showWd ? wd.indexOf(Math.min(...wdVals)) : -1;
+
+  const trend = points.length ? computeTrend(points, { lowerIsBetter: false } as Metric) : null;
+  const last = points[points.length - 1];
+  const fmtIdx = (v: number) => `${Math.round(v)}`;
+  const level = (v: number) => v >= 105 ? "лучше обычного" : v <= 95 ? "ниже обычного" : "обычный уровень";
+
+  return (
+    <div className="wstat-card wstat-overview">
+      <div className="wstat-card-head">
+        <div>
+          <b>Общая картина</b>
+          <div className="muted" style={{ fontSize: "0.72rem" }}>все упражнения одним числом · 100 — твой обычный уровень</div>
+        </div>
+        {trend && (trend.kind === "few"
+          ? <span className="wstat-badge">нужно ещё {trend.need} {trend.need === 1 ? "разминка" : trend.need < 5 ? "разминки" : "разминок"}</span>
+          : <span className={`wstat-badge ${trend.kind}`}>
+              {trend.kind === "better" ? `▲ форма растёт: +${trend.pct}%` : trend.kind === "worse" ? `▼ форма снизилась: −${trend.pct}%` : "● стабильно"}
+            </span>)}
+      </div>
+
+      {points.length > 0 ? <>
+        <div className="wstat-nums">
+          <div><span>Последняя</span><b>{fmtIdx(last.value)}</b><small className="muted">{level(last.value)}</small></div>
+          <div><span>Среднее за период</span><b>{fmtIdx(mean(points.map(p => p.value)))}</b></div>
+          <div><span>Лучшее утро</span><b>{fmtIdx(Math.max(...points.map(p => p.value)))}</b></div>
+        </div>
+        <TrendChart points={points} m={{ title: "Индекс формы", fmt: fmtIdx }} baseline={100} />
+      </> : <div className="muted" style={{ marginBottom: 8 }}>Индекс появится, когда наберётся хотя бы {MIN_FOR_MEDIAN} разминки.</div>}
+
+      <div className="wstat-subhead">Регулярность</div>
+      <div className="wstat-nums">
+        <div><span>Серия сейчас</span><b>{current} {current === 1 ? "день" : current >= 2 && current <= 4 ? "дня" : "дней"}</b></div>
+        <div><span>Рекорд серии</span><b>{best}</b></div>
+        <div><span>Дней с разминкой</span><b>{pctDone}%</b></div>
+      </div>
+      <div className="wstat-cal-wrap">
+        <div className="wstat-cal-labels">{WD.map((w, i) => <span key={w}>{i % 2 === 0 ? w : ""}</span>)}</div>
+        <div className="wstat-cal" style={{ gridTemplateColumns: `repeat(${weeks}, minmax(0, 20px))` }}>
+          {cells.map(c => (
+            <span key={c.date} className={`wstat-cell ${c.kind} ${c.date === today ? "today" : ""}`}
+              title={c.kind === "future" || c.kind === "before" ? "" : `${c.date.split("-").reverse().join(".")} — ${c.kind === "full" ? "полная" : c.kind === "short" ? "короткая" : "без разминки"}`} />
+          ))}
+        </div>
+      </div>
+      <div className="wstat-legend">
+        <span><i className="wstat-cell full" /> полная</span>
+        <span><i className="wstat-cell short" /> короткая</span>
+        <span><i className="wstat-cell none" /> пропуск</span>
+      </div>
+
+      {showWd && <>
+        <div className="wstat-subhead">По дням недели</div>
+        <div className="wstat-wd">
+          {wd.map((v, i) => (
+            <div key={i} className={`wstat-wd-col ${i === wdBest ? "best" : ""} ${i === wdWorst ? "worst" : ""}`}>
+              <div className="wstat-wd-bar-wrap">
+                {v !== null && <div className="wstat-wd-bar" style={{ height: `${Math.max(8, Math.min(100, (v - 70) / 0.6))}%` }} />}
+              </div>
+              <b>{v !== null ? fmtIdx(v) : "—"}</b>
+              <span>{WD[i]}</span>
+            </div>
+          ))}
+        </div>
+        <div className="muted" style={{ fontSize: "0.72rem", marginTop: 6 }}>
+          Лучше всего голова работает {["в понедельник", "во вторник", "в среду", "в четверг", "в пятницу", "в субботу", "в воскресенье"][wdBest]}, тяжелее всего — {["в понедельник", "во вторник", "в среду", "в четверг", "в пятницу", "в субботу", "в воскресенье"][wdWorst]}.
+        </div>
+      </>}
+    </div>
+  );
+}
+
 export default function WarmupStats({ items }: { items: Entity[] }) {
   const [period, setPeriod] = useState<Period>("30");
   const [showAll, setShowAll] = useState(false);
@@ -234,6 +411,9 @@ export default function WarmupStats({ items }: { items: Entity[] }) {
         <div><b>{all.length}</b><span>всего за всё время</span></div>
       </div>
 
+      <Overview all={all} entries={entries} days={days} today={today} />
+
+      <div className="wstat-section-label">По упражнениям</div>
       {METRICS.map(m => <MetricCard key={m.key} entries={entries} m={m} />)}
 
       <div className="muted" style={{ fontSize: "0.72rem", margin: "4px 2px 12px", lineHeight: 1.45 }}>
