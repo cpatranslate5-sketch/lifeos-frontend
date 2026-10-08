@@ -433,3 +433,41 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
   .warmup-history-row{grid-template-columns:90px 1fr;}
   .stroop-box{font-size:1.6rem;}
 }
+
+/* ---------- Разминка: переключатель «Разминка / Статистика» ---------- */
+.wtab-switch{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:14px;gap:2px;}
+.wtab-switch span{padding:6px 14px;border-radius:8px;font-size:0.85rem;font-weight:600;color:var(--muted);cursor:pointer;user-select:none;}
+.wtab-switch span.on{background:var(--goal);color:#fff;}
+.warmup-done-links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+
+/* ---------- Статистика разминок ---------- */
+.wstat-periods{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.wstat-period{padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:0.8rem;cursor:pointer;color:var(--muted);user-select:none;}
+.wstat-period.on{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:600;}
+.wstat-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.wstat-summary > div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
+.wstat-summary b{font-size:1.35rem;font-variant-numeric:tabular-nums;}
+.wstat-summary span{font-size:0.72rem;color:var(--muted);line-height:1.25;}
+.wstat-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;}
+.wstat-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.wstat-badge{font-size:0.74rem;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--line);color:var(--muted);white-space:nowrap;}
+.wstat-badge.better{background:rgba(79,166,148,0.16);color:var(--goal);}
+.wstat-badge.worse{background:rgba(193,80,58,0.14);color:var(--event);}
+.wstat-badge.flat{background:var(--line);color:var(--text);}
+.wstat-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
+.wstat-nums > div{display:flex;flex-direction:column;gap:1px;}
+.wstat-nums span{font-size:0.7rem;color:var(--muted);}
+.wstat-nums b{font-size:1rem;font-variant-numeric:tabular-nums;}
+.wstat-chart{position:relative;width:100%;touch-action:pan-y;}
+.wstat-chart svg{display:block;overflow:visible;}
+.wstat-grid{stroke:var(--line);stroke-width:1;}
+.wstat-axis{fill:var(--muted);font-size:10px;font-variant-numeric:tabular-nums;}
+.wstat-dot{fill:var(--goal);opacity:0.45;transition:r .12s;}
+.wstat-dot.on{opacity:1;stroke:var(--card);stroke-width:2;}
+.wstat-avg{fill:none;stroke:var(--goal);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;}
+.wstat-crosshair{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;}
+.wstat-tip{position:absolute;top:-6px;width:140px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:0.74rem;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,0.15);z-index:2;}
+.wstat-tip-date{color:var(--muted);font-size:0.7rem;margin-bottom:2px;}
+@media (max-width:480px){
+  .wstat-summary b{font-size:1.15rem;}
+}
