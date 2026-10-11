@@ -86,6 +86,8 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
   const doneMin = totals.reduce((s, t) => s + t.doneMin, 0);
   const contentMin = doneMin + totalMin;
   const totalPending = totals.reduce((s, t) => s + t.pending, 0);
+  const totalCount = totals.reduce((s, t) => s + t.count, 0);
+  const totalDoneCount = totals.reduce((s, t) => s + t.doneCount, 0);
   const missing = totals.reduce((s, t) => s + (t.pending - t.withDuration), 0);
   const aiCount = totals.reduce((s, t) => s + t.aiCount, 0);
   const activeTypes = MEDIA_TYPES.filter(t => totals.find(x => x.type === t)!.pending > 0);
@@ -149,9 +151,9 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
 
       <div className="time-hero">
         <div className="time-hero-stats">
-          <div><span>Всего в медиатеке</span><b>{fmtHours(contentMin)}</b></div>
-          <div><span>Просмотрено и прочитано</span><b>{fmtHours(doneMin)}</b><small>{doneShare}%</small></div>
-          <div className="main"><span>Осталось</span><b>{fmtHours(totalMin)}</b><small>{100 - doneShare}%</small></div>
+          <div><span>Всего в медиатеке</span><b>{fmtHours(contentMin)}</b><small>{totalCount} {plural(totalCount, "позиция", "позиции", "позиций")}</small></div>
+          <div><span>Просмотрено и прочитано</span><b>{fmtHours(doneMin)}</b><small>{doneShare}% · {totalDoneCount} {plural(totalDoneCount, "позиция", "позиции", "позиций")}</small></div>
+          <div className="main"><span>Осталось</span><b>{fmtHours(totalMin)}</b><small>{100 - doneShare}% · {totalPending} {plural(totalPending, "позиция", "позиции", "позиций")}</small></div>
         </div>
         {contentMin > 0 && (
           <div className="time-progress" title={`Пройдено ${doneShare}%`}>
@@ -228,7 +230,12 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
             <div key={t.type} className="time-card" style={{ ["--accent" as any]: meta.color }}>
               <div className="time-card-head">
                 <b>{meta.emoji} {meta.label}</b>
-                <span className="muted">{t.pending} не {doneWord}{t.inProgress ? ` · ${t.inProgress} в процессе` : ""}</span>
+                <div className="time-counts">
+                  <span><b>{t.count}</b> всего</span>
+                  <span><b>{t.doneCount}</b> {doneWord} ({pct(t.doneCount, t.count)}%)</span>
+                  <span><b>{t.pending}</b> осталось{t.inProgress ? ` · ${t.inProgress} в процессе` : ""}</span>
+                </div>
+                {t.count > 0 && <div className="time-progress small"><div style={{ width: `${pct(t.doneCount, t.count)}%`, background: "var(--accent)" }} /></div>}
               </div>
 
               {t.pending === 0 ? (
