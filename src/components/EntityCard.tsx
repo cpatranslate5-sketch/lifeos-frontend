@@ -528,14 +528,14 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
           <div className="field media-criterion" onClick={() => !yearEditing && setYearEditing(true)}>
             {yearEditing ? (
               <>
-                <strong>Год:</strong>
+                <strong>{e.type === "book" ? "Год написания:" : "Год:"}</strong>
                 <input autoFocus type="text" inputMode="numeric" maxLength={4} defaultValue={e.attributes?.year || ""} placeholder="напр. 2024" onClick={(ev) => ev.stopPropagation()}
                   onBlur={async (ev) => { await updateEntityField(e.id, "year", ev.target.value.trim()); setYearEditing(false); onChanged(); }}
                   onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setYearEditing(false); }} />
               </>
             ) : (
               <>
-                <strong>Год:</strong>{" "}
+                <strong>{e.type === "book" ? "Год написания:" : "Год:"}</strong>{" "}
                 {e.attributes?.year ? (
                   <span className={onFilterByCriterion ? "criterion-link" : ""} onClick={(ev) => clickCriterion(ev, "year", e.attributes.year)}>{e.attributes.year}</span>
                 ) : "не указан"}

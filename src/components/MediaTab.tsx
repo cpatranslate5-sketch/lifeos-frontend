@@ -111,6 +111,7 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
   const [newGeo, setNewGeo] = useState<string[]>([]);
   const [newGenres, setNewGenres] = useState<string[]>([]);
   const [newActors, setNewActors] = useState("");
+  const [newYear, setNewYear] = useState("");
   const [newInProgress, setNewInProgress] = useState(false);
   const [newRating, setNewRating] = useState<number | null>(null);
   const [newCoverFile, setNewCoverFile] = useState<File | null>(null);
@@ -142,6 +143,7 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
     if (newAuthor.trim()) attrs.author = newAuthor.split(",").map(s => s.trim()).filter(Boolean);
     if (newGeo.length > 0) attrs.geo = newGeo;
     if (newGenres.length > 0) attrs.genres = newGenres;
+    if (type === "book" && newYear.trim()) attrs.year = newYear.trim();
     if (isCast && newActors.trim()) attrs.actors = newActors.split(",").map(s => s.trim()).filter(Boolean);
     if (newInProgress) attrs.status = "in_progress";
     if (newRating) attrs.rating = newRating;
@@ -173,6 +175,14 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
 
         <label className="muted">{authorLabelFor(type)}</label>
         <input value={newAuthor} onChange={e => setNewAuthor(e.target.value)} placeholder="Через запятую, если несколько" />
+
+        {type === "book" && (
+          <>
+            <label className="muted">Год написания</label>
+            <input value={newYear} onChange={e => setNewYear(e.target.value.replace(/[^0-9]/g, ""))}
+              inputMode="numeric" maxLength={4} placeholder="напр. 1866" />
+          </>
+        )}
 
         <label className="muted">Гео (можно несколько)</label>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", margin: "4px 0 10px" }}>
