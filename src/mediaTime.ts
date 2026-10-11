@@ -132,6 +132,8 @@ export function fmtDays(days: number): string {
 export interface TypeTotals {
   type: MediaType;
   pending: number;          // всего непросмотренного
+  count: number;            // всего позиций в разделе
+  doneCount: number;        // из них просмотрено/прочитано/пройдено
   withDuration: number;     // из них с длительностью
   knownMin: number;         // осталось по известным длительностям
   estimatedMin: number;     // плюс оценка для карточек без длительности (по среднему)
@@ -170,6 +172,8 @@ export function computeTotals(items: Entity[], type: MediaType, pagesPerHour: nu
   return {
     type,
     pending: pending.length,
+    count: all.length,
+    doneCount: done.length,
     withDuration: known.length,
     knownMin,
     estimatedMin,

@@ -592,3 +592,6 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .seasons-grid label{text-align:left;align-items:stretch;}
 .seasons-edit label.seasons-ongoing{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:6px;width:auto;}
 .seasons-edit label.seasons-ongoing input{width:auto;margin:0;}
+.time-counts{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:0.78rem;color:var(--muted);}
+.time-counts b{color:var(--text);font-variant-numeric:tabular-nums;}
+.time-progress.small{height:5px;margin:6px 0 2px;}
