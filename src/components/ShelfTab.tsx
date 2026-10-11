@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Entity, createEntity, uploadEntityCover, entityCoverUrl } from "../api";
+import { Entity, createEntity, uploadEntityCover, entityCoverUrl, detectSeries } from "../api";
 import EntityCard, { FilterKind } from "./EntityCard";
+import SeriesFolder from "./SeriesFolder";
+import { groupUnits, unitSortKey, topCountsByUnit } from "../series";
+import { showToast } from "../toast";
 
 function yearBucket(y: number): string {
   if (y < 1950) return "1900-1949";
@@ -163,7 +166,7 @@ function GameStatsModal({ items, onClose }: { items: Entity[]; onClose: () => vo
         <div style={{ fontWeight: 600, marginBottom: 6 }}>Статистика</div>
         <div className="muted" style={{ marginBottom: 10 }}>Всего: {items.length} · играю сейчас: {inProgress} · пройдено: {done}</div>
         <div style={{ fontWeight: 600, marginBottom: 4 }}>Топ разработчиков</div>
-        {topCounts(items.map(e => e.attributes?.developer).filter(Boolean)).map(([d, n]) => (
+        {topCountsByUnit(items, e => e.attributes?.developer ? [e.attributes.developer] : []).map(([d, n]) => (
           <div key={d} className="field">{d} — {n}</div>
         ))}
         {items.every(e => !e.attributes?.developer) && <div className="muted">Нет данных</div>}
@@ -216,8 +219,24 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
 
   const anyFilterActive = ratingFilter.length > 0 || statusFilter.length > 0 || developerFilter.length > 0 || yearFilter.length > 0;
   const sorted = [...filtered].sort((a, b) => sortKey(a) - sortKey(b));
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-  const pageItems = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil((isGame ? groupUnits(sorted).length : sorted.length) / PAGE_SIZE));
+  // Игры одной серии показываем папкой (у остальных разделов полки серий нет)
+  const units = isGame ? groupUnits(sorted).sort((a, b) => unitSortKey(a) - unitSortKey(b)) : sorted.map(e => ({ kind: "single" as const, e }));
+  const pageUnits = units.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const [grouping, setGrouping] = useState(false);
+  async function handleDetectSeries() {
+    setGrouping(true);
+    try {
+      const r = await detectSeries(profile, [type]);
+      const x = r[type];
+      showToast(x ? `Серий найдено: ${x.series} (карточек в них: ${x.items})` : "Серий не найдено");
+      onChanged();
+    } catch {
+      showToast("Не удалось собрать серии — попробуйте ещё раз");
+    } finally {
+      setGrouping(false);
+    }
+  }
 
   useEffect(() => { setPage(1); }, [items.length, ratingFilter, statusFilter, developerFilter, yearFilter]);
 
@@ -242,6 +261,10 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
           </div>
           {showAdd && <GameAddModal profile={profile} space={space} onClose={() => setShowAdd(false)} onAdded={onChanged} />}
           {showStats && <GameStatsModal items={items} onClose={() => setShowStats(false)} />}
+          <div className="series-tools">
+            <span>{items.length} игр</span>
+            <button type="button" onClick={handleDetectSeries} disabled={grouping}>{grouping ? "Ищу серии… до минуты" : "🗂 Собрать серии"}</button>
+          </div>
 
           <div className="media-filters">
             <div style={{ position: "relative" }}>
@@ -346,7 +369,9 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
       <PageBar page={page} totalPages={totalPages} onPageChange={setPage} />
 
       {sorted.length === 0 && <div className="muted">{anyFilterActive ? "Ничего не найдено по этим фильтрам." : "Пока пусто."}</div>}
-      {pageItems.map(it => <EntityCard key={it.id} e={it} onChanged={onChanged} profile={profile} onFilterByCriterion={isGame ? handleFilterByCriterion : undefined} layout={layout} />)}
+      {pageUnits.map(u => u.kind === "single"
+        ? <EntityCard key={u.e.id} e={u.e} onChanged={onChanged} profile={profile} onFilterByCriterion={isGame ? handleFilterByCriterion : undefined} layout={layout} />
+        : <SeriesFolder key={u.key} unit={u} onChanged={onChanged} profile={profile} onFilterByCriterion={handleFilterByCriterion} />)}
 
       <PageBar page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>

@@ -321,6 +321,11 @@ export async function fillDurations(profile: string, space = "life", includeDone
   return res.json();
 }
 
+export async function detectSeries(profile: string, types: string[], space = "life"): Promise<Record<string, { series: number; items: number }>> {
+  const res = await req("/entities/detect-series", { method: "POST", body: JSON.stringify({ profile, types, space }) });
+  return res.json();
+}
+
 export async function enrichEntity(id: string): Promise<Entity> {
   const res = await req(`/entities/${id}/enrich`, { method: "POST" });
   return res.json();

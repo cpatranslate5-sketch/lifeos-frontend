@@ -595,3 +595,29 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .time-counts{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:0.78rem;color:var(--muted);}
 .time-counts b{color:var(--text);font-variant-numeric:tabular-nums;}
 .time-progress.small{height:5px;margin:6px 0 2px;}
+
+/* ---------- Серии / франшизы ---------- */
+.series-folder{padding:0;overflow:hidden;}
+.series-head{all:unset;box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:center;width:100%;padding:9px 12px;cursor:pointer;}
+.series-head:focus-visible{outline:2px solid var(--goal);outline-offset:-2px;}
+.series-cover{position:relative;box-shadow:4px 4px 0 -1px var(--card),4px 4px 0 0 var(--line),8px 8px 0 -1px var(--card),8px 8px 0 0 var(--line);margin-right:8px;}
+.series-count{position:absolute;right:3px;bottom:3px;background:rgba(0,0,0,0.65);color:#fff;font-size:0.7rem;font-weight:700;border-radius:6px;padding:1px 6px;}
+.series-info{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.series-title{font-weight:700;font-size:1rem;}
+.series-meta{font-size:0.78rem;}
+.series-progress{display:block;height:5px;border-radius:999px;background:var(--line);overflow:hidden;max-width:240px;}
+.series-progress span{display:block;height:100%;background:var(--goal);border-radius:999px;}
+.series-rating{display:flex;flex-direction:column;align-items:flex-end;font-weight:700;color:#E8963D;font-size:1rem;white-space:nowrap;}
+.series-rating small{font-size:0.68rem;font-weight:500;color:var(--muted);}
+.series-chevron{color:var(--muted);font-size:1rem;}
+.series-members{border-top:1px solid var(--line);padding:8px 10px 4px;background:var(--bg);}
+.series-member{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;align-items:start;}
+.series-num{font-size:0.75rem;font-weight:700;color:var(--muted);text-align:right;padding-top:12px;font-variant-numeric:tabular-nums;}
+.series-member-card{min-width:0;}
+.series-edit{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.series-edit input{flex:1;min-width:140px;}
+.series-edit .series-order-input{flex:0 0 56px;min-width:0;}
+.series-edit button{background:var(--goal);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-weight:600;cursor:pointer;}
+.series-tools{display:flex;gap:8px;flex-wrap:wrap;margin:-6px 0 12px;font-size:0.8rem;color:var(--muted);align-items:center;}
+.series-tools button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--text);cursor:pointer;font-size:0.8rem;}
+@media (max-width:480px){.series-head{grid-template-columns:auto minmax(0,1fr) auto;}.series-chevron{display:none;}}

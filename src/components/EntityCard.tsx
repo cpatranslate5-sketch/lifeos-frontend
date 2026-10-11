@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Entity, updateEntityField, renameEntity, deleteEntity, createEntity, uploadEntityCover, entityCoverUrl, propagateCover, enrichEntity, autoImageEntity } from "../api";
+import { Entity, updateEntityField, renameEntity, deleteEntity, createEntity, fetchEntities, uploadEntityCover, entityCoverUrl, propagateCover, enrichEntity, autoImageEntity } from "../api";
 import { TYPES, genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { todayStr, addDaysStr } from "../dateUtils";
 import { showToast } from "../toast";
@@ -10,6 +10,7 @@ import { useLiteMode } from "../liteMode";
 import MiniCalendar from "./MiniCalendar";
 import DurationField from "./DurationField";
 import SeasonsField from "./SeasonsField";
+import SeriesField from "./SeriesField";
 
 const MONTHS_RU = ["", "января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 
@@ -281,7 +282,17 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   async function copyToOtherFolder() {
     const target = profile === "kotyonok" ? "nemalenkiy" : "kotyonok";
     const targetLabel = target === "kotyonok" ? "Котёнок" : "НеМаленький";
-    const { done, done_dates, status, rating, reminder_marker, skipped_dates, in_process_dates, ...catalogAttrs } = e.attributes || {};
+    // Не создаём дубль, если такая карточка в той папке уже есть
+    // (сравниваем без учёта регистра, «ё/е», кавычек и знаков препинания).
+    const norm = (s: string) => s.toLowerCase().replace(/ё/g, "е").replace(/[«»"'.,:;!?()\-–—]/g, " ").replace(/\s+/g, " ").trim();
+    try {
+      const existing = await fetchEntities(e.type, undefined, target);
+      if (existing.some(x => norm(x.name) === norm(e.name))) {
+        showToast(`«${e.name}» уже есть в «${targetLabel}»`);
+        return;
+      }
+    } catch { /* не удалось проверить — копируем как обычно */ }
+    const { done, done_dates, status, rating, reminder_marker, skipped_dates, in_process_dates, seasons_watched, ...catalogAttrs } = e.attributes || {};
     await createEntity(e.type, e.name, catalogAttrs, "life", target);
     showToast(`Скопировано в «${targetLabel}»`);
   }
@@ -526,6 +537,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
       )}
 
       {e.type === "game" && <DurationField e={e} onChanged={onChanged} />}
+      {e.type === "game" && <SeriesField e={e} onChanged={onChanged} />}
 
       {isMedia && (
         <div className="media-criteria">
@@ -550,6 +562,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
 
           <DurationField e={e} onChanged={onChanged} />
           {e.type === "show" && <SeasonsField e={e} onChanged={onChanged} />}
+          <SeriesField e={e} onChanged={onChanged} />
 
           <div className="field media-criterion" onClick={() => !authorEditing && setAuthorEditing(true)}>
             {authorEditing ? (

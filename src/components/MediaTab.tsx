@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Entity, createEntity, uploadEntityCover, entityCoverUrl, enrichTmdb } from "../api";
+import { Entity, createEntity, uploadEntityCover, entityCoverUrl, enrichTmdb, detectSeries } from "../api";
 import EntityCard, { FilterKind } from "./EntityCard";
+import SeriesFolder from "./SeriesFolder";
+import { groupUnits, unitSortKey, topCountsByUnit } from "../series";
 import { genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { showToast } from "../toast";
 
@@ -249,32 +251,28 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
 function StatsModal({ type, items, onClose }: { type: string; items: Entity[]; onClose: () => void }) {
   const isCast = type === "movie" || type === "show";
 
-  function topCounts(values: string[], n = 5): [string, number][] {
-    const counts = new Map<string, number>();
-    for (const v of values) counts.set(v, (counts.get(v) || 0) + 1);
-    return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, n);
-  }
-
   function authorsOf(e: Entity): string[] {
     const a = e.attributes?.author;
     if (!a) return [];
     return Array.isArray(a) ? a : [a];
   }
+  // Серия считается одним произведением: значения её частей объединяются.
+  const unitsCount = groupUnits(items).length;
 
   return (
     <div className="modal-bg" onClick={onClose}>
       <div className="modal" onClick={ev => ev.stopPropagation()}>
         <div style={{ fontWeight: 600, marginBottom: 6 }}>Статистика</div>
-        <div className="muted" style={{ marginBottom: 10 }}>По {items.length} {items.length === 1 ? "записи" : "записям"}</div>
+        <div className="muted" style={{ marginBottom: 10 }}>По {items.length} {items.length === 1 ? "записи" : "записям"}{unitsCount < items.length ? ` · ${unitsCount} с учётом серий (каждая серия считается один раз)` : ""}</div>
 
         <div style={{ fontWeight: 600, marginBottom: 4 }}>Топ жанров</div>
-        {topCounts(items.flatMap(e => e.attributes?.genres || [])).map(([g, n]) => (
+        {topCountsByUnit(items, e => e.attributes?.genres || []).map(([g, n]) => (
           <div key={g} className="field">{g} — {n}</div>
         ))}
         {items.every(e => (e.attributes?.genres || []).length === 0) && <div className="muted" style={{ marginBottom: 8 }}>нет данных</div>}
 
         <div style={{ fontWeight: 600, margin: "10px 0 4px" }}>Топ {authorLabelFor(type).toLowerCase()}ов</div>
-        {topCounts(items.flatMap(e => authorsOf(e))).map(([a, n]) => (
+        {topCountsByUnit(items, e => authorsOf(e)).map(([a, n]) => (
           <div key={a} className="field">{a} — {n}</div>
         ))}
         {items.every(e => authorsOf(e).length === 0) && <div className="muted" style={{ marginBottom: 8 }}>нет данных</div>}
@@ -282,7 +280,7 @@ function StatsModal({ type, items, onClose }: { type: string; items: Entity[]; o
         {isCast && (
           <>
             <div style={{ fontWeight: 600, margin: "10px 0 4px" }}>Топ актёров</div>
-            {topCounts(items.flatMap(e => e.attributes?.actors || [])).map(([a, n]) => (
+            {topCountsByUnit(items, e => e.attributes?.actors || []).map(([a, n]) => (
               <div key={a} className="field">{a} — {n}</div>
             ))}
             {items.every(e => (e.attributes?.actors || []).length === 0) && <div className="muted">нет данных</div>}
@@ -290,7 +288,7 @@ function StatsModal({ type, items, onClose }: { type: string; items: Entity[]; o
         )}
 
         <div style={{ fontWeight: 600, margin: "10px 0 4px" }}>По гео</div>
-        {topCounts(items.flatMap(e => (e.attributes?.geo as string[]) || [])).map(([g, n]) => (
+        {topCountsByUnit(items, e => (e.attributes?.geo as string[]) || []).map(([g, n]) => (
           <div key={g} className="field">{g} — {n}</div>
         ))}
         {items.every(e => ((e.attributes?.geo as string[]) || []).length === 0) && <div className="muted">нет данных</div>}
@@ -409,9 +407,25 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   });
 
   const sorted = [...filtered].sort((a, b) => sortKey(a) - sortKey(b));
+  const units = groupUnits(sorted).sort((a, b) => unitSortKey(a) - unitSortKey(b));
   const anyFilterActive = !!searchTerm || genreFilter.length > 0 || geoFilter.length > 0 || yearFilter.length > 0 || authorFilter.length > 0 || actorFilter.length > 0 || ratingFilter.length > 0 || statusFilter.length > 0;
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-  const pageItems = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(units.length / PAGE_SIZE));
+  const pageUnits = units.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const seriesCount = units.filter(u => u.kind === "series").length;
+  const [grouping, setGrouping] = useState(false);
+  async function handleDetectSeries() {
+    setGrouping(true);
+    try {
+      const r = await detectSeries(profile, [type]);
+      const x = r[type];
+      showToast(x ? `Серий найдено: ${x.series} (карточек в них: ${x.items})` : "Серий не найдено");
+      onChanged();
+    } catch {
+      showToast("Не удалось собрать серии — попробуйте ещё раз");
+    } finally {
+      setGrouping(false);
+    }
+  }
 
   const PageBar = () => totalPages > 1 ? (
     <div className="pagination">
@@ -438,6 +452,11 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
             {enriching ? "Заполняю…" : "🎬 Заполнить пустые карточки"}
           </button>
         )}
+      </div>
+
+      <div className="series-tools">
+        <span>{items.length} {type === "book" ? "книг" : type === "show" ? "сериалов" : "фильмов"}{seriesCount ? ` · серий на экране: ${seriesCount}` : ""}</span>
+        <button type="button" onClick={handleDetectSeries} disabled={grouping}>{grouping ? "Ищу серии… до минуты" : "🗂 Собрать серии"}</button>
       </div>
 
       {showAdd && <AddModal type={type} profile={profile} onClose={() => setShowAdd(false)} onAdded={onChanged} />}
@@ -604,7 +623,9 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
       <PageBar />
 
       {sorted.length === 0 && <div className="muted">{anyFilterActive ? "Ничего не найдено по этим фильтрам." : "Пока пусто."}</div>}
-      {pageItems.map(it => <EntityCard key={it.id} e={it} onChanged={onChanged} profile={profile} onFilterByCriterion={handleFilterByCriterion} />)}
+      {pageUnits.map(u => u.kind === "single"
+        ? <EntityCard key={u.e.id} e={u.e} onChanged={onChanged} profile={profile} onFilterByCriterion={handleFilterByCriterion} />
+        : <SeriesFolder key={u.key} unit={u} onChanged={onChanged} profile={profile} onFilterByCriterion={handleFilterByCriterion} />)}
 
       <PageBar />
     </div>
