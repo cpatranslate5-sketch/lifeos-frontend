@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Entity, createEntity, uploadEntityCover, entityCoverUrl, detectSeries } from "../api";
 import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
+import SeriesModal from "./SeriesModal";
 import { SeriesCatalog } from "../seriesActions";
 import { groupUnits, unitSortKey, topCountsByUnit } from "../series";
 import { showToast } from "../toast";
@@ -178,6 +179,7 @@ function GameStatsModal({ items, onClose }: { items: Entity[]; onClose: () => vo
 }
 
 export default function ShelfTab({ title, placeholder, type, items, onChanged, extraAttrs, space, profile, layout }: Props) {
+  const [creatingSeries, setCreatingSeries] = useState(false);
   const [val, setVal] = useState("");
   const [page, setPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
@@ -265,7 +267,8 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
           {showStats && <GameStatsModal items={items} onClose={() => setShowStats(false)} />}
           <div className="series-tools">
             <span>{items.length} игр</span>
-            <button type="button" onClick={handleDetectSeries} disabled={grouping}>{grouping ? "Ищу серии… до минуты" : "🗂 Собрать серии"}</button>
+            <button type="button" className="series-create-btn" onClick={() => setCreatingSeries(true)}>＋ Создать серию</button>
+        {creatingSeries && <SeriesModal mode="create" type={type} onClose={() => setCreatingSeries(false)} onDone={onChanged} />}
           </div>
 
           <div className="media-filters">

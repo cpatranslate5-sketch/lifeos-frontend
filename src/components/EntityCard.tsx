@@ -11,6 +11,8 @@ import MiniCalendar from "./MiniCalendar";
 import DurationField from "./DurationField";
 import SeasonsField from "./SeasonsField";
 import SeriesField from "./SeriesField";
+import SeriesModal from "./SeriesModal";
+import { useSeriesCatalog } from "../seriesActions";
 
 const MONTHS_RU = ["", "января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 
@@ -79,6 +81,9 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
   const isHabit = e.type === "habit";
   const isMedia = ["movie", "show", "book"].includes(e.type);
   const hasRating = ["movie", "show", "book", "game"].includes(e.type);
+  const seriesCatalog = useSeriesCatalog();
+  const [seriesModal, setSeriesModal] = useState(false);
+  const canAddToSeries = hasRating && seriesCatalog.length > 0 && !(typeof e.attributes?.series === "string" && e.attributes.series.trim());
   const isCast = ["movie", "show"].includes(e.type);
   const doneDates: string[] = e.attributes?.done_dates || [];
   const skippedDates: string[] = e.attributes?.skipped_dates || [];
@@ -751,7 +756,11 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
             {autoImaging ? "Ищу фото…" : "🖼️ Добавить фото автоматически"}
           </div>
         )}
+        {canAddToSeries && (
+          <div className="why series-add-btn" onClick={() => setSeriesModal(true)}>🗂 Добавить в серию</div>
+        )}
         <div className="why danger-action" onClick={handleDelete}>Удалить</div>
+        {seriesModal && <SeriesModal mode="add" type={e.type} card={e} onClose={() => setSeriesModal(false)} onDone={onChanged} />}
         {hasRating && (
           <div className="star-rating" style={{ marginBottom: 0, marginLeft: "auto" }}>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (

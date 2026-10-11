@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Entity, createEntity, uploadEntityCover, entityCoverUrl, enrichTmdb, detectSeries } from "../api";
 import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
+import SeriesModal from "./SeriesModal";
 import { SeriesCatalog } from "../seriesActions";
 import { groupUnits, unitSortKey, topCountsByUnit } from "../series";
 import { genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
@@ -301,6 +302,7 @@ function StatsModal({ type, items, onClose }: { type: string; items: Entity[]; o
 }
 
 export default function MediaTab({ title, placeholder, type, items, onChanged, profile }: Props) {
+  const [creatingSeries, setCreatingSeries] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -458,7 +460,8 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
 
       <div className="series-tools">
         <span>{items.length} {type === "book" ? "книг" : type === "show" ? "сериалов" : "фильмов"}{seriesCount ? ` · серий на экране: ${seriesCount}` : ""}</span>
-        <button type="button" onClick={handleDetectSeries} disabled={grouping}>{grouping ? "Ищу серии… до минуты" : "🗂 Собрать серии"}</button>
+        <button type="button" className="series-create-btn" onClick={() => setCreatingSeries(true)}>＋ Создать серию</button>
+        {creatingSeries && <SeriesModal mode="create" type={type} onClose={() => setCreatingSeries(false)} onDone={onChanged} />}
       </div>
 
       {showAdd && <AddModal type={type} profile={profile} onClose={() => setShowAdd(false)} onAdded={onChanged} />}

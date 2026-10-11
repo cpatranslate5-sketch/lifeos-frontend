@@ -639,3 +639,24 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .series-add-part:hover{border-color:#E8963D;}
 .series-tools{display:flex;gap:8px;flex-wrap:wrap;margin:-6px 0 12px;font-size:0.8rem;color:var(--muted);align-items:center;}
 .series-tools button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--text);cursor:pointer;font-size:0.8rem;}
+.series-modal{position:relative;max-width:520px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
+.series-modal-title{font-weight:700;font-size:1.05rem;padding-right:28px;}
+.series-modal-sub{font-size:0.8rem;margin-top:2px;}
+.series-modal-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);margin-top:14px;}
+.series-modal-hint{font-size:0.76rem;margin:-4px 0 6px;}
+.series-modal-row{display:flex;gap:8px;align-items:flex-start;}
+.series-modal-row input{flex:1;}
+.series-modal .series-modal-close{position:absolute;top:12px;right:10px;background:none;color:var(--muted);padding:4px 8px;margin:0;font-size:0.95rem;}
+.series-modal .series-modal-primary{background:#E8963D;color:#fff;margin:4px 0 0;white-space:nowrap;}
+.series-modal .series-modal-primary:disabled{opacity:0.5;cursor:default;}
+.series-modal-list{display:flex;flex-direction:column;gap:4px;overflow-y:auto;min-height:60px;max-height:40vh;padding-right:2px;}
+.series-modal .series-option{margin:0;font-weight:500;background:var(--bg);color:var(--text);border:1px solid var(--line);padding:8px 10px;}
+.series-modal .series-option:hover{border-color:#E8963D;}
+.series-check{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-size:0.82rem;cursor:pointer;}
+.series-check.on{border-color:#E8963D;background:rgba(232,150,61,0.08);}
+.series-modal .series-check input{width:auto;margin:0;flex-shrink:0;}
+.series-check .series-option-name{flex:1;}
+.series-check .muted{font-size:0.72rem;white-space:nowrap;}
+.series-modal-actions{display:flex;gap:4px;margin-top:12px;}
+.series-tools .series-create-btn{border-color:#E8963D;color:#E8963D;font-weight:600;}
+.why.series-add-btn{background:rgba(232,150,61,0.15);color:#B8691A;}

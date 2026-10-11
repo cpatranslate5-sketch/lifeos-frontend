@@ -114,3 +114,27 @@ export function suggestSeriesName(a: Entity, b: Entity): string {
   if (name.length < 3) name = first.name.split(/[:.(]|\s[—–-]\s|\s\d/)[0].trim();
   return name || first.name;
 }
+
+/** Перенести карточки в серию name (новую или существующую). Если какие-то из них
+ *  были в других сериях — те серии перенумеровываются без них. */
+export async function putIntoSeries(name: string, cards: Entity[], catalog: Entity[]) {
+  const n = name.trim();
+  if (!n || !cards.length) return;
+  const type = cards[0].type;
+  const ids = new Set(cards.map(c => c.id));
+  const target = seriesOfType(catalog, type).find(s => s.name.toLowerCase() === n.toLowerCase());
+  const finalName = target ? target.name : n;
+  // старые серии, из которых карточки уходят
+  const oldNames = new Set(cards.map(c => seriesName(c)).filter((x): x is string => !!x && x.toLowerCase() !== n.toLowerCase()));
+  await addToSeries(finalName, target ? target.members : [], cards.filter(c => !target || !target.members.some(m => m.id === c.id)));
+  for (const old of oldNames) {
+    const rest = catalog.filter(x => x.type === type && !ids.has(x.id) && seriesName(x)?.toLowerCase() === old.toLowerCase())
+      .sort((a, b) => (order(a) - order(b)) || (year(a) - year(b)));
+    await Promise.all(rest.map((m, i) => (order(m) !== i + 1 ? updateEntityField(m.id, "series_order", i + 1) : null)));
+  }
+}
+
+/** Название по умолчанию для серии из одной карточки: до двоеточия / номера части. */
+export function baseTitle(name: string): string {
+  return name.split(/[:.(]|\s[—–-]\s|\s\d+\s*$|\s(I|II|III|IV|V|VI)\s*$/)[0].trim() || name;
+}

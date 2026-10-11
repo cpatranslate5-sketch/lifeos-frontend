@@ -27,7 +27,7 @@ function memberOrder(a: Entity, b: Entity) {
 
 /** Собирает список в «единицы»: одиночные карточки и папки серий.
  *  Порядок — по первому появлению в исходном (уже отсортированном) списке.
- *  Серия из одной оставшейся после фильтров карточки показывается обычной карточкой. */
+ *  Серия показывается папкой, даже если в ней пока одна часть. */
 export function groupUnits(items: Entity[]): Unit[] {
   const buckets = new Map<string, Entity[]>();
   for (const e of items) {
@@ -42,7 +42,7 @@ export function groupUnits(items: Entity[]): Unit[] {
   for (const e of items) {
     const n = seriesName(e);
     const key = n ? e.type + "|" + n.toLowerCase() : "";
-    if (n && buckets.get(key)!.length > 1) {
+    if (n) {
       if (seen.has(key)) continue;
       seen.add(key);
       units.push({ kind: "series", key, name: n, members: [...buckets.get(key)!].sort(memberOrder) });
