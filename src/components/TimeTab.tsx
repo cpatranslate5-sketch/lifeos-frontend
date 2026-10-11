@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Entity, createEntity, updateEntityField, fillDurations } from "../api";
 import { todayStr, addDaysStr } from "../dateUtils";
 import { showToast } from "../toast";
+import DurationField from "./DurationField";
 import {
   MEDIA_TYPES, MEDIA_META, MediaType, MediaBudget, BUDGET_TYPE, readBudget, computeTotals,
-  fmtHours, fmtMinutes, fmtDays, rememberPagesPerHour, TypeTotals, plural,
+  fmtHours, fmtMinutes, fmtDays, rememberPagesPerHour, TypeTotals, plural, isPending, itemMinutes, isEstimate,
 } from "../mediaTime";
 
 // ============================================================
@@ -34,6 +35,7 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
   const { entity, budget: saved } = readBudget(items);
   const [budget, setBudget] = useState<MediaBudget>(saved);
   const [filling, setFilling] = useState(false);
+  const [showList, setShowList] = useState<"missing" | "ai" | null>(null);
   const loadedFor = useRef<string | null>(null);
   const saveTimer = useRef<number | undefined>(undefined);
 
@@ -71,6 +73,14 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
   const finiteDays = spans.map(s => s.days).filter((d): d is number => d !== null);
   const overallDays = finiteDays.length ? Math.max(...finiteDays) : 0;
   const slowest = spans.filter(s => s.days !== null && s.days === overallDays && overallDays > 0)[0];
+
+  const typeOrder = (e: Entity) => MEDIA_TYPES.indexOf(e.type as MediaType);
+  const pendingMedia = items.filter(e => MEDIA_TYPES.includes(e.type as MediaType) && isPending(e));
+  const missingList = pendingMedia.filter(e => itemMinutes(e, budget.pages_per_hour) === null)
+    .sort((a, b) => typeOrder(a) - typeOrder(b) || a.name.localeCompare(b.name, "ru"));
+  const aiList = pendingMedia.filter(e => itemMinutes(e, budget.pages_per_hour) !== null && isEstimate(e))
+    .sort((a, b) => typeOrder(a) - typeOrder(b) || a.name.localeCompare(b.name, "ru"));
+  const shownList = showList === "missing" ? missingList : showList === "ai" ? aiList : [];
 
   async function runFill() {
     setFilling(true);
@@ -117,8 +127,34 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
 
       {(missing > 0 || aiCount > 0) && (
         <div className="time-note">
-          {missing > 0 && <div>У <b>{missing}</b> {plural(missing, "карточки", "карточек", "карточек")} нет длительности — пока считаю их по среднему в разделе.</div>}
-          {aiCount > 0 && <div className="muted">≈ {aiCount} — оценки Claude, их можно поправить на карточке.</div>}
+          {missing > 0 && (
+            <div>
+              У <b>{missing}</b> {plural(missing, "карточки", "карточек", "карточек")} нет длительности — пока считаю их по среднему в разделе.{" "}
+              <span className="time-link" onClick={() => setShowList(showList === "missing" ? null : "missing")}>{showList === "missing" ? "Скрыть" : "Показать"}</span>
+            </div>
+          )}
+          {aiCount > 0 && (
+            <div className="muted">
+              ≈ {aiCount} — оценки Claude, их можно поправить.{" "}
+              <span className="time-link" onClick={() => setShowList(showList === "ai" ? null : "ai")}>{showList === "ai" ? "Скрыть" : "Показать и поправить"}</span>
+            </div>
+          )}
+          {shownList.length > 0 && (
+            <div className="time-list">
+              {shownList.map((e, i) => (
+                <div key={e.id}>
+                  {(i === 0 || shownList[i - 1].type !== e.type) && (
+                    <div className="time-list-group">{MEDIA_META[e.type as MediaType].emoji} {MEDIA_META[e.type as MediaType].label}</div>
+                  )}
+                  <div className="time-list-row">
+                    <span className="time-list-name">{e.name}</span>
+                    <DurationField e={e} onChanged={onChanged} />
+                  </div>
+                </div>
+              ))}
+              <div className="muted time-small" style={{ marginTop: 6 }}>Нажми на цифру или ✎, чтобы вписать своё значение — оно перестанет считаться оценкой.</div>
+            </div>
+          )}
           {missing > 0 && (
             <button type="button" className="time-fill-btn" disabled={filling} onClick={runFill}>
               {filling ? "Ищу длительность… это может занять минуту" : "Заполнить длительность автоматически"}
