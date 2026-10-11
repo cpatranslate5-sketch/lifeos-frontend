@@ -64,6 +64,7 @@ function plural(n: number, [one, few, many]: [string, string, string]) {
   if (b > 1 && b < 5) return few;
   return many;
 }
+const NOW: Record<string, string> = { movie: "Смотрю сейчас", show: "Смотрю сейчас", book: "Читаю сейчас", game: "Играю сейчас" };
 const DONE: Record<string, string> = { movie: "просмотрено", show: "просмотрено", book: "прочитано", game: "пройдено" };
 
 function asList(v: unknown): string[] {
@@ -100,6 +101,8 @@ export default function SeriesFolder({ unit, onChanged, profile, onFilterByCrite
   const isGame = type === "game";
   const creators = common(m, isGame ? "developer" : "author");
   const genres = common(m, "genres");
+  const nowParts = m.filter(e => e.attributes?.status === "in_progress" && !e.attributes?.done);
+  const waitingParts = m.filter(e => e.attributes?.status === "waiting_season" && !e.attributes?.done);
   const toggle = () => { if (!renaming) setOpen(!open); };
   const [renaming, setRenaming] = useState(false);
   async function doRename(v: string) {
@@ -134,6 +137,16 @@ export default function SeriesFolder({ unit, onChanged, profile, onFilterByCrite
               </>}
             </div>
           </div>
+          {nowParts.length > 0 && (
+            <div className="series-now">
+              <div className="status-badge on">
+                ▶ {NOW[type]}{m.length > 1 ? `: ${nowParts.map(e => e.name).join(", ")}` : ""}
+              </div>
+            </div>
+          )}
+          {nowParts.length === 0 && waitingParts.length > 0 && (
+            <div className="series-now"><div className="status-badge new-season on">🔔 Жду новый сезон</div></div>
+          )}
           <div className="card-middle layout-media series-middle">
             <div className="media-criteria">
             <div className="field"><strong>Части:</strong> {m.length} {plural(m.length, WORD[type])}{span ? ` · ${span}` : ""}</div>
