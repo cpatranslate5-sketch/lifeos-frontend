@@ -533,3 +533,12 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
   .time-grid{grid-template-columns:1fr;}
   .time-hero-big{font-size:2rem;}
 }
+
+.time-link{color:var(--goal);text-decoration:underline;cursor:pointer;font-weight:600;white-space:nowrap;}
+.time-list{margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 12px 10px;max-height:420px;overflow-y:auto;}
+.time-list-group{font-size:0.75rem;font-weight:700;color:var(--muted);margin:10px 0 2px;text-transform:uppercase;letter-spacing:0.03em;}
+.time-list-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:4px 0;border-bottom:1px solid var(--line);font-size:0.85rem;}
+.time-list-row:last-child{border-bottom:none;}
+.time-list-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.time-list-row .field{margin:0;white-space:nowrap;font-size:0.8rem;}
+@media (max-width:480px){ .time-list-row{flex-direction:column;align-items:flex-start;gap:0;} }
