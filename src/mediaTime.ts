@@ -26,9 +26,10 @@ export const BUDGET_TYPE = "media_budget";
 export interface MediaBudget {
   movie: number; show: number; book: number; game: number; // минут в день
   pages_per_hour: number;
+  include_future: number; // 1 — учитывать будущие сезоны выходящих сериалов
 }
 
-export const DEFAULT_BUDGET: MediaBudget = { movie: 30, show: 45, book: 30, game: 30, pages_per_hour: 30 };
+export const DEFAULT_BUDGET: MediaBudget = { movie: 30, show: 45, book: 30, game: 30, pages_per_hour: 30, include_future: 1 };
 
 export function readBudget(items: Entity[]): { entity: Entity | null; budget: MediaBudget } {
   const entity = items.find(e => e.type === BUDGET_TYPE) || null;
@@ -45,7 +46,40 @@ export function isPending(e: Entity): boolean {
   return !e.attributes?.done && e.attributes?.status !== "skipped";
 }
 
-/** Минуты на карточку, или null, если длительность не указана. */
+// ---------- Сериалы: сезоны ----------
+// duration_min у сериала — все ВЫШЕДШИЕ серии. Дополнительно (необязательно):
+//   seasons_released — сколько сезонов вышло (из TMDB или вручную)
+//   seasons_watched  — сколько сезонов уже просмотрено
+//   seasons_total    — сколько сезонов будет всего (если известно / по ожиданиям)
+//   show_ongoing     — сериал ещё выходит
+export interface SeasonInfo { released: number | null; watched: number; total: number | null; ongoing: boolean; perSeason: number | null }
+
+export function seasonInfo(e: Entity): SeasonInfo {
+  const a = e.attributes || {};
+  const released = a.seasons_released > 0 ? a.seasons_released : null;
+  const watched = a.seasons_watched > 0 ? a.seasons_watched : 0;
+  const total = a.seasons_total > 0 ? a.seasons_total : null;
+  const perSeason = released && a.duration_min > 0 ? a.duration_min / released : null;
+  return { released, watched, total, ongoing: !!a.show_ongoing || (!!total && !!released && total > released), perSeason };
+}
+
+/** Сколько минут будущих (ещё не вышедших) сезонов, если известно, сколько их будет. */
+export function futureMinutes(e: Entity): number {
+  if (e.type !== "show") return 0;
+  const s = seasonInfo(e);
+  if (!s.perSeason || !s.total || !s.released || s.total <= s.released) return 0;
+  return s.perSeason * (s.total - s.released);
+}
+
+/** Сколько минут уже просмотрено у сериала «в процессе». */
+export function watchedMinutes(e: Entity): number {
+  if (e.type !== "show") return 0;
+  const s = seasonInfo(e);
+  if (!s.perSeason || !s.watched) return 0;
+  return s.perSeason * Math.min(s.watched, s.released || s.watched);
+}
+
+/** Минуты на карточку (весь вышедший объём), или null, если длительность не указана. */
 export function itemMinutes(e: Entity, pagesPerHour: number): number | null {
   const a = e.attributes || {};
   if (e.type === "book") {
@@ -99,30 +133,53 @@ export interface TypeTotals {
   type: MediaType;
   pending: number;          // всего непросмотренного
   withDuration: number;     // из них с длительностью
-  knownMin: number;         // сумма известных минут
+  knownMin: number;         // осталось по известным длительностям
   estimatedMin: number;     // плюс оценка для карточек без длительности (по среднему)
-  totalMin: number;         // known + estimated
+  futureMin: number;        // будущие сезоны (входят в totalMin, если включены)
+  totalMin: number;         // всего осталось
+  doneMin: number;          // уже просмотрено/прочитано (включая просмотренные сезоны)
+  contentMin: number;       // весь контент раздела = doneMin + totalMin
   aiCount: number;          // сколько длительностей — оценка Claude
   inProgress: number;
+  ongoing: number;          // сериалы, которые ещё выходят
   longest: { e: Entity; min: number }[];
 }
 
-export function computeTotals(items: Entity[], type: MediaType, pagesPerHour: number): TypeTotals {
-  const pending = items.filter(e => e.type === type && isPending(e));
-  const known = pending.map(e => ({ e, min: itemMinutes(e, pagesPerHour) })).filter((x): x is { e: Entity; min: number } => x.min !== null);
+export function computeTotals(items: Entity[], type: MediaType, pagesPerHour: number, includeFuture = true): TypeTotals {
+  const all = items.filter(e => e.type === type);
+  const pending = all.filter(isPending);
+  const done = all.filter(e => e.attributes?.done);
+  const withMin = all.map(e => ({ e, min: itemMinutes(e, pagesPerHour) }));
+  const knownAll = withMin.filter((x): x is { e: Entity; min: number } => x.min !== null);
+  const avg = knownAll.length ? knownAll.reduce((s, x) => s + x.min, 0) / knownAll.length : 0;
+  const future = (e: Entity) => (includeFuture ? futureMinutes(e) : 0);
+
+  // Осталось: вышедшее − просмотренные сезоны + (по желанию) будущие сезоны.
+  const remaining = pending.map(e => {
+    const m = itemMinutes(e, pagesPerHour);
+    return { e, min: m === null ? null : Math.max(0, m - watchedMinutes(e)) + future(e) };
+  });
+  const known = remaining.filter((x): x is { e: Entity; min: number } => x.min !== null);
   const knownMin = known.reduce((s, x) => s + x.min, 0);
   const missing = pending.length - known.length;
-  const avg = known.length ? knownMin / known.length : 0;
   const estimatedMin = missing * avg;
+
+  const doneMin = done.reduce((s, e) => s + (itemMinutes(e, pagesPerHour) ?? avg), 0)
+    + pending.reduce((s, e) => s + watchedMinutes(e), 0);
+
   return {
     type,
     pending: pending.length,
     withDuration: known.length,
     knownMin,
     estimatedMin,
+    futureMin: pending.reduce((s, e) => s + future(e), 0),
     totalMin: knownMin + estimatedMin,
+    doneMin,
+    contentMin: doneMin + knownMin + estimatedMin,
     aiCount: known.filter(x => isEstimate(x.e)).length,
     inProgress: pending.filter(e => e.attributes?.status === "in_progress").length,
+    ongoing: pending.filter(e => e.type === "show" && seasonInfo(e).ongoing).length,
     longest: [...known].sort((a, b) => b.min - a.min).slice(0, 3),
   };
 }

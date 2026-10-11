@@ -542,3 +542,53 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .time-list-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .time-list-row .field{margin:0;white-space:nowrap;font-size:0.8rem;}
 @media (max-width:480px){ .time-list-row{flex-direction:column;align-items:flex-start;gap:0;} }
+
+/* Сезоны сериала */
+.seasons-edit{display:flex;flex-direction:column;gap:6px;cursor:default;}
+.seasons-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.seasons-grid label{display:flex;flex-direction:column;font-size:0.7rem;color:var(--muted);gap:2px;}
+.seasons-grid input{width:100%;padding:4px 6px;}
+.seasons-ongoing{display:flex;align-items:center;gap:6px;font-size:0.8rem;}
+.seasons-actions{display:flex;align-items:center;gap:12px;}
+.seasons-actions button{background:var(--goal);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:0.8rem;font-weight:600;cursor:pointer;}
+/* Время: итоги, стрелки, прогресс, тест чтения */
+.time-hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.time-hero-stats > div{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.time-hero-stats span{font-size:0.75rem;color:var(--muted);}
+.time-hero-stats b{font-size:1.35rem;font-weight:800;font-variant-numeric:tabular-nums;}
+.time-hero-stats .main b{font-size:1.9rem;}
+.time-hero-stats small{font-size:0.75rem;color:var(--muted);}
+.time-progress{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:12px 0 8px;}
+.time-progress > div{height:100%;background:var(--goal);border-radius:999px;}
+.time-hero-result{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.time-stepper{display:inline-flex;align-items:center;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:2px;}
+.time-stepper b{min-width:48px;text-align:center;font-variant-numeric:tabular-nums;}
+.time-stepper button{width:26px;height:26px;border:none;border-radius:7px;background:var(--card);color:var(--text);font-size:1rem;font-weight:700;cursor:pointer;line-height:1;padding:0;}
+.time-stepper button:hover{background:var(--goal);color:#fff;}
+.time-note-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.time-fill-btn.secondary{background:var(--card);color:var(--text);border:1px solid var(--line);}
+.time-share{display:block;font-size:0.72rem;font-weight:600;color:var(--muted);}
+.time-ongoing{background:var(--bg);border-radius:8px;padding:8px 10px;font-size:0.82rem;display:flex;flex-direction:column;gap:4px;}
+.time-ongoing label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+.time-ongoing .time-list{max-height:360px;}
+.time-list-row.column{flex-direction:column;align-items:flex-start;gap:0;}
+.time-list-row.column .time-list-name{font-weight:600;}
+.reading-test{max-width:620px;}
+.reading-head{display:flex;justify-content:space-between;margin-bottom:8px;}
+.reading-text{max-height:55vh;overflow-y:auto;font-size:1rem;line-height:1.6;margin-bottom:12px;padding-right:4px;}
+.reading-text p{margin:0 0 0.8em;}
+.reading-q{margin-bottom:12px;}
+.reading-options{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.reading-options span{padding:5px 12px;border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:0.85rem;}
+.reading-options span.on{background:var(--goal);color:#fff;border-color:var(--goal);}
+.reading-result{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.reading-result > div{background:var(--bg);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;}
+.reading-result span{font-size:0.72rem;color:var(--muted);}
+.reading-actions{display:flex;align-items:center;gap:14px;}
+@media (max-width:480px){
+  .time-hero-stats b{font-size:1.05rem;}
+  .time-hero-stats .main b{font-size:1.4rem;}
+}
+.seasons-grid label{text-align:left;align-items:stretch;}
+.seasons-edit label.seasons-ongoing{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:6px;width:auto;}
+.seasons-edit label.seasons-ongoing input{width:auto;margin:0;}

@@ -316,8 +316,8 @@ export async function enrichTmdb(profile: string, type: string, space = "life", 
   return res.json();
 }
 
-export async function fillDurations(profile: string, space = "life"): Promise<{ checked: number; from_catalog: number; from_ai: number; not_filled: number }> {
-  const res = await req("/entities/fill-durations", { method: "POST", body: JSON.stringify({ profile, space }) });
+export async function fillDurations(profile: string, space = "life", includeDone = true): Promise<{ checked: number; from_catalog: number; from_ai: number; not_filled: number }> {
+  const res = await req("/entities/fill-durations", { method: "POST", body: JSON.stringify({ profile, space, include_done: includeDone }) });
   return res.json();
 }
 

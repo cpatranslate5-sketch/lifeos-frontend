@@ -9,6 +9,7 @@ import HabitYearGrid from "./HabitYearGrid";
 import { useLiteMode } from "../liteMode";
 import MiniCalendar from "./MiniCalendar";
 import DurationField from "./DurationField";
+import SeasonsField from "./SeasonsField";
 
 const MONTHS_RU = ["", "января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 
@@ -548,6 +549,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
           </div>
 
           <DurationField e={e} onChanged={onChanged} />
+          {e.type === "show" && <SeasonsField e={e} onChanged={onChanged} />}
 
           <div className="field media-criterion" onClick={() => !authorEditing && setAuthorEditing(true)}>
             {authorEditing ? (
