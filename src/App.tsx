@@ -21,13 +21,14 @@ import DatesTab from "./components/DatesTab";
 import Diary from "./components/Diary";
 import ToastHost from "./components/ToastHost";
 import WeeklyReport from "./components/WeeklyReport";
+import TimeTab from "./components/TimeTab";
 import ProfileGate, { Folder, saveFolder, clearSavedFolder } from "./components/ProfileGate";
 import { getToken, setToken, verifyToken, checkHealth, fetchEntities, createEntity, entityCoverUrl, Entity } from "./api";
 import { todayStr, addDaysStr, weekdayOf } from "./dateUtils";
 
 const LIFE_TABS = [
   ["chat", "Чат"], ["date", "Задачи"], ["warmup", "Разминка"], ["dates", "События"], ["sport", "Спорт"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
-  ["games", "Игры"], ["leisure", "Досуг"], ["household", "Быт"], ["reflection", "Рефлексия"],
+  ["games", "Игры"], ["time", "⏳ Время"], ["leisure", "Досуг"], ["household", "Быт"], ["reflection", "Рефлексия"],
   ["manage", "Управление"],
 ] as const;
 
@@ -38,7 +39,7 @@ const WORK_TABS = [
 const GENERAL_TABS = [
   ["date", "Задачи"], ["warmup", "Разминка"],
   ["dates", "События"], ["sport", "Спорт"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
-  ["games", "Игры"], ["leisure", "Досуг"], ["household", "Быт"],
+  ["games", "Игры"], ["time", "⏳ Время"], ["leisure", "Досуг"], ["household", "Быт"],
 ] as const;
 
 const FOLDER_LABELS: Record<Folder, string> = { nemalenkiy: "НеМаленький", kotyonok: "Котёнок", pd: "PD" };
@@ -339,6 +340,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
       {tab === "shows" && <MediaTab title="Сериалы" placeholder="Название сериала…" type="show" items={shows} onChanged={refresh} profile={profile} />}
       {tab === "books" && <MediaTab title="Книги" placeholder="Название книги…" type="book" items={books} onChanged={refresh} profile={profile} />}
       {tab === "games" && <ShelfTab title="Игры" placeholder="Название игры…" type="game" items={games} onChanged={refresh} profile={profile} />}
+      {tab === "time" && <TimeTab items={entities} onChanged={refresh} profile={profile} space={space} />}
       {tab === "leisure" && <ShelfTab title="Досуг" placeholder="Игра, футбол, поездка…" type="leisure" items={leisureItems} onChanged={refresh} profile={profile} layout="compact" />}
       {tab === "household" && <ShelfTab title="Быт" placeholder="Дело по дому…" type="task" items={household} onChanged={refresh} extraAttrs={{ category: "household" }} profile={profile} layout="compact" />}
       {tab === "dates" && <DatesTab items={anniversaries} onChanged={refresh} profile={profile} />}

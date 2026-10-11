@@ -8,6 +8,7 @@ import { computeStreak, computeBestStreak } from "../habitUtils";
 import HabitYearGrid from "./HabitYearGrid";
 import { useLiteMode } from "../liteMode";
 import MiniCalendar from "./MiniCalendar";
+import DurationField from "./DurationField";
 
 const MONTHS_RU = ["", "января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 
@@ -473,6 +474,8 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
           <span style={{ color: "#E8963D", textDecoration: "underline", cursor: "pointer" }} onClick={() => setShowYearGrid(true)}>За всё время</span>
         </div>
       )}
+
+      {hasRating && <DurationField e={e} onChanged={onChanged} />}
 
       {["movie", "show", "book", "game"].includes(e.type) && !e.attributes?.done && (
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>

@@ -61,6 +61,7 @@ function PageBar({ page, totalPages, onPageChange }: { page: number; totalPages:
 function GameAddModal({ profile, space, onClose, onAdded }: { profile: string; space?: string; onClose: () => void; onAdded: () => void }) {
   const [val, setVal] = useState("");
   const [developer, setDeveloper] = useState("");
+  const [hours, setHours] = useState("");
   const [inProgress, setInProgress] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -89,6 +90,8 @@ function GameAddModal({ profile, space, onClose, onAdded }: { profile: string; s
     if (!val.trim()) return;
     const attrs: Record<string, any> = {};
     if (developer.trim()) attrs.developer = developer.trim();
+    const h = parseFloat(hours.replace(",", "."));
+    if (h > 0) { attrs.duration_min = Math.round(h * 60); attrs.duration_source = "manual"; }
     if (inProgress) attrs.status = "in_progress";
     if (rating) attrs.rating = rating;
     const created = await createEntity("game", val.trim(), attrs, space || "life", profile);
@@ -118,6 +121,10 @@ function GameAddModal({ profile, space, onClose, onAdded }: { profile: string; s
 
         <label className="muted">Разработчик</label>
         <input value={developer} onChange={e => setDeveloper(e.target.value)} placeholder="Название студии" />
+
+        <label className="muted">Прохождение, часов</label>
+        <input value={hours} onChange={e => setHours(e.target.value.replace(/[^0-9.,]/g, ""))} inputMode="decimal"
+          placeholder="можно не заполнять — Life OS оценит сама" />
 
         <label className="muted">Оценка</label>
         <div className="star-rating" style={{ justifyContent: "flex-start", marginBottom: 12 }}>

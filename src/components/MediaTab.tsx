@@ -112,6 +112,7 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
   const [newGenres, setNewGenres] = useState<string[]>([]);
   const [newActors, setNewActors] = useState("");
   const [newYear, setNewYear] = useState("");
+  const [newDuration, setNewDuration] = useState("");
   const [newInProgress, setNewInProgress] = useState(false);
   const [newRating, setNewRating] = useState<number | null>(null);
   const [newCoverFile, setNewCoverFile] = useState<File | null>(null);
@@ -144,6 +145,12 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
     if (newGeo.length > 0) attrs.geo = newGeo;
     if (newGenres.length > 0) attrs.genres = newGenres;
     if (type === "book" && newYear.trim()) attrs.year = newYear.trim();
+    const dur = parseFloat(newDuration.replace(",", "."));
+    if (dur > 0) {
+      if (type === "book") attrs.pages = Math.round(dur);
+      else attrs.duration_min = Math.round(type === "show" ? dur * 60 : dur);
+      attrs.duration_source = "manual";
+    }
     if (isCast && newActors.trim()) attrs.actors = newActors.split(",").map(s => s.trim()).filter(Boolean);
     if (newInProgress) attrs.status = "in_progress";
     if (newRating) attrs.rating = newRating;
@@ -183,6 +190,10 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
               inputMode="numeric" maxLength={4} placeholder="напр. 1866" />
           </>
         )}
+
+        <label className="muted">{type === "book" ? "Объём, страниц" : type === "show" ? "Все серии, часов" : "Длительность, минут"}</label>
+        <input value={newDuration} onChange={e => setNewDuration(e.target.value.replace(/[^0-9.,]/g, ""))} inputMode="decimal"
+          placeholder="можно не заполнять — Life OS найдёт или оценит сама" />
 
         <label className="muted">Гео (можно несколько)</label>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", margin: "4px 0 10px" }}>
