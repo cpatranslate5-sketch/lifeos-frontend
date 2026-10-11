@@ -96,27 +96,25 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
   const overallDays = finiteDays.length ? Math.max(...finiteDays) : 0;
   const slowest = spans.filter(s => s.days !== null && s.days === overallDays && overallDays > 0)[0];
 
-  // Общее время в день меняем стрелками — разделы масштабируются пропорционально.
+  // Общее время в день меняем стрелками. Распределяем его по разделам
+  // пропорционально оставшемуся объёму — так все разделы заканчиваются
+  // одновременно, и каждый шаг стрелки честно сдвигает итоговую дату.
   function setTotalPerDay(target: number) {
-    target = Math.max(0, Math.min(MAX_TOTAL, target));
-    if (!activeTypes.length) return;
-    const cur = perDayTotal;
+    target = Math.max(0, Math.min(MAX_TOTAL, Math.round(target)));
+    const weighted = totals.filter(x => x.totalMin > 0);
+    if (!weighted.length) return;
+    const sum = weighted.reduce((s, x) => s + x.totalMin, 0);
     const patch: Partial<MediaBudget> = {};
-    if (cur <= 0) {
-      const each = round5(target / activeTypes.length);
-      activeTypes.forEach(t => { patch[t] = each; });
-    } else {
-      activeTypes.forEach(t => { patch[t] = round5((budget[t] * target) / cur); });
-    }
-    // подгоняем округление, чтобы сумма совпала с целью
-    const sum = activeTypes.reduce((s, t) => s + (patch[t] as number), 0);
-    const diff = round5(target) - sum;
-    if (diff !== 0) {
-      const biggest = [...activeTypes].sort((a, b) => (patch[b] as number) - (patch[a] as number))[0];
-      patch[biggest] = Math.max(0, (patch[biggest] as number) + diff);
-    }
+    MEDIA_TYPES.forEach(tp => { if (!weighted.find(x => x.type === tp)) patch[tp] = 0; });
+    const raw = weighted.map(x => ({ tp: x.type, v: (target * x.totalMin) / sum }));
+    raw.forEach(r => { patch[r.tp] = Math.floor(r.v); });
+    let rest = target - raw.reduce((s, r) => s + Math.floor(r.v), 0);
+    [...raw].sort((a, b) => (b.v % 1) - (a.v % 1)).forEach(r => { if (rest > 0) { patch[r.tp] = (patch[r.tp] as number) + 1; rest--; } });
     changeMany(patch);
   }
+
+  // Сбалансированы ли разделы (заканчиваются примерно одновременно)
+  const balanced = finiteDays.length > 1 && Math.max(...finiteDays) - Math.min(...finiteDays) <= Math.max(2, overallDays * 0.03);
 
   const typeOrder = (e: Entity) => MEDIA_TYPES.indexOf(e.type as MediaType);
   const byTypeName = (a: Entity, b: Entity) => typeOrder(a) - typeOrder(b) || a.name.localeCompare(b.name, "ru");
@@ -187,8 +185,8 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
               </span>
             )}
             <div className="muted time-small" style={{ marginTop: 6, width: "100%" }}>
-              Стрелки меняют время всех разделов сразу, сохраняя пропорции. Точнее — ползунками в разделах ниже.
-              {slowest && finiteDays.length > 1 && <> Дольше всего — {MEDIA_META[slowest.t.type].label.toLowerCase()}.</>}
+              Стрелки распределяют время по разделам пропорционально тому, сколько в каждом осталось, — тогда всё заканчивается одновременно.
+              {slowest && finiteDays.length > 1 && !balanced && <> Сейчас дату определяют <b>{MEDIA_META[slowest.t.type].label.toLowerCase()}</b> — это самый долгий раздел; ползунки других разделов дату не сдвинут, пока они заканчиваются раньше.</>}
               {unbudgeted.length > 0 && <> Не учтены (0 минут в день): {unbudgeted.map(s => MEDIA_META[s.t.type].label.toLowerCase()).join(", ")}.</>}
             </div>
           </div>
