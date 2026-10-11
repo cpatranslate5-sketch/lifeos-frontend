@@ -6,7 +6,7 @@ import { fmtMinutes, itemMinutes, cachedPagesPerHour } from "../mediaTime";
 // Фильм — в минутах, сериал и игра — в часах, книга — в страницах.
 const UNIT: Record<string, { label: string; unit: string; placeholder: string; toStored: (v: number) => number; fromStored: (a: Record<string, any>) => number | null }> = {
   movie: { label: "Длительность", unit: "мин", placeholder: "напр. 120", toStored: v => Math.round(v), fromStored: a => a.duration_min ?? null },
-  show: { label: "Все серии", unit: "ч", placeholder: "напр. 40", toStored: v => Math.round(v * 60), fromStored: a => a.duration_min ? Math.round((a.duration_min / 60) * 10) / 10 : null },
+  show: { label: "Длительность", unit: "ч", placeholder: "напр. 40", toStored: v => Math.round(v * 60), fromStored: a => a.duration_min ? Math.round((a.duration_min / 60) * 10) / 10 : null },
   game: { label: "Прохождение", unit: "ч", placeholder: "напр. 35", toStored: v => Math.round(v * 60), fromStored: a => a.duration_min ? Math.round((a.duration_min / 60) * 10) / 10 : null },
   book: { label: "Объём", unit: "стр", placeholder: "напр. 320", toStored: v => Math.round(v), fromStored: a => a.pages ?? null },
 };

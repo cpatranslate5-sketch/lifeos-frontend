@@ -475,8 +475,6 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         </div>
       )}
 
-      {hasRating && <DurationField e={e} onChanged={onChanged} />}
-
       {["movie", "show", "book", "game"].includes(e.type) && !e.attributes?.done && (
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <div className={`status-badge ${e.attributes?.status === "in_progress" ? "on" : ""}`}
@@ -526,6 +524,8 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         </div>
       )}
 
+      {e.type === "game" && <DurationField e={e} onChanged={onChanged} />}
+
       {isMedia && (
         <div className="media-criteria">
           <div className="field media-criterion" onClick={() => !yearEditing && setYearEditing(true)}>
@@ -546,6 +546,8 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
               </>
             )}
           </div>
+
+          <DurationField e={e} onChanged={onChanged} />
 
           <div className="field media-criterion" onClick={() => !authorEditing && setAuthorEditing(true)}>
             {authorEditing ? (

@@ -191,7 +191,7 @@ function AddModal({ type, profile, onClose, onAdded }: { type: string; profile: 
           </>
         )}
 
-        <label className="muted">{type === "book" ? "Объём, страниц" : type === "show" ? "Все серии, часов" : "Длительность, минут"}</label>
+        <label className="muted">{type === "book" ? "Объём, страниц" : type === "show" ? "Длительность (все серии), часов" : "Длительность, минут"}</label>
         <input value={newDuration} onChange={e => setNewDuration(e.target.value.replace(/[^0-9.,]/g, ""))} inputMode="decimal"
           placeholder="можно не заполнять — Life OS найдёт или оценит сама" />
 
