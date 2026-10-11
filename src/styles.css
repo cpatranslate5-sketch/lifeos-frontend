@@ -606,7 +606,7 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .series-count{position:absolute;right:3px;bottom:3px;background:rgba(0,0,0,0.65);color:#fff;font-size:0.7rem;font-weight:700;border-radius:6px;padding:1px 6px;}
 .series-title-text{cursor:pointer;}
 .series-middle{margin-top:0 !important;padding-top:4px;}
-.series-tag{display:inline-block;vertical-align:1px;margin-left:4px;font-size:0.66rem;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 7px;}
+.series-tag{display:inline-block;vertical-align:1px;margin-left:4px;font-size:0.66rem;font-weight:700;color:#fff;background:#E8963D;border:1px solid #E8963D;border-radius:999px;padding:0 7px;}
 .series-progress{display:block;max-width:160px;margin-top:3px;height:5px;border-radius:999px;background:var(--line);overflow:hidden;}
 .series-progress span{display:block;height:100%;background:var(--goal);border-radius:999px;}
 .series-stars .star{cursor:inherit;}
