@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Entity, createEntity, uploadEntityCover, entityCoverUrl, detectSeries } from "../api";
 import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
+import { SeriesCatalog } from "../seriesActions";
 import { groupUnits, unitSortKey, topCountsByUnit } from "../series";
 import { showToast } from "../toast";
 
@@ -246,6 +247,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
   }
 
   return (
+    <SeriesCatalog.Provider value={items}>
     <div className="view">
       <h1>{title}</h1>
 
@@ -375,5 +377,6 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
 
       <PageBar page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
+    </SeriesCatalog.Provider>
   );
 }

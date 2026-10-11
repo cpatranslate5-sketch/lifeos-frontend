@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Entity, createEntity, uploadEntityCover, entityCoverUrl, enrichTmdb, detectSeries } from "../api";
 import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
+import { SeriesCatalog } from "../seriesActions";
 import { groupUnits, unitSortKey, topCountsByUnit } from "../series";
 import { genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { showToast } from "../toast";
@@ -436,6 +437,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   ) : null;
 
   return (
+    <SeriesCatalog.Provider value={items}>
     <div className="view">
       <h1>{title}</h1>
 
@@ -629,5 +631,6 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
 
       <PageBar />
     </div>
+    </SeriesCatalog.Provider>
   );
 }

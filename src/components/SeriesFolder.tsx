@@ -1,9 +1,57 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Entity, entityCoverUrl } from "../api";
 import { Unit, unitRating, unitStatus } from "../series";
 import EntityCard, { FilterKind } from "./EntityCard";
 import { useLiteMode } from "../liteMode";
 import { authorLabelFor } from "../types";
+import { seriesName } from "../series";
+import { useSeriesCatalog, matches, similarity, addToSeries, renameSeries } from "../seriesActions";
+
+/** Внизу раскрытой серии: найти карточку и добавить её частью. */
+function AddPart({ name, members, onChanged }: { name: string; members: Entity[]; onChanged: () => void }) {
+  const catalog = useSeriesCatalog();
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false);
+  const type = members[0].type;
+  const ids = new Set(members.map(x => x.id));
+  const hits = useMemo(() => {
+    const pool = catalog.filter(x => x.type === type && !ids.has(x.id));
+    if (q.trim().length >= 2) return pool.filter(x => matches(x.name, q)).slice(0, 8);
+    return pool.filter(x => !seriesName(x))
+      .map(x => ({ x, s: similarity(name, x.name) })).filter(v => v.s > 0)
+      .sort((a, b) => b.s - a.s).slice(0, 5).map(v => v.x);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalog, q, type, name, members]);
+  async function add(x: Entity) {
+    setBusy(true);
+    try { await addToSeries(name, members, [x]); setQ(""); onChanged(); } finally { setBusy(false); }
+  }
+  if (!open) return <button type="button" className="series-add-part" onClick={() => setOpen(true)}>＋ Добавить часть в серию</button>;
+  return (
+    <div className="series-picker series-picker-inline">
+      <div className="series-picker-head">
+        <strong>Добавить в «{name}»</strong>
+        <button type="button" className="series-picker-close" onClick={() => { setOpen(false); setQ(""); }} aria-label="Закрыть">✕</button>
+      </div>
+      <input className="series-picker-search" autoFocus value={q} onChange={ev => setQ(ev.target.value)}
+        placeholder="Начни вводить название…" onKeyDown={ev => { if (ev.key === "Escape") { setOpen(false); setQ(""); } }} />
+      {hits.length > 0 && (
+        <div className="series-picker-group">
+          {!q.trim() && <div className="series-picker-label">Похоже на эту серию</div>}
+          {hits.map(x => (
+            <button key={x.id} type="button" className="series-option" disabled={busy} onClick={() => add(x)}>
+              <span className="series-option-name">{x.name}</span>
+              <span className="muted">{[x.attributes?.year, seriesName(x) ? `сейчас в «${seriesName(x)}»` : ""].filter(Boolean).join(" · ")}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      {q.trim().length >= 2 && hits.length === 0 && <div className="muted series-picker-hint">Ничего не нашлось. Если карточки ещё нет — сначала добавь её обычным способом.</div>}
+      {busy && <div className="muted series-picker-hint">Сохраняю…</div>}
+    </div>
+  );
+}
 
 const WORD: Record<string, [string, string, string]> = {
   movie: ["фильм", "фильма", "фильмов"], show: ["сериал", "сериала", "сериалов"],
@@ -52,7 +100,12 @@ export default function SeriesFolder({ unit, onChanged, profile, onFilterByCrite
   const isGame = type === "game";
   const creators = common(m, isGame ? "developer" : "author");
   const genres = common(m, "genres");
-  const toggle = () => setOpen(!open);
+  const toggle = () => { if (!renaming) setOpen(!open); };
+  const [renaming, setRenaming] = useState(false);
+  async function doRename(v: string) {
+    setRenaming(false);
+    if (v.trim() && v.trim() !== unit.name) { await renameSeries(m, v); onChanged(); }
+  }
 
   return (
     <div className={`series-folder ${open ? "open" : ""}`}>
@@ -71,7 +124,14 @@ export default function SeriesFolder({ unit, onChanged, profile, onFilterByCrite
           <div className="card-top card-top-title">
             <div className="card-title-text series-title-text"
               style={allDone ? { textDecoration: "line-through", textDecorationColor: "var(--event)", textDecorationThickness: 2, color: "var(--event)" } : {}}>
-              {unit.name} <span className="series-tag">серия</span>
+              {renaming ? (
+                <input className="card-title-input" autoFocus defaultValue={unit.name} onClick={ev => ev.stopPropagation()}
+                  onBlur={ev => doRename(ev.target.value)}
+                  onKeyDown={ev => { ev.stopPropagation(); if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setRenaming(false); }} />
+              ) : <>
+                {unit.name} <span className="series-tag">серия</span>
+                <span className="edit-pencil" title="Переименовать серию" onClick={ev => { ev.stopPropagation(); setRenaming(true); }}>✎</span>
+              </>}
             </div>
           </div>
           <div className="card-middle layout-media series-middle">
@@ -116,6 +176,7 @@ export default function SeriesFolder({ unit, onChanged, profile, onFilterByCrite
               </div>
             </div>
           ))}
+          <AddPart name={unit.name} members={m} onChanged={onChanged} />
         </div>
       )}
     </div>
