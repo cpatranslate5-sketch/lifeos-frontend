@@ -3,6 +3,7 @@ import Chat from "./components/Chat";
 import DateList from "./components/DateList";
 import ShelfTab from "./components/ShelfTab";
 import MediaTab from "./components/MediaTab";
+import NowTab from "./components/NowTab";
 import Reflection from "./components/Reflection";
 import QuickTaskAdd from "./components/QuickTaskAdd";
 import LongTerm from "./components/LongTerm";
@@ -27,7 +28,7 @@ import { getToken, setToken, verifyToken, checkHealth, fetchEntities, createEnti
 import { todayStr, addDaysStr, weekdayOf } from "./dateUtils";
 
 const LIFE_TABS = [
-  ["chat", "Чат"], ["date", "Задачи"], ["warmup", "Разминка"], ["dates", "События"], ["sport", "Спорт"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
+  ["chat", "Чат"], ["date", "Задачи"], ["warmup", "Разминка"], ["dates", "События"], ["sport", "Спорт"], ["now", "▶ Сейчас"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
   ["games", "Игры"], ["time", "⏳ Время"], ["leisure", "Досуг"], ["household", "Быт"], ["reflection", "Рефлексия"],
   ["manage", "Управление"],
 ] as const;
@@ -38,7 +39,7 @@ const WORK_TABS = [
 
 const GENERAL_TABS = [
   ["date", "Задачи"], ["warmup", "Разминка"],
-  ["dates", "События"], ["sport", "Спорт"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
+  ["dates", "События"], ["sport", "Спорт"], ["now", "▶ Сейчас"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
   ["games", "Игры"], ["time", "⏳ Время"], ["leisure", "Досуг"], ["household", "Быт"],
 ] as const;
 
@@ -336,6 +337,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
       {tab === "longterm" && <LongTerm items={longTermItems} space={space} profile={profile} onChanged={refresh} />}
       {tab === "orders" && <ShelfTab title="Заказы" placeholder="Номер/название заказа…" type="order" items={orders} onChanged={refresh} space={space} profile={profile} />}
 
+      {tab === "now" && <NowTab items={[...movies, ...shows, ...books, ...games]} onChanged={refresh} profile={profile} />}
       {tab === "movies" && <MediaTab title="Кино" placeholder="Название фильма…" type="movie" items={movies} onChanged={refresh} profile={profile} />}
       {tab === "shows" && <MediaTab title="Сериалы" placeholder="Название сериала…" type="show" items={shows} onChanged={refresh} profile={profile} />}
       {tab === "books" && <MediaTab title="Книги" placeholder="Название книги…" type="book" items={books} onChanged={refresh} profile={profile} />}
