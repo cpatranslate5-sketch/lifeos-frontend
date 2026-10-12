@@ -4,7 +4,7 @@ import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
 import SeriesModal from "./SeriesModal";
 import { SeriesCatalog } from "../seriesActions";
-import { groupUnits, unitSortKey, topCountsByUnit, matchesSearch } from "../series";
+import { groupUnits, unitSortKey, topCountsByUnit, matchesSearch, seriesName } from "../series";
 import { showToast } from "../toast";
 
 function yearBucket(y: number): string {
@@ -188,6 +188,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [developerFilter, setDeveloperFilter] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [seriesOnly, setSeriesOnly] = useState(false);
   const [yearFilter, setYearFilter] = useState<string[]>([]);
   const [openDropdown, setOpenDropdown] = useState<"rating" | "status" | "developer" | "year" | null>(null);
   const isGame = type === "game";
@@ -219,10 +220,11 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
     }
     if (developerFilter.length > 0 && !developerFilter.includes(e.attributes?.developer || "")) return false;
     if (yearFilter.length > 0 && (!e.attributes?.year || !yearFilter.includes(yearBucket(Number(e.attributes.year))))) return false;
+    if (seriesOnly && !seriesName(e)) return false;
     return true;
   }) : items;
 
-  const anyFilterActive = !!searchTerm || ratingFilter.length > 0 || statusFilter.length > 0 || developerFilter.length > 0 || yearFilter.length > 0;
+  const anyFilterActive = seriesOnly || !!searchTerm || ratingFilter.length > 0 || statusFilter.length > 0 || developerFilter.length > 0 || yearFilter.length > 0;
   const sorted = [...filtered].sort((a, b) => sortKey(a) - sortKey(b));
   const totalPages = Math.max(1, Math.ceil((isGame ? groupUnits(sorted).length : sorted.length) / PAGE_SIZE));
   // Игры одной серии показываем папкой (у остальных разделов полки серий нет)
@@ -243,7 +245,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
     }
   }
 
-  useEffect(() => { setPage(1); }, [items.length, ratingFilter, statusFilter, developerFilter, yearFilter, searchTerm]);
+  useEffect(() => { setPage(1); }, [items.length, ratingFilter, statusFilter, developerFilter, yearFilter, searchTerm, seriesOnly]);
 
   function handleFilterByCriterion(kind: FilterKind, value: string) {
     if (kind === "author") { setRatingFilter([]); setStatusFilter([]); setYearFilter([]); setDeveloperFilter([value]); }
@@ -360,8 +362,14 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
               )}
             </div>
 
+            {isGame && (
+              <div className={`media-filter-btn ${seriesOnly ? "active" : ""}`} onClick={() => setSeriesOnly(!seriesOnly)} title="Показать только серии">
+                🗂 Серии{seriesOnly ? " ✓" : ""}
+              </div>
+            )}
+
             {anyFilterActive && (
-              <div className="media-filter-btn" onClick={() => { setSearchTerm(""); setRatingFilter([]); setStatusFilter([]); setDeveloperFilter([]); setYearFilter([]); }} style={{ color: "var(--event)" }}>
+              <div className="media-filter-btn" onClick={() => { setSearchTerm(""); setRatingFilter([]); setStatusFilter([]); setDeveloperFilter([]); setYearFilter([]); setSeriesOnly(false); }} style={{ color: "var(--event)" }}>
                 Сбросить все
               </div>
             )}

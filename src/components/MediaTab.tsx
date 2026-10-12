@@ -4,7 +4,7 @@ import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
 import SeriesModal from "./SeriesModal";
 import { SeriesCatalog } from "../seriesActions";
-import { groupUnits, unitSortKey, topCountsByUnit, matchesSearch } from "../series";
+import { groupUnits, unitSortKey, topCountsByUnit, matchesSearch, seriesName } from "../series";
 import { genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { showToast } from "../toast";
 
@@ -313,6 +313,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   const [actorFilter, setActorFilter] = useState<string[]>([]);
   const [ratingFilter, setRatingFilter] = useState<number[]>([]);
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [seriesOnly, setSeriesOnly] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<"genre" | "geo" | "year" | "author" | "actor" | "rating" | "status" | null>(null);
   const [page, setPage] = useState(1);
   const isCast = type === "movie" || type === "show";
@@ -339,7 +340,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
     }
   }
 
-  useEffect(() => { setPage(1); }, [searchTerm, genreFilter, geoFilter, yearFilter, authorFilter, actorFilter, ratingFilter, statusFilter]);
+  useEffect(() => { setPage(1); }, [searchTerm, genreFilter, geoFilter, yearFilter, authorFilter, actorFilter, ratingFilter, statusFilter, seriesOnly]);
 
   useEffect(() => {
     if (!openDropdown) return;
@@ -406,12 +407,13 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
       const isDone = !!e.attributes?.done;
       if (!(statusFilter.includes("done") && isDone) && !(statusFilter.includes("not_done") && !isDone)) return false;
     }
+    if (seriesOnly && !seriesName(e)) return false;
     return true;
   });
 
   const sorted = [...filtered].sort((a, b) => sortKey(a) - sortKey(b));
   const units = groupUnits(sorted).sort((a, b) => unitSortKey(a) - unitSortKey(b));
-  const anyFilterActive = !!searchTerm || genreFilter.length > 0 || geoFilter.length > 0 || yearFilter.length > 0 || authorFilter.length > 0 || actorFilter.length > 0 || ratingFilter.length > 0 || statusFilter.length > 0;
+  const anyFilterActive = seriesOnly || !!searchTerm || genreFilter.length > 0 || geoFilter.length > 0 || yearFilter.length > 0 || authorFilter.length > 0 || actorFilter.length > 0 || ratingFilter.length > 0 || statusFilter.length > 0;
   const totalPages = Math.max(1, Math.ceil(units.length / PAGE_SIZE));
   const pageUnits = units.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const seriesCount = units.filter(u => u.kind === "series").length;
@@ -618,8 +620,12 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
           )}
         </div>
 
+        <div className={`media-filter-btn ${seriesOnly ? "active" : ""}`} onClick={() => setSeriesOnly(!seriesOnly)} title="Показать только серии">
+          🗂 Серии{seriesOnly ? " ✓" : ""}
+        </div>
+
         {anyFilterActive && (
-          <div className="media-filter-btn" onClick={() => { setSearchTerm(""); setGenreFilter([]); setGeoFilter([]); setYearFilter([]); setAuthorFilter([]); setActorFilter([]); setRatingFilter([]); setStatusFilter([]); }} style={{ color: "var(--event)" }}>
+          <div className="media-filter-btn" onClick={() => { setSearchTerm(""); setGenreFilter([]); setGeoFilter([]); setYearFilter([]); setAuthorFilter([]); setActorFilter([]); setRatingFilter([]); setStatusFilter([]); setSeriesOnly(false); }} style={{ color: "var(--event)" }}>
             Сбросить все
           </div>
         )}
