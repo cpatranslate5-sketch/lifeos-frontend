@@ -81,3 +81,20 @@ export function topCountsByUnit(items: Entity[], valuesOf: (e: Entity) => string
   }
   return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, n);
 }
+
+// ── Поиск: совпадение по названию карточки ИЛИ по названию её серии ──
+// Латинские буквы-двойники (a, c, e, o, p…) приводим к кириллице, ё → е,
+// чтобы «Гарри Поттер», набранный с ошибочной раскладкой, тоже находился.
+const LOOKALIKES: Record<string, string> = {
+  a: "а", b: "в", c: "с", e: "е", h: "н", k: "к", m: "м", o: "о", p: "р", t: "т", x: "х", y: "у",
+};
+export function normalizeSearch(s: string): string {
+  return s.toLowerCase().replace(/ё/g, "е").split("").map(ch => LOOKALIKES[ch] || ch).join("");
+}
+export function matchesSearch(e: Entity, term: string): boolean {
+  const q = normalizeSearch(term.trim());
+  if (!q) return true;
+  if (normalizeSearch(e.name).includes(q)) return true;
+  const s = seriesName(e);
+  return !!s && normalizeSearch(s).includes(q);
+}

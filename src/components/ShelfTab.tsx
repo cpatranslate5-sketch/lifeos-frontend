@@ -4,7 +4,7 @@ import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
 import SeriesModal from "./SeriesModal";
 import { SeriesCatalog } from "../seriesActions";
-import { groupUnits, unitSortKey, topCountsByUnit } from "../series";
+import { groupUnits, unitSortKey, topCountsByUnit, matchesSearch } from "../series";
 import { showToast } from "../toast";
 
 function yearBucket(y: number): string {
@@ -187,6 +187,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
   const [ratingFilter, setRatingFilter] = useState<number[]>([]);
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [developerFilter, setDeveloperFilter] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [yearFilter, setYearFilter] = useState<string[]>([]);
   const [openDropdown, setOpenDropdown] = useState<"rating" | "status" | "developer" | "year" | null>(null);
   const isGame = type === "game";
@@ -210,6 +211,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
   const years = YEAR_BUCKET_ORDER.filter(b => presentBuckets.has(b)).reverse();
 
   const filtered = isGame ? items.filter(e => {
+    if (searchTerm && !matchesSearch(e, searchTerm)) return false;
     if (ratingFilter.length > 0 && !ratingFilter.includes(e.attributes?.rating || 0)) return false;
     if (statusFilter.length > 0) {
       const isDone = !!e.attributes?.done;
@@ -220,7 +222,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
     return true;
   }) : items;
 
-  const anyFilterActive = ratingFilter.length > 0 || statusFilter.length > 0 || developerFilter.length > 0 || yearFilter.length > 0;
+  const anyFilterActive = !!searchTerm || ratingFilter.length > 0 || statusFilter.length > 0 || developerFilter.length > 0 || yearFilter.length > 0;
   const sorted = [...filtered].sort((a, b) => sortKey(a) - sortKey(b));
   const totalPages = Math.max(1, Math.ceil((isGame ? groupUnits(sorted).length : sorted.length) / PAGE_SIZE));
   // Игры одной серии показываем папкой (у остальных разделов полки серий нет)
@@ -241,7 +243,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
     }
   }
 
-  useEffect(() => { setPage(1); }, [items.length, ratingFilter, statusFilter, developerFilter, yearFilter]);
+  useEffect(() => { setPage(1); }, [items.length, ratingFilter, statusFilter, developerFilter, yearFilter, searchTerm]);
 
   function handleFilterByCriterion(kind: FilterKind, value: string) {
     if (kind === "author") { setRatingFilter([]); setStatusFilter([]); setYearFilter([]); setDeveloperFilter([value]); }
@@ -272,6 +274,8 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
           </div>
 
           <div className="media-filters">
+            <input value={searchTerm} placeholder="Поиск по названию или серии…" onChange={e => setSearchTerm(e.target.value)}
+              style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "7px 12px", color: "var(--text)", fontSize: "0.8rem", minWidth: 160, flex: 1 }} />
             <div style={{ position: "relative" }}>
               <div className={`media-filter-btn ${ratingFilter.length ? "active" : ""}`} onClick={() => setOpenDropdown(openDropdown === "rating" ? null : "rating")}>
                 По оценке {ratingFilter.length > 0 ? `(${ratingFilter.length})` : ""}
@@ -357,7 +361,7 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
             </div>
 
             {anyFilterActive && (
-              <div className="media-filter-btn" onClick={() => { setRatingFilter([]); setStatusFilter([]); setDeveloperFilter([]); setYearFilter([]); }} style={{ color: "var(--event)" }}>
+              <div className="media-filter-btn" onClick={() => { setSearchTerm(""); setRatingFilter([]); setStatusFilter([]); setDeveloperFilter([]); setYearFilter([]); }} style={{ color: "var(--event)" }}>
                 Сбросить все
               </div>
             )}

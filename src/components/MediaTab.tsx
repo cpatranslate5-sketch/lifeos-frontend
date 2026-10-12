@@ -4,7 +4,7 @@ import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
 import SeriesModal from "./SeriesModal";
 import { SeriesCatalog } from "../seriesActions";
-import { groupUnits, unitSortKey, topCountsByUnit } from "../series";
+import { groupUnits, unitSortKey, topCountsByUnit, matchesSearch } from "../series";
 import { genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
 import { showToast } from "../toast";
 
@@ -383,7 +383,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
   const allActors = Array.from(new Set(items.flatMap(e => (e.attributes?.actors || []) as string[]))).sort();
 
   const filtered = items.filter(e => {
-    if (searchTerm && !normalizeSearch(e.name).includes(normalizeSearch(searchTerm))) return false;
+    if (searchTerm && !matchesSearch(e, searchTerm)) return false;
     if (genreFilter.length > 0) {
       const g: string[] = e.attributes?.genres || [];
       if (!genreFilter.some(f => g.includes(f))) return false;
@@ -468,7 +468,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
       {showStats && <StatsModal type={type} items={items} onClose={() => setShowStats(false)} />}
 
       <div className="media-filters">
-        <input value={searchTerm} placeholder="Поиск по названию…" onChange={e => setSearchTerm(e.target.value)}
+        <input value={searchTerm} placeholder="Поиск по названию или серии…" onChange={e => setSearchTerm(e.target.value)}
           style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "7px 12px", color: "var(--text)", fontSize: "0.8rem", minWidth: 160, flex: 1 }} />
 
         <div style={{ position: "relative" }}>
