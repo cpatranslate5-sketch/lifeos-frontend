@@ -3,6 +3,7 @@ import { Entity, createEntity, uploadEntityCover, entityCoverUrl, detectSeries }
 import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
 import SeriesModal from "./SeriesModal";
+import RandomPick, { randomButtonLabel } from "./RandomPick";
 import { SeriesCatalog } from "../seriesActions";
 import { groupUnits, unitSortKey, topCountsByUnit, matchesSearch, seriesName } from "../series";
 import { showToast } from "../toast";
@@ -179,6 +180,7 @@ function GameStatsModal({ items, onClose }: { items: Entity[]; onClose: () => vo
 }
 
 export default function ShelfTab({ title, placeholder, type, items, onChanged, extraAttrs, space, profile, layout }: Props) {
+  const [randomOpen, setRandomOpen] = useState(false);
   const [creatingSeries, setCreatingSeries] = useState(false);
   const [val, setVal] = useState("");
   const [page, setPage] = useState(1);
@@ -259,16 +261,18 @@ export default function ShelfTab({ title, placeholder, type, items, onChanged, e
 
       {isGame ? (
         <>
-          <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
             <button onClick={() => setShowAdd(true)} style={{ background: "var(--project)", border: "none", borderRadius: 9, padding: "9px 16px", color: "#14171F", fontWeight: 600, cursor: "pointer" }}>
               + Добавить
             </button>
             <button onClick={() => setShowStats(true)} style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: "pointer" }}>
               📊 Статистика
             </button>
+            <button className="random-btn" onClick={() => setRandomOpen(true)}>{randomButtonLabel(type)}</button>
           </div>
           {showAdd && <GameAddModal profile={profile} space={space} onClose={() => setShowAdd(false)} onAdded={onChanged} />}
           {showStats && <GameStatsModal items={items} onClose={() => setShowStats(false)} />}
+          {randomOpen && <RandomPick type={type} pool={filtered} all={items} onClose={() => setRandomOpen(false)} onChanged={onChanged} />}
           <div className="series-tools">
             <span>{items.length} игр</span>
             <button type="button" className="series-create-btn" onClick={() => setCreatingSeries(true)}>＋ Создать серию</button>

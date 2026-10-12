@@ -21,6 +21,7 @@ import Manage from "./components/Manage";
 import DatesTab from "./components/DatesTab";
 import Diary from "./components/Diary";
 import ToastHost from "./components/ToastHost";
+import MilestoneWatcher from "./components/Milestone";
 import WeeklyReport from "./components/WeeklyReport";
 import TimeTab from "./components/TimeTab";
 import ProfileGate, { Folder, saveFolder, clearSavedFolder } from "./components/ProfileGate";
@@ -258,6 +259,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
 
   return (
     <div className="app-shell">
+      <MilestoneWatcher entities={entities} scopeKey={`${profile}:${space}`} />
       {!liteMode && <SpiderDrop entities={entities} />}
       {decorCovers.length > 0 && (
         <div className="side-decor-wrap left">

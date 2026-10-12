@@ -3,6 +3,7 @@ import { Entity, createEntity, uploadEntityCover, entityCoverUrl, enrichTmdb, de
 import EntityCard, { FilterKind } from "./EntityCard";
 import SeriesFolder from "./SeriesFolder";
 import SeriesModal from "./SeriesModal";
+import RandomPick, { randomButtonLabel } from "./RandomPick";
 import { SeriesCatalog } from "../seriesActions";
 import { groupUnits, unitSortKey, topCountsByUnit, matchesSearch, seriesName } from "../series";
 import { genresFor, authorLabelFor, GEO_OPTIONS } from "../types";
@@ -303,6 +304,7 @@ function StatsModal({ type, items, onClose }: { type: string; items: Entity[]; o
 
 export default function MediaTab({ title, placeholder, type, items, onChanged, profile }: Props) {
   const [creatingSeries, setCreatingSeries] = useState(false);
+  const [randomOpen, setRandomOpen] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -445,13 +447,14 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
     <div className="view">
       <h1>{title}</h1>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
         <button onClick={() => setShowAdd(true)} style={{ background: "var(--project)", border: "none", borderRadius: 9, padding: "9px 16px", color: "#14171F", fontWeight: 600, cursor: "pointer" }}>
           + Добавить
         </button>
         <button onClick={() => setShowStats(true)} style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: "pointer" }}>
           📊 Статистика
         </button>
+        <button className="random-btn" onClick={() => setRandomOpen(true)}>{randomButtonLabel(type)}</button>
         {["movie", "show", "book"].includes(type) && (
           <button onClick={handleEnrich} disabled={enriching}
             style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 9, padding: "9px 16px", color: "var(--text)", fontWeight: 600, cursor: enriching ? "default" : "pointer", opacity: enriching ? 0.6 : 1 }}>
@@ -468,6 +471,7 @@ export default function MediaTab({ title, placeholder, type, items, onChanged, p
 
       {showAdd && <AddModal type={type} profile={profile} onClose={() => setShowAdd(false)} onAdded={onChanged} />}
       {showStats && <StatsModal type={type} items={items} onClose={() => setShowStats(false)} />}
+      {randomOpen && <RandomPick type={type} pool={filtered} all={items} onClose={() => setRandomOpen(false)} onChanged={onChanged} />}
 
       <div className="media-filters">
         <input value={searchTerm} placeholder="Поиск по названию или серии…" onChange={e => setSearchTerm(e.target.value)}

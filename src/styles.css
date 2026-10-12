@@ -669,3 +669,44 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 /* Окна (добавление карточки и др.): если не влезают по высоте — прокрутка внутри окна */
 .modal-bg{padding:12px 0;box-sizing:border-box;}
 .modal{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box;}
+
+/* --- Случайный выбор --- */
+.random-btn{background:linear-gradient(135deg,#9B5DE5,#F15BB5);border:none;border-radius:9px;padding:9px 16px;color:#fff;font-weight:600;cursor:pointer;}
+.random-btn:hover{filter:brightness(1.08);}
+.random-modal{text-align:center;max-width:360px;}
+.random-title{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:12px;}
+.random-card{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.random-cover{width:150px;height:220px;border-radius:12px;overflow:hidden;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:3rem;box-shadow:0 10px 30px rgba(0,0,0,0.35);}
+.random-cover img{width:100%;height:100%;object-fit:cover;}
+.random-card.rolling .random-cover{filter:blur(1.5px);transform:scale(0.96);}
+.random-card.landed .random-cover{animation:random-pop .45s cubic-bezier(.2,1.6,.4,1);}
+.random-name{font-size:1.15rem;font-weight:700;line-height:1.25;min-height:1.5em;}
+.random-card.rolling .random-name{opacity:0.6;}
+.random-meta{font-size:0.8rem;color:var(--muted);animation:random-fade .4s ease;}
+.random-series{color:#FF9F1C;margin-top:4px;}
+.random-genres{margin-top:4px;}
+.random-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px;}
+.random-actions button{margin-right:0;}
+.random-actions .random-again{background:var(--bg);color:var(--text);border:1px solid var(--line);}
+.random-actions button:disabled{opacity:0.5;cursor:default;}
+.random-hint{font-size:0.7rem;color:var(--muted);margin-top:10px;}
+.random-empty{font-size:1rem;padding:20px 0;}
+@keyframes random-pop{0%{transform:scale(0.8) rotate(-4deg);}100%{transform:scale(1) rotate(0);}}
+@keyframes random-fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+/* --- Поздравление с круглым числом --- */
+.milestone-bg{position:fixed;inset:0;z-index:1000;background:radial-gradient(circle at center,rgba(40,20,70,0.75),rgba(0,0,0,0.85));display:flex;align-items:center;justify-content:center;animation:random-fade .3s ease;padding:16px;box-sizing:border-box;}
+.milestone-confetti{position:fixed;inset:0;pointer-events:none;}
+.milestone-card{position:relative;text-align:center;padding:28px 26px 22px;border-radius:22px;max-width:340px;width:100%;color:#fff;
+  background:linear-gradient(135deg,#FF5E5B 0%,#F15BB5 35%,#9B5DE5 70%,#00A6ED 100%);background-size:200% 200%;
+  box-shadow:0 20px 60px rgba(241,91,181,0.45),0 0 0 4px rgba(255,255,255,0.15);animation:ms-pop .6s cubic-bezier(.2,1.6,.4,1),ms-shift 4s ease infinite;}
+.milestone-card.big{background:linear-gradient(135deg,#FFB400 0%,#FEE440 40%,#FF9F1C 75%,#FF5E5B 100%);background-size:200% 200%;color:#2a1a00;box-shadow:0 20px 70px rgba(255,180,0,0.6),0 0 0 4px rgba(255,255,255,0.3);}
+.milestone-emoji{font-size:3.4rem;animation:ms-bounce 1.2s ease-in-out infinite;}
+.milestone-number{font-size:4.2rem;font-weight:900;line-height:1;margin:4px 0;text-shadow:0 4px 18px rgba(0,0,0,0.25);}
+.milestone-title{font-size:1.4rem;font-weight:800;margin-top:6px;}
+.milestone-text{font-size:1.05rem;margin-top:6px;font-weight:500;}
+.milestone-sub{font-size:0.85rem;margin-top:6px;opacity:0.85;}
+.milestone-card button{margin-top:18px;background:#fff;color:#14171F;border:none;border-radius:999px;padding:10px 26px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.2);}
+@keyframes ms-pop{0%{transform:scale(0.3) rotate(-10deg);opacity:0;}100%{transform:scale(1) rotate(0);opacity:1;}}
+@keyframes ms-shift{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+@keyframes ms-bounce{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-8px) scale(1.08);}}
