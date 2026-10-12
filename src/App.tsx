@@ -339,7 +339,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
       {tab === "longterm" && <LongTerm items={longTermItems} space={space} profile={profile} onChanged={refresh} />}
       {tab === "orders" && <ShelfTab title="Заказы" placeholder="Номер/название заказа…" type="order" items={orders} onChanged={refresh} space={space} profile={profile} />}
 
-      {tab === "now" && <NowTab items={[...movies, ...shows, ...books, ...games]} onChanged={refresh} profile={profile} />}
+      {tab === "now" && <NowTab items={[...movies, ...shows, ...books, ...games]} challenges={entities.filter(e => e.type === "challenge")} onChanged={refresh} profile={profile} />}
       {tab === "movies" && <MediaTab title="Кино" placeholder="Название фильма…" type="movie" items={movies} onChanged={refresh} profile={profile} />}
       {tab === "shows" && <MediaTab title="Сериалы" placeholder="Название сериала…" type="show" items={shows} onChanged={refresh} profile={profile} />}
       {tab === "books" && <MediaTab title="Книги" placeholder="Название книги…" type="book" items={books} onChanged={refresh} profile={profile} />}

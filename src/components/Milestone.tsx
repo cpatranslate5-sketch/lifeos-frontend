@@ -19,7 +19,7 @@ const KINDS: Record<string, { emoji: string; text: (n: number) => string }> = {
 
 const COLORS = ["#FF5E5B", "#FFB400", "#3EC300", "#00A6ED", "#9B5DE5", "#F15BB5", "#FEE440", "#00F5D4"];
 
-function Confetti() {
+export function Confetti() {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const c = ref.current!; const ctx = c.getContext("2d")!;

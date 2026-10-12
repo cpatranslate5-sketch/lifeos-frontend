@@ -203,6 +203,8 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
         await updateEntityField(e.id, "done_dates", nextValue ? [...rest, selectedDate] : rest);
       } else {
         await updateEntityField(e.id, "done", nextValue);
+        // дата прохождения — для челленджей
+        if (["movie", "show", "book", "game"].includes(e.type)) await updateEntityField(e.id, "done_at", nextValue ? todayStr() : null);
       }
     } catch {
       setOptDone(null);

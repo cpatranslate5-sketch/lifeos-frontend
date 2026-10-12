@@ -1,6 +1,7 @@
 import { Entity } from "../api";
 import EntityCard from "./EntityCard";
 import { SeriesCatalog } from "../seriesActions";
+import Challenges from "./Challenges";
 
 // Вкладка «Сейчас»: всё, что отмечено как «смотрю / читаю / играю сейчас»,
 // сразу по всем медиа-разделам. Отдельно — сериалы, где ждёшь новый сезон.
@@ -14,13 +15,14 @@ const SECTIONS: [string, string, string][] = [
 const isNow = (e: Entity) => e.attributes?.status === "in_progress" && !e.attributes?.done;
 const isWaiting = (e: Entity) => e.attributes?.status === "waiting_season" && !e.attributes?.done;
 
-export default function NowTab({ items, onChanged, profile }: { items: Entity[]; onChanged: () => void; profile?: string }) {
+export default function NowTab({ items, onChanged, profile, challenges = [] }: { items: Entity[]; onChanged: () => void; profile?: string; challenges?: Entity[] }) {
   const now = items.filter(isNow);
   const waiting = items.filter(e => e.type === "show" && isWaiting(e));
 
   return (
     <div className="view">
       <h1>▶ Сейчас</h1>
+      <Challenges challenges={challenges} media={items} profile={profile || "nemalenkiy"} onChanged={onChanged} />
       <div className="muted now-summary">
         {now.length === 0
           ? "Пока ничего не отмечено. В карточке фильма, сериала, книги или игры нажми «Хочу — отметить как «сейчас»», и она появится здесь."
