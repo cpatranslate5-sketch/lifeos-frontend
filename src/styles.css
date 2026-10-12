@@ -710,3 +710,7 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 @keyframes ms-pop{0%{transform:scale(0.3) rotate(-10deg);opacity:0;}100%{transform:scale(1) rotate(0);opacity:1;}}
 @keyframes ms-shift{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
 @keyframes ms-bounce{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-8px) scale(1.08);}}
+
+/* Доля категории во всей медиатеке */
+.time-of-all{margin-top:8px;font-size:0.8rem;color:var(--muted);}
+.time-of-all b{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--accent);color:#14171F;font-weight:700;}
