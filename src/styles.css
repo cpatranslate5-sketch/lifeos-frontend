@@ -763,3 +763,21 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .tlog-plan{position:absolute;left:-4px;right:-4px;height:0;border-top:2px dashed var(--muted);}
 .tlog-cap{font-size:0.65rem;font-variant-numeric:tabular-nums;white-space:nowrap;}
 .tlog-weeksum{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:0.8rem;}
+
+/* Недельные итоги */
+.tlog-weekhead{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.tlog-weekhead b{font-size:0.88rem;text-align:center;}
+.tlog-weekhead button{background:var(--bg);border:1px solid var(--line);border-radius:8px;width:30px;height:30px;color:var(--text);cursor:pointer;font-size:1rem;flex:none;}
+.tlog-weekhead button:disabled{opacity:0.35;cursor:default;}
+.tlog-col.future{opacity:0.45;cursor:default;}
+.tlog-table-wrap{overflow-x:auto;margin-top:12px;}
+.tlog-table{width:100%;border-collapse:collapse;font-size:0.82rem;font-variant-numeric:tabular-nums;}
+.tlog-table th{font-weight:600;color:var(--muted);text-align:right;padding:4px 6px;font-size:0.75rem;}
+.tlog-table td{text-align:right;padding:6px;border-top:1px solid var(--line);white-space:nowrap;}
+.tlog-table td:first-child,.tlog-table th:first-child{text-align:left;}
+.tlog-table tr.total td{font-weight:800;border-top:2px solid var(--line);}
+.tlog-table td.plus{color:#2c8c00;}
+.tlog-table td.minus{color:#D9534F;}
+.tlog-pct{padding:1px 7px;border-radius:999px;background:var(--line);font-weight:700;font-size:0.75rem;}
+.tlog-pct.ok{background:#3EC30033;color:#2c8c00;}
+@media (max-width:480px){.tlog-table th,.tlog-table td{padding:5px 3px;font-size:0.72rem;}.tlog-pct{padding:1px 4px;font-size:0.68rem;}}
