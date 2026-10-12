@@ -823,3 +823,9 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .ch-step b{min-width:26px;text-align:center;font-size:1.1rem;font-variant-numeric:tabular-nums;}
 .modal .ch-step button{margin:0;padding:2px 10px;background:var(--card);color:var(--text);border:1px solid var(--line);}
 @media (max-width:480px){.ch-row{grid-template-columns:90px 1fr auto;}}
+/* Дневник по неделе */
+.tlog-row-week{grid-template-columns:110px 1fr auto auto;row-gap:3px;}
+.tlog-sub{grid-column:2 / -1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:0.72rem;}
+.tlog-dayedit{display:inline-flex;align-items:center;gap:4px;}
+.tlog-dayedit input{width:52px;background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:2px 5px;font-size:0.75rem;text-align:right;}
+@media (max-width:560px){.tlog-row-week{grid-template-columns:1fr auto;}.tlog-row-week .tlog-sub{grid-column:1 / -1;order:5;}}
