@@ -5,6 +5,7 @@ import { showToast } from "../toast";
 import DurationField from "./DurationField";
 import SeasonsField from "./SeasonsField";
 import ReadingTest from "./ReadingTest";
+import TimeLog from "./TimeLog";
 import {
   MEDIA_TYPES, MEDIA_META, MediaType, MediaBudget, BUDGET_TYPE, readBudget, computeTotals,
   fmtHours, fmtMinutes, fmtDays, rememberPagesPerHour, TypeTotals, plural, isPending, itemMinutes, isEstimate,
@@ -231,6 +232,8 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
           </div>
         )}
       </div>
+
+      <TimeLog entity={entity} budget={budget} profile={profile} onChanged={onChanged} />
 
       {(missing > 0 || aiCount > 0) && (
         <div className="time-note">
