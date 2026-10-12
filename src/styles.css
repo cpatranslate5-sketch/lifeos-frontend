@@ -714,3 +714,15 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 /* Доля категории во всей медиатеке */
 .time-of-all{margin-top:8px;font-size:0.8rem;color:var(--muted);}
 .time-of-all b{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--accent);color:#14171F;font-weight:700;}
+
+/* Рекомендованное распределение времени по разделам */
+.time-split{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+.time-split-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:0.85rem;margin-bottom:10px;}
+.time-split-apply{background:var(--project);border:none;border-radius:9px;padding:7px 14px;color:#14171F;font-weight:700;cursor:pointer;}
+.time-split-ok{color:var(--muted);font-size:0.8rem;}
+.time-split-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
+.time-split-item{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;}
+.time-split-name{font-size:0.8rem;font-weight:600;}
+.time-split-val{font-size:1.25rem;font-weight:800;margin:2px 0 6px;font-variant-numeric:tabular-nums;}
+.time-split-bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:5px;}
+.time-split-bar div{height:100%;background:var(--accent);}
