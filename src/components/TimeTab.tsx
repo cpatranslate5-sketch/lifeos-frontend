@@ -236,6 +236,11 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
                   <span><b>{t.pending}</b> осталось{t.inProgress ? ` · ${t.inProgress} в процессе` : ""}</span>
                 </div>
                 {t.count > 0 && <div className="time-progress small"><div style={{ width: `${pct(t.doneCount, t.count)}%`, background: "var(--accent)" }} /></div>}
+                {contentMin > 0 && t.contentMin > 0 && (
+                  <div className="time-of-all">
+                    Всего {fmtHours(t.contentMin)} — <b>{pct(t.contentMin, contentMin)}%</b> всей медиатеки
+                  </div>
+                )}
               </div>
 
               {t.pending === 0 ? (
