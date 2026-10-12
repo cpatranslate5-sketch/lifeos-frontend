@@ -666,3 +666,6 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .now-section{margin-bottom:18px;}
 .now-title{font-size:1rem;font-weight:700;margin:0 0 8px;}
 .now-title .muted{font-weight:500;font-size:0.85rem;}
+/* Окна (добавление карточки и др.): если не влезают по высоте — прокрутка внутри окна */
+.modal-bg{padding:12px 0;box-sizing:border-box;}
+.modal{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box;}
