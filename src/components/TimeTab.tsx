@@ -101,10 +101,10 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
   // Общее время в день меняем стрелками. Распределяем его по разделам
   // пропорционально оставшемуся объёму — так все разделы заканчиваются
   // одновременно, и каждый шаг стрелки честно сдвигает итоговую дату.
-  function setTotalPerDay(target: number) {
+  function splitByRemaining(target: number): Partial<MediaBudget> | null {
     target = Math.max(0, Math.min(MAX_TOTAL, Math.round(target)));
     const weighted = totals.filter(x => x.totalMin > 0);
-    if (!weighted.length) return;
+    if (!weighted.length) return null;
     const sum = weighted.reduce((s, x) => s + x.totalMin, 0);
     const patch: Partial<MediaBudget> = {};
     MEDIA_TYPES.forEach(tp => { if (!weighted.find(x => x.type === tp)) patch[tp] = 0; });
@@ -112,8 +112,18 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
     raw.forEach(r => { patch[r.tp] = Math.floor(r.v); });
     let rest = target - raw.reduce((s, r) => s + Math.floor(r.v), 0);
     [...raw].sort((a, b) => (b.v % 1) - (a.v % 1)).forEach(r => { if (rest > 0) { patch[r.tp] = (patch[r.tp] as number) + 1; rest--; } });
-    changeMany(patch);
+    return patch;
   }
+  function setTotalPerDay(target: number) {
+    const patch = splitByRemaining(target);
+    if (patch) changeMany(patch);
+  }
+
+  // Рекомендованное распределение текущего общего времени в день
+  // по доле каждого раздела в оставшемся объёме.
+  const recommended = splitByRemaining(perDayTotal) || {};
+  const recTypes = MEDIA_TYPES.filter(tp => totals.find(x => x.type === tp)!.totalMin > 0);
+  const recDiffers = recTypes.some(tp => Math.abs((recommended[tp] as number ?? 0) - budget[tp]) >= 1);
 
   // Сбалансированы ли разделы (заканчиваются примерно одновременно)
   const balanced = finiteDays.length > 1 && Math.max(...finiteDays) - Math.min(...finiteDays) <= Math.max(2, overallDays * 0.03);
@@ -190,6 +200,33 @@ export default function TimeTab({ items, onChanged, profile, space }: { items: E
               Стрелки распределяют время по разделам пропорционально тому, сколько в каждом осталось, — тогда всё заканчивается одновременно.
               {slowest && finiteDays.length > 1 && !balanced && <> Сейчас дату определяют <b>{MEDIA_META[slowest.t.type].label.toLowerCase()}</b> — это самый долгий раздел; ползунки других разделов дату не сдвинут, пока они заканчиваются раньше.</>}
               {unbudgeted.length > 0 && <> Не учтены (0 минут в день): {unbudgeted.map(s => MEDIA_META[s.t.type].label.toLowerCase()).join(", ")}.</>}
+            </div>
+          </div>
+        )}
+
+        {totalMin > 0 && perDayTotal > 0 && recTypes.length > 0 && (
+          <div className="time-split">
+            <div className="time-split-head">
+              <span>Как разделить {fmtMinutes(perDayTotal)} в день, чтобы всё закончилось одновременно:</span>
+              {recDiffers
+                ? <button type="button" className="time-split-apply" onClick={() => setTotalPerDay(perDayTotal)}>⚖️ Распределить так</button>
+                : <span className="time-split-ok">✓ Сейчас так и стоит</span>}
+            </div>
+            <div className="time-split-items">
+              {recTypes.map(tp => {
+                const t = totals.find(x => x.type === tp)!;
+                const rec = (recommended[tp] as number) ?? 0;
+                const cur = budget[tp];
+                const meta = MEDIA_META[tp];
+                return (
+                  <div key={tp} className="time-split-item" style={{ ["--accent" as any]: meta.color }}>
+                    <div className="time-split-name">{meta.emoji} {meta.label}</div>
+                    <div className="time-split-val">{fmtMinutes(rec)}</div>
+                    <div className="time-split-bar"><div style={{ width: `${pct(t.totalMin, totalMin)}%` }} /></div>
+                    <div className="muted time-small">{pct(t.totalMin, totalMin)}% оставшегося{Math.abs(rec - cur) >= 1 ? ` · сейчас ${cur === 0 ? "0 мин" : fmtMinutes(cur)}` : ""}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
