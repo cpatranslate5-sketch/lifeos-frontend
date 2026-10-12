@@ -15,6 +15,25 @@ import { MEDIA_TYPES, MEDIA_META, MediaType, MediaBudget, BUDGET_TYPE, fmtMinute
 type DayLog = Partial<Record<MediaType, number>>;
 type Log = Record<string, DayLog>;
 type Timer = { type: MediaType; start: number } | null;
+type Plan = Record<MediaType, number>;
+// История плана: каждая запись — какой план действовал начиная с момента `at`.
+// План дня = последняя запись, сделанная ДО 00:00 этого дня.
+type PlanHist = { at: string; b: Plan }[];
+
+const planOf = (b: MediaBudget): Plan => ({ movie: b.movie, show: b.show, book: b.book, game: b.game });
+const samePlan = (a: Plan, b: Plan) => MEDIA_TYPES.every(t => a[t] === b[t]);
+
+function planForDay(hist: PlanHist, d: string, current: Plan): Plan {
+  const midnight = new Date(d + "T00:00:00").getTime();
+  let found: Plan | null = null;
+  for (const h of hist) { if (new Date(h.at).getTime() <= midnight) found = h.b; }
+  return found || hist[0]?.b || current;
+}
+
+function mondayOf(d: string): string {
+  const wd = new Date(d + "T12:00").getDay(); // 0 = вс
+  return addDaysStr(d, wd === 0 ? -6 : 1 - wd);
+}
 
 const WD = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
 const MONTHS = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
@@ -29,12 +48,17 @@ function dayLabel(d: string): string {
 }
 const sumDay = (d: DayLog | undefined) => MEDIA_TYPES.reduce((s, t) => s + (d?.[t] || 0), 0);
 
+function shortDate(d: string) { const [, m, day] = d.split("-").map(Number); return `${day} ${MONTHS[m - 1]}`; }
+
 export default function TimeLog({ entity, budget, profile, onChanged }: {
   entity: Entity | null; budget: MediaBudget; profile: string; onChanged: () => void;
 }) {
   const [log, setLog] = useState<Log>(() => (entity?.attributes?.log as Log) || {});
   const [timer, setTimer] = useState<Timer>(() => (entity?.attributes?.log_timer as Timer) || null);
   const [day, setDay] = useState(todayStr());
+  const [weekStart, setWeekStart] = useState(mondayOf(todayStr()));
+  const [hist, setHist] = useState<PlanHist>(() => (entity?.attributes?.plan_hist as PlanHist) || []);
+  const histTimer = useRef<number | undefined>(undefined);
   const [, tick] = useState(0);
   const saveTimer = useRef<number | undefined>(undefined);
   const dirty = useRef(false);
@@ -48,6 +72,27 @@ export default function TimeLog({ entity, budget, profile, onChanged }: {
     setTimer((entity?.attributes?.log_timer as Timer) || null);
   }, [entity?.attributes?.log, entity?.attributes?.log_timer]);
 
+  useEffect(() => {
+    const h = entity?.attributes?.plan_hist as PlanHist | undefined;
+    if (h && h.length >= hist.length) setHist(h);
+  }, [entity?.attributes?.plan_hist]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Запоминаем план, когда он меняется (с паузой, чтобы ползунок не плодил записи).
+  // Самая первая запись действует «всегда», чтобы у прошлых дней тоже был план.
+  const cur = planOf(budget);
+  useEffect(() => {
+    window.clearTimeout(histTimer.current);
+    histTimer.current = window.setTimeout(() => {
+      const last = hist[hist.length - 1];
+      if (last && samePlan(last.b, cur)) return;
+      const entry = { at: hist.length ? new Date().toISOString() : "2000-01-01T00:00:00.000Z", b: cur };
+      const next = [...hist, entry].slice(-300);
+      setHist(next);
+      if (entityRef.current) save("plan_hist", next);
+    }, 3000);
+    return () => window.clearTimeout(histTimer.current);
+  }, [budget.movie, budget.show, budget.book, budget.game, hist.length, !!entity]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Секундомер тикает раз в 15 секунд
   useEffect(() => {
     if (!timer) return;
@@ -55,7 +100,7 @@ export default function TimeLog({ entity, budget, profile, onChanged }: {
     return () => window.clearInterval(id);
   }, [timer]);
 
-  async function save(field: "log" | "log_timer", value: unknown) {
+  async function save(field: "log" | "log_timer" | "plan_hist", value: unknown) {
     try {
       const ent = entityRef.current;
       if (ent) await updateEntityField(ent.id, field, value);
@@ -96,10 +141,18 @@ export default function TimeLog({ entity, budget, profile, onChanged }: {
 
   const today = todayStr();
   const dayLog = log[day] || {};
-  const planTotal = MEDIA_TYPES.reduce((s, t) => s + budget[t], 0);
+  const dayPlan = planForDay(hist, day, cur);
+  const planTotal = MEDIA_TYPES.reduce((s, t) => s + dayPlan[t], 0);
   const factTotal = sumDay(dayLog);
-  const week = Array.from({ length: 7 }, (_, i) => addDaysStr(today, i - 6));
-  const weekMax = Math.max(planTotal, ...week.map(d => sumDay(log[d])), 1);
+  const week = Array.from({ length: 7 }, (_, i) => addDaysStr(weekStart, i));
+  const dayPlans: Record<string, Plan> = Object.fromEntries(week.map(d => [d, planForDay(hist, d, cur)]));
+  const weekPlan = Object.fromEntries(MEDIA_TYPES.map(t => [t, week.reduce((s, d) => s + dayPlans[d][t], 0)])) as Plan;
+  const weekFact = Object.fromEntries(MEDIA_TYPES.map(t => [t, week.reduce((s, d) => s + (log[d]?.[t] || 0), 0)])) as Plan;
+  const weekPlanTotal = MEDIA_TYPES.reduce((s, t) => s + weekPlan[t], 0);
+  const weekFactTotal = MEDIA_TYPES.reduce((s, t) => s + weekFact[t], 0);
+  const isCurrentWeek = weekStart === mondayOf(today);
+  const planToDate = week.filter(d => d <= today).reduce((s, d) => s + MEDIA_TYPES.reduce((x, t) => x + dayPlans[d][t], 0), 0);
+  const weekMax = Math.max(...week.map(d => Math.max(sumDay(log[d]), MEDIA_TYPES.reduce((x, t) => x + dayPlans[d][t], 0))), 1);
   const timerMin = timer ? Math.floor((Date.now() - timer.start) / 60000) : 0;
 
   return (
@@ -129,7 +182,7 @@ export default function TimeLog({ entity, budget, profile, onChanged }: {
         {MEDIA_TYPES.map(t => {
           const meta = MEDIA_META[t];
           const fact = dayLog[t] || 0;
-          const plan = budget[t];
+          const plan = dayPlan[t];
           const w = plan > 0 ? Math.min(100, (fact / plan) * 100) : fact > 0 ? 100 : 0;
           return (
             <div key={t} className="tlog-row" style={{ ["--accent" as any]: meta.color }}>
@@ -154,15 +207,21 @@ export default function TimeLog({ entity, budget, profile, onChanged }: {
       </div>
 
       <div className="tlog-week">
-        <div className="muted time-small">Последние 7 дней · линия — план на день</div>
+        <div className="tlog-weekhead">
+          <button type="button" onClick={() => setWeekStart(addDaysStr(weekStart, -7))} aria-label="прошлая неделя">‹</button>
+          <b>{weekStart === mondayOf(today) ? "Эта неделя" : "Неделя"} · {shortDate(weekStart)} — {shortDate(addDaysStr(weekStart, 6))}</b>
+          <button type="button" onClick={() => setWeekStart(addDaysStr(weekStart, 7))} disabled={weekStart >= mondayOf(today)} aria-label="следующая неделя">›</button>
+        </div>
         <div className="tlog-chart">
           {week.map(d => {
             const dl = log[d] || {};
             const tot = sumDay(dl);
+            const pl = MEDIA_TYPES.reduce((s, t) => s + dayPlans[d][t], 0);
+            const future = d > today;
             return (
-              <div key={d} className={`tlog-col ${d === day ? "on" : ""}`} onClick={() => setDay(d)} title={`${dayLabel(d)}: ${fmtMinutes(tot)}`}>
+              <div key={d} className={`tlog-col ${d === day ? "on" : ""} ${future ? "future" : ""}`} onClick={() => !future && setDay(d)} title={`${dayLabel(d)}: ${fmtMinutes(tot)} из ${fmtMinutes(pl)}`}>
                 <div className="tlog-stack">
-                  {planTotal > 0 && <div className="tlog-plan" style={{ bottom: `${(planTotal / weekMax) * 100}%` }} />}
+                  {pl > 0 && <div className="tlog-plan" style={{ bottom: `${Math.min(100, (pl / weekMax) * 100)}%` }} />}
                   {MEDIA_TYPES.map(t => dl[t] ? <div key={t} style={{ height: `${(dl[t]! / weekMax) * 100}%`, background: MEDIA_META[t].color }} /> : null)}
                 </div>
                 <div className="tlog-cap">{tot ? fmtMinutes(tot) : "—"}</div>
@@ -171,12 +230,38 @@ export default function TimeLog({ entity, budget, profile, onChanged }: {
             );
           })}
         </div>
-        <div className="tlog-weeksum">
-          {MEDIA_TYPES.map(t => {
-            const fact = week.reduce((s, d) => s + (log[d]?.[t] || 0), 0);
-            return <span key={t}>{MEDIA_META[t].emoji} {fmtMinutes(fact)}<span className="muted"> / {fmtMinutes(budget[t] * 7)}</span></span>;
-          })}
+
+        <div className="tlog-table-wrap">
+          <table className="tlog-table">
+            <thead>
+              <tr><th></th><th>План</th><th>Факт</th><th>%</th><th>Разница</th></tr>
+            </thead>
+            <tbody>
+              {[...MEDIA_TYPES.map(t => ({ key: t, label: `${MEDIA_META[t].emoji} ${MEDIA_META[t].label}`, plan: weekPlan[t], fact: weekFact[t] })),
+                { key: "total", label: "Итого", plan: weekPlanTotal, fact: weekFactTotal }].map(r => {
+                const diff = r.fact - r.plan;
+                const p = r.plan > 0 ? Math.round((r.fact / r.plan) * 100) : null;
+                if (r.key !== "total" && !r.plan && !r.fact) return null;
+                return (
+                  <tr key={r.key} className={r.key === "total" ? "total" : ""}>
+                    <td>{r.label}</td>
+                    <td>{r.plan ? fmtMinutes(r.plan) : "—"}</td>
+                    <td>{r.fact ? fmtMinutes(r.fact) : "—"}</td>
+                    <td><span className={`tlog-pct ${p !== null && p >= 100 ? "ok" : ""}`}>{p === null ? "—" : `${p}%`}</span></td>
+                    <td className={diff >= 0 ? "plus" : "minus"}>{diff === 0 ? "0" : `${diff > 0 ? "+" : "−"}${fmtMinutes(Math.abs(diff))}`}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
+        {isCurrentWeek && planToDate > 0 && (
+          <div className="muted time-small" style={{ marginTop: 6 }}>
+            По плану к концу сегодняшнего дня — {fmtMinutes(planToDate)}, по факту {fmtMinutes(weekFactTotal)}
+            {weekFactTotal >= planToDate ? " — идёшь по графику 👍" : ` — отстаёшь на ${fmtMinutes(planToDate - weekFactTotal)}`}.
+          </div>
+        )}
+        <div className="muted time-small" style={{ marginTop: 4 }}>План каждого дня — тот, что стоял на 00:00 этого дня: если меняешь время в день, новый план начнёт считаться с завтрашнего дня.</div>
       </div>
     </div>
   );
