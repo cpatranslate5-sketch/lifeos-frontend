@@ -829,3 +829,51 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .tlog-dayedit{display:inline-flex;align-items:center;gap:4px;}
 .tlog-dayedit input{width:52px;background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:2px 5px;font-size:0.75rem;text-align:right;}
 @media (max-width:560px){.tlog-row-week{grid-template-columns:1fr auto;}.tlog-row-week .tlog-sub{grid-column:1 / -1;order:5;}}
+
+/* --- Циклы --- */
+.cy-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.cy-toolbar input{flex:1;min-width:160px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 12px;color:var(--text);}
+.cy-card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden;}
+.cy-top{display:flex;gap:14px;padding:12px 14px;cursor:pointer;align-items:center;}
+.cy-covers{width:84px;height:84px;flex:none;border-radius:10px;overflow:hidden;display:grid;gap:2px;background:var(--bg);border:1px solid var(--line);}
+.cy-covers.n0,.cy-covers.n1{grid-template-columns:1fr;}
+.cy-covers.n2{grid-template-columns:1fr 1fr;}
+.cy-covers.n3,.cy-covers.n4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+.cy-covers.n3 img:first-child{grid-row:span 2;}
+.cy-covers img{width:100%;height:100%;object-fit:cover;min-height:0;}
+.cy-covers span{display:flex;align-items:center;justify-content:center;font-size:2rem;}
+.cy-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+.cy-name{font-weight:800;font-size:1.05rem;}
+.cy-tag{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;color:#fff;background:linear-gradient(90deg,#6E5FC9,#2E86BE);border-radius:999px;padding:1px 8px;vertical-align:2px;}
+.cy-rename{font:inherit;font-weight:700;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--text);padding:3px 8px;}
+.cy-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.cy-chips span{font-size:0.75rem;font-weight:700;border-radius:999px;padding:1px 9px;border:1px solid var(--accent);color:var(--text);}
+.cy-prog{display:flex;align-items:center;gap:8px;font-size:0.78rem;font-variant-numeric:tabular-nums;}
+.cy-bar{flex:1;max-width:240px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;}
+.cy-bar div{height:100%;background:linear-gradient(90deg,#6E5FC9,#2E86BE);}
+.cy-open{color:var(--muted);font-size:1.1rem;}
+.cy-body{border-top:1px solid var(--line);padding:10px 14px 12px;}
+.cy-group{margin-bottom:10px;}
+.cy-group-title{font-weight:700;font-size:0.85rem;margin-bottom:4px;}
+.cy-group-title .muted{font-weight:500;}
+.cy-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px dashed var(--line);font-size:0.86rem;}
+.cy-row:first-of-type{border-top:none;}
+.cy-row.done .cy-row-name{color:var(--muted);}
+.cy-row-name{flex:1;min-width:0;}
+.cy-ser{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;color:#fff;background:#E8963D;border-radius:999px;padding:0 7px;vertical-align:1px;}
+.cy-now{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;background:var(--project);color:#14171F;border-radius:999px;padding:0 7px;}
+.cy-rate{font-size:0.75rem;color:#C9861A;white-space:nowrap;}
+.cy-x{cursor:pointer;color:var(--muted);padding:0 4px;}
+.cy-x:hover{color:#E5484D;}
+.cy-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.cy-add{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--text);font-weight:600;cursor:pointer;}
+.cy-modal{max-width:460px;}
+.cy-types{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px;}
+.cy-types span{font-size:0.75rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer;}
+.cy-types span.on{background:var(--project);border-color:var(--project);color:#14171F;font-weight:700;}
+.cy-pool{max-height:44vh;overflow-y:auto;border:1px solid var(--line);border-radius:10px;padding:4px;}
+.cy-opt{display:flex;gap:8px;align-items:flex-start;padding:5px 6px;border-radius:7px;font-size:0.84rem;cursor:pointer;}
+.cy-opt.on{background:var(--bg);}
+.modal .cy-opt input{width:auto;margin:3px 0 0;}
+.cy-chip{display:inline-block;font-size:0.75rem;font-weight:700;border-radius:999px;padding:1px 9px;background:linear-gradient(90deg,#6E5FC933,#2E86BE33);}
+.cy-info .series-now{font-size:0.78rem;font-weight:600;margin:0;}

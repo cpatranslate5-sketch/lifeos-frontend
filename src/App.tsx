@@ -4,6 +4,7 @@ import DateList from "./components/DateList";
 import ShelfTab from "./components/ShelfTab";
 import MediaTab from "./components/MediaTab";
 import NowTab from "./components/NowTab";
+import CyclesTab from "./components/CyclesTab";
 import Reflection from "./components/Reflection";
 import QuickTaskAdd from "./components/QuickTaskAdd";
 import LongTerm from "./components/LongTerm";
@@ -30,7 +31,7 @@ import { todayStr, addDaysStr, weekdayOf } from "./dateUtils";
 
 const LIFE_TABS = [
   ["chat", "Чат"], ["date", "Задачи"], ["warmup", "Разминка"], ["dates", "События"], ["sport", "Спорт"], ["now", "▶ Сейчас"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
-  ["games", "Игры"], ["time", "⏳ Время"], ["leisure", "Досуг"], ["household", "Быт"], ["reflection", "Рефлексия"],
+  ["games", "Игры"], ["cycles", "🌌 Циклы"], ["time", "⏳ Время"], ["leisure", "Досуг"], ["household", "Быт"], ["reflection", "Рефлексия"],
   ["manage", "Управление"],
 ] as const;
 
@@ -41,7 +42,7 @@ const WORK_TABS = [
 const GENERAL_TABS = [
   ["date", "Задачи"], ["warmup", "Разминка"],
   ["dates", "События"], ["sport", "Спорт"], ["now", "▶ Сейчас"], ["movies", "Кино"], ["shows", "Сериалы"], ["books", "Книги"],
-  ["games", "Игры"], ["time", "⏳ Время"], ["leisure", "Досуг"], ["household", "Быт"],
+  ["games", "Игры"], ["cycles", "🌌 Циклы"], ["time", "⏳ Время"], ["leisure", "Досуг"], ["household", "Быт"],
 ] as const;
 
 const FOLDER_LABELS: Record<Folder, string> = { nemalenkiy: "НеМаленький", kotyonok: "Котёнок", pd: "PD" };
@@ -343,6 +344,7 @@ function MainApp({ profile, onSwitchFolder }: { profile: string; onSwitchFolder:
       {tab === "movies" && <MediaTab title="Кино" placeholder="Название фильма…" type="movie" items={movies} onChanged={refresh} profile={profile} />}
       {tab === "shows" && <MediaTab title="Сериалы" placeholder="Название сериала…" type="show" items={shows} onChanged={refresh} profile={profile} />}
       {tab === "books" && <MediaTab title="Книги" placeholder="Название книги…" type="book" items={books} onChanged={refresh} profile={profile} />}
+      {tab === "cycles" && <CyclesTab items={[...movies, ...shows, ...books, ...games]} onChanged={refresh} profile={profile} />}
       {tab === "games" && <ShelfTab title="Игры" placeholder="Название игры…" type="game" items={games} onChanged={refresh} profile={profile} />}
       {tab === "time" && <TimeTab items={entities} onChanged={refresh} profile={profile} space={space} />}
       {tab === "leisure" && <ShelfTab title="Досуг" placeholder="Игра, футбол, поездка…" type="leisure" items={leisureItems} onChanged={refresh} profile={profile} layout="compact" />}
