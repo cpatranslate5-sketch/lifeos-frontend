@@ -21,6 +21,10 @@ const TYPES: { t: string; label: string; emoji: string; color: string }[] = [
 const META = Object.fromEntries(TYPES.map(x => [x.t, x]));
 const DONE_WORD: Record<string, string> = { book: "прочитано", movie: "просмотрено", show: "просмотрено", game: "пройдено" };
 
+const isNow = (e: Entity) => e.attributes?.status === "in_progress" && !e.attributes?.done;
+const isWaiting = (e: Entity) => e.attributes?.status === "waiting_season" && !e.attributes?.done;
+const NOW_VERB: Record<string, string> = { book: "Читаю", movie: "Смотрю", show: "Смотрю", game: "Играю" };
+
 export const cycleOf = (e: Entity): string | null => (e.attributes?.universe ? String(e.attributes.universe).trim() : null) || null;
 const norm = (s: string) => normalizeSearch(s).replace(/[«»"':,.!?—–-]/g, " ").replace(/\s+/g, " ").trim();
 const words = (s: string) => new Set(norm(s).split(" ").filter(w => w.length > 2));
@@ -116,7 +120,8 @@ function CycleCard({ name, members, items, onChanged }: { name: string; members:
   const [renaming, setRenaming] = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
   const done = members.filter(e => e.attributes?.done).length;
-  const now = members.filter(e => e.attributes?.status === "in_progress" && !e.attributes?.done);
+  const now = members.filter(isNow);
+  const waiting = members.filter(isWaiting);
   const covers = members.filter(e => e.attributes?.cover_path).slice(0, 4);
   const byType = TYPES.map(x => ({ ...x, list: members.filter(e => e.type === x.t).sort((a, b) => (+a.attributes?.year || 0) - (+b.attributes?.year || 0) || (+a.attributes?.series_order || 0) - (+b.attributes?.series_order || 0)) })).filter(x => x.list.length);
 
@@ -139,7 +144,7 @@ function CycleCard({ name, members, items, onChanged }: { name: string; members:
   }
 
   return (
-    <div className="cy-card">
+    <div className={`cy-card ${now.length ? "active" : waiting.length ? "waiting" : ""}`}>
       <div className="cy-top" onClick={() => setOpen(!open)}>
         <div className={`cy-covers n${covers.length}`}>
           {covers.length ? covers.map(e => <img key={e.id} src={entityCoverUrl(e.attributes!.cover_path)} alt="" />) : <span>🌌</span>}
@@ -150,6 +155,8 @@ function CycleCard({ name, members, items, onChanged }: { name: string; members:
               onBlur={ev => rename(ev.target.value)} onKeyDown={ev => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setRenaming(false); }} />
           ) : (
             <div className="cy-name">{name} <span className="cy-tag">цикл</span>
+              {now.length > 0 && <span className="cy-live">▶ В процессе</span>}
+              {!now.length && waiting.length > 0 && <span className="cy-wait">🔔 Жду сезон</span>}
               <span className="edit-pencil" onClick={ev => { ev.stopPropagation(); setRenaming(true); }} title="Переименовать">✎</span></div>
           )}
           <div className="cy-chips">
@@ -159,7 +166,7 @@ function CycleCard({ name, members, items, onChanged }: { name: string; members:
             <div className="cy-bar"><div style={{ width: `${members.length ? (done / members.length) * 100 : 0}%` }} /></div>
             <span>{done} / {members.length}</span>
           </div>
-          {now.length > 0 && <div className="series-now">▶ Сейчас: {now.map(e => e.name).join(", ")}</div>}
+          {now.length > 0 && <div className="cy-nowline">{now.map(e => <span key={e.id}>{META[e.type]?.emoji} {NOW_VERB[e.type]}: <b>{e.name}</b></span>)}</div>}
         </div>
         <span className="cy-open">{open ? "▾" : "▸"}</span>
       </div>
@@ -203,7 +210,9 @@ export default function CyclesTab({ items, onChanged }: { items: Entity[]; onCha
   const cycles = useMemo(() => {
     const m = new Map<string, { name: string; members: Entity[] }>();
     for (const e of items) { const c = cycleOf(e); if (!c) continue; const k = c.toLowerCase(); if (!m.has(k)) m.set(k, { name: c, members: [] }); m.get(k)!.members.push(e); }
-    return [...m.values()].sort((a, b) => a.name.localeCompare(b.name, "ru"));
+    // наверху — циклы, где что-то в процессе, затем «жду сезон», затем остальные по алфавиту
+    const rank = (c: { members: Entity[] }) => c.members.some(isNow) ? 0 : c.members.some(isWaiting) ? 1 : 2;
+    return [...m.values()].sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name, "ru"));
   }, [items]);
   const shown = q.trim() ? cycles.filter(c => norm(c.name + " " + c.members.map(e => e.name).join(" ")).includes(norm(q))) : cycles;
 
@@ -216,7 +225,17 @@ export default function CyclesTab({ items, onChanged }: { items: Entity[]; onCha
         <button type="button" className="ch-new" onClick={() => setCreating(true)}>＋ Новый цикл</button>
       </div>
       {!cycles.length && <div className="ch-empty muted">Пока нет ни одного цикла. Нажми «Новый цикл», назови вселенную и отметь всё, что к ней относится.</div>}
-      {shown.map(c => <CycleCard key={c.name} name={c.name} members={c.members} items={items} onChanged={onChanged} />)}
+      {shown.some(c => c.members.some(isNow)) && <div className="cy-section-label">▶ В процессе</div>}
+      {shown.map((c, i) => {
+        const active = c.members.some(isNow);
+        const prevActive = i > 0 && shown[i - 1].members.some(isNow);
+        return (
+          <div key={c.name}>
+            {!active && (i === 0 ? false : prevActive) && <div className="cy-section-label">Остальные циклы</div>}
+            <CycleCard name={c.name} members={c.members} items={items} onChanged={onChanged} />
+          </div>
+        );
+      })}
       {creating && <Picker items={items} onClose={() => setCreating(false)} onDone={onChanged} />}
     </div>
   );
