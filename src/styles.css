@@ -861,7 +861,7 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .cy-row.done .cy-row-name{color:var(--muted);}
 .cy-row-name{flex:1;min-width:0;}
 .cy-ser{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;color:#fff;background:#E8963D;border-radius:999px;padding:0 7px;vertical-align:1px;}
-.cy-now{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;background:var(--project);color:#14171F;border-radius:999px;padding:0 7px;}
+.cy-now{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;background:#FFD400;color:#14171F;border-radius:999px;padding:0 7px;}
 .cy-rate{font-size:0.75rem;color:#C9861A;white-space:nowrap;}
 .cy-x{cursor:pointer;color:var(--muted);padding:0 4px;}
 .cy-x:hover{color:#E5484D;}
@@ -879,10 +879,10 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .cy-info .series-now{font-size:0.78rem;font-weight:600;margin:0;}
 
 /* Циклы: в процессе */
-.cy-card.active{border-color:var(--project);box-shadow:0 0 0 1px var(--project),0 6px 20px rgba(0,0,0,0.08);}
-.cy-card.waiting{border-color:#E8B23A88;}
-.cy-live{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:800;background:var(--project);color:#14171F;border-radius:999px;padding:1px 8px;vertical-align:2px;animation:cy-pulse 2s ease-in-out infinite;}
-.cy-wait{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;border:1px solid #E8B23A;color:#B7860B;border-radius:999px;padding:0 7px;vertical-align:2px;}
+.cy-card.active{border-color:#FFD400;box-shadow:0 0 0 1px #FFD400,0 6px 20px rgba(0,0,0,0.08);}
+.cy-card.waiting{border-color:rgba(232,150,61,0.55);}
+.cy-live{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:800;background:#FFD400;color:#14171F;border-radius:999px;padding:1px 8px;vertical-align:2px;animation:cy-pulse 2s ease-in-out infinite;}
+.cy-wait{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;border:1px solid rgba(232,150,61,0.6);color:#E8963D;border-radius:999px;padding:0 7px;vertical-align:2px;}
 @keyframes cy-pulse{50%{opacity:0.65;}}
 @media (prefers-reduced-motion:reduce){.cy-live{animation:none;}}
 .cy-nowline{display:flex;flex-direction:column;gap:2px;font-size:0.78rem;}
