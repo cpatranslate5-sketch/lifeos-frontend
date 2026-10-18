@@ -545,6 +545,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
 
       {e.type === "game" && <DurationField e={e} onChanged={onChanged} />}
       {e.type === "game" && <SeriesField e={e} onChanged={onChanged} />}
+      {e.type === "game" && e.attributes?.universe && <div className="field"><strong>Цикл:</strong> <span className="cy-chip">🌌 {e.attributes.universe}</span></div>}
 
       {isMedia && (
         <div className="media-criteria">
@@ -570,6 +571,7 @@ export default function EntityCard({ e, onChanged, selectedDate, showNextStep, p
           <DurationField e={e} onChanged={onChanged} />
           {e.type === "show" && <SeasonsField e={e} onChanged={onChanged} />}
           <SeriesField e={e} onChanged={onChanged} />
+          {e.attributes?.universe && <div className="field media-criterion"><strong>Цикл:</strong> <span className="cy-chip">🌌 {e.attributes.universe}</span></div>}
 
           <div className="field media-criterion" onClick={() => !authorEditing && setAuthorEditing(true)}>
             {authorEditing ? (
