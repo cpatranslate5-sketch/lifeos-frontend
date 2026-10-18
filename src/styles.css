@@ -877,3 +877,14 @@ body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
 .modal .cy-opt input{width:auto;margin:3px 0 0;}
 .cy-chip{display:inline-block;font-size:0.75rem;font-weight:700;border-radius:999px;padding:1px 9px;background:linear-gradient(90deg,#6E5FC933,#2E86BE33);}
 .cy-info .series-now{font-size:0.78rem;font-weight:600;margin:0;}
+
+/* Циклы: в процессе */
+.cy-card.active{border-color:var(--project);box-shadow:0 0 0 1px var(--project),0 6px 20px rgba(0,0,0,0.08);}
+.cy-card.waiting{border-color:#E8B23A88;}
+.cy-live{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:800;background:var(--project);color:#14171F;border-radius:999px;padding:1px 8px;vertical-align:2px;animation:cy-pulse 2s ease-in-out infinite;}
+.cy-wait{display:inline-block;margin-left:6px;font-size:0.66rem;font-weight:700;border:1px solid #E8B23A;color:#B7860B;border-radius:999px;padding:0 7px;vertical-align:2px;}
+@keyframes cy-pulse{50%{opacity:0.65;}}
+@media (prefers-reduced-motion:reduce){.cy-live{animation:none;}}
+.cy-nowline{display:flex;flex-direction:column;gap:2px;font-size:0.78rem;}
+.cy-nowline b{font-weight:700;}
+.cy-section-label{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin:14px 2px 8px;}
