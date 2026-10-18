@@ -155,7 +155,7 @@ function CycleCard({ name, members, items, onChanged }: { name: string; members:
               onBlur={ev => rename(ev.target.value)} onKeyDown={ev => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); if (ev.key === "Escape") setRenaming(false); }} />
           ) : (
             <div className="cy-name">{name} <span className="cy-tag">цикл</span>
-              {now.length > 0 && <span className="cy-live">▶ В процессе</span>}
+              {now.length > 0 && <span className="cy-live">▶ Сейчас</span>}
               {!now.length && waiting.length > 0 && <span className="cy-wait">🔔 Жду сезон</span>}
               <span className="edit-pencil" onClick={ev => { ev.stopPropagation(); setRenaming(true); }} title="Переименовать">✎</span></div>
           )}
@@ -210,7 +210,7 @@ export default function CyclesTab({ items, onChanged }: { items: Entity[]; onCha
   const cycles = useMemo(() => {
     const m = new Map<string, { name: string; members: Entity[] }>();
     for (const e of items) { const c = cycleOf(e); if (!c) continue; const k = c.toLowerCase(); if (!m.has(k)) m.set(k, { name: c, members: [] }); m.get(k)!.members.push(e); }
-    // наверху — циклы, где что-то в процессе, затем «жду сезон», затем остальные по алфавиту
+    // наверху — циклы, где что-то «сейчас», затем «жду сезон», затем остальные по алфавиту
     const rank = (c: { members: Entity[] }) => c.members.some(isNow) ? 0 : c.members.some(isWaiting) ? 1 : 2;
     return [...m.values()].sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name, "ru"));
   }, [items]);
@@ -225,17 +225,7 @@ export default function CyclesTab({ items, onChanged }: { items: Entity[]; onCha
         <button type="button" className="ch-new" onClick={() => setCreating(true)}>＋ Новый цикл</button>
       </div>
       {!cycles.length && <div className="ch-empty muted">Пока нет ни одного цикла. Нажми «Новый цикл», назови вселенную и отметь всё, что к ней относится.</div>}
-      {shown.some(c => c.members.some(isNow)) && <div className="cy-section-label">▶ В процессе</div>}
-      {shown.map((c, i) => {
-        const active = c.members.some(isNow);
-        const prevActive = i > 0 && shown[i - 1].members.some(isNow);
-        return (
-          <div key={c.name}>
-            {!active && (i === 0 ? false : prevActive) && <div className="cy-section-label">Остальные циклы</div>}
-            <CycleCard name={c.name} members={c.members} items={items} onChanged={onChanged} />
-          </div>
-        );
-      })}
+      {shown.map(c => <CycleCard key={c.name} name={c.name} members={c.members} items={items} onChanged={onChanged} />)}
       {creating && <Picker items={items} onClose={() => setCreating(false)} onDone={onChanged} />}
     </div>
   );
